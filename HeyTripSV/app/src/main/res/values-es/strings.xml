@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">HeyTripSV</string>
+    <string name="navbar_home">Inicio</string>
+    <string name="navbar_search">Buscar</string>
+    <string name="navbar_saved">Guardados</string>
+    <string name="navbar_profile">Perfil</string>
+    <string name="categories">Categorías</string>
+    <string name="categories_desc">Descubre tours basados en las siguientes categorías</string>
+    <string name="beaches">Playas</string>
+    <string name="mountains">Montañas</string>
+    <string name="towns">Pueblos</string>
+    <string name="routes">Rutas</string>
+    <string name="others">Otros</string>
+    <string name="upcoming">Tour más próximos</string>
+    <string name="recent">Tours publicados recientemente</string>
+
+</resources>
