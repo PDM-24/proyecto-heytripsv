@@ -13,5 +13,7 @@
     <string name="others">Others</string>
     <string name="upcoming">Upcoming tours</string>
     <string name="recent">Recently uploaded tours</string>
-
+    <string name="log_in">Log In</string>
+    <string name="about_us">About Us</string>
+    <string name="profile">Profile</string>
 </resources>

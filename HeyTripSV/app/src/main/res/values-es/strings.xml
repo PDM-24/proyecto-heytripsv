@@ -14,5 +14,8 @@
     <string name="others">Otros</string>
     <string name="upcoming">Tour más próximos</string>
     <string name="recent">Tours publicados recientemente</string>
+    <string name="log_in">Iniciar sesion</string>
+    <string name="about_us">Sobre Nosotros</string>
+    <string name="profile">Perfil</string>
 
 </resources>
