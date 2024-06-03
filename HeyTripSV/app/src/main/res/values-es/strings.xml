@@ -22,4 +22,12 @@
     <string name="includes">Incluye</string>
     <string name="destination">Destino</string>
 
+    <string name="log_in">Iniciar sesion</string>
+    <string name="about_us">Sobre Nosotros</string>
+    <string name="profile">Perfil</string>
+    <string name="support_us">Apoyanos</string>
+    <string name="text_about">Somos un equipo de desarrolladores apasionados por los viajes y comprometidos a conectarte con destinos fascinantes y experiencias memorables. </string>
+    <string name="text_support">Si deseas apoyarnos, puedes hacerlo por medio de la plataforma Buy me a coffee </string>
+    <string name="buy_coffee">Buy me a coffee</string>
+    <string name="btn_about">Acerca de nosotros</string>
 </resources>

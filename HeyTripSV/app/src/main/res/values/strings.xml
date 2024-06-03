@@ -20,5 +20,14 @@
     <string name="itinerary">Itinerary</string>
     <string name="includes">Includes</string>
     <string name="destination">Destination</string>
+    <string name="log_in">Log In</string>
+    <string name="about_us">About Us</string>
+    <string name="profile">Profile</string>
+    <string name="support_us">Support Us</string>
+    <string name="text_about">We are a team of developers passionate about travel and committed to connecting you with fascinating destinations and memorable experiences.</string>
+    <string name="text_support">If you want to support us, you can do so through the Buy me a coffee platform</string>
+    <string name="buy_coffee">Buy me a coffee</string>
+    <string name="btn_about">About Us</string>
+
 
 </resources>
