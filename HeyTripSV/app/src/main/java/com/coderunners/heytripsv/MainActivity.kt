@@ -21,11 +21,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.coderunners.heytripsv.ui.navigation.BottomNavigationBar
 import com.coderunners.heytripsv.ui.navigation.NavBarGraph
+import com.coderunners.heytripsv.ui.screen.PostViewModel
 import com.coderunners.heytripsv.ui.theme.HeyTripSVTheme
 import com.coderunners.heytripsv.ui.theme.MainGreen
 import com.coderunners.heytripsv.ui.theme.TextGray
 
 class MainActivity : ComponentActivity() {
+    private val postViewModel = PostViewModel()
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +62,8 @@ class MainActivity : ComponentActivity() {
                             innerPadding ->
                         NavBarGraph(
                             navController = navController,
-                            innerPadding = innerPadding
+                            innerPadding = innerPadding,
+                            postViewModel = postViewModel
                         )
                     }
                 }

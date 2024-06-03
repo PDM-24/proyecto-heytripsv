@@ -35,7 +35,7 @@ import com.coderunners.heytripsv.ui.theme.TextGray
 import com.coderunners.heytripsv.ui.theme.White
 
 @Composable
-fun MainScreen( innerPadding: PaddingValues){
+fun MainScreen( innerPadding: PaddingValues, postViewModel: PostViewModel, onClick: () -> Unit ){
 
     Column (
         modifier = Modifier
@@ -120,7 +120,8 @@ fun MainScreen( innerPadding: PaddingValues){
                     items(PostList){
                             postItem ->
                         PostCard(post = postItem) {
-                            //Mover a vista post
+                            postViewModel.saveSelectedPost(postItem)
+                            onClick()
                         }
                     }
                 }
