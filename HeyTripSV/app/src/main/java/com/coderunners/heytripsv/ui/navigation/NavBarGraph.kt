@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.coderunners.heytripsv.ui.screen.AboutUsScreen
 import com.coderunners.heytripsv.ui.screen.MainScreen
 import com.coderunners.heytripsv.ui.screen.PostViewModel
 import com.coderunners.heytripsv.ui.screen.PostViewScreen
@@ -27,7 +28,12 @@ fun NavBarGraph(
             PostViewScreen(innerPadding, postViewModel)
         }
             composable(ScreenRoute.Profile.route){
-                ProfileScreen(innerPadding)
+                ProfileScreen(innerPadding, navController)
             }
+        composable(ScreenRoute.AboutUs.route){
+                AboutUsScreen(innerPadding)
+            }
+
+
     }
 }
