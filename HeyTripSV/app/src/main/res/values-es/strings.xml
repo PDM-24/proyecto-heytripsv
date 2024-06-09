@@ -14,6 +14,14 @@
     <string name="others">Otros</string>
     <string name="upcoming">Tour más próximos</string>
     <string name="recent">Tours publicados recientemente</string>
+    <string name="provided_by">Proporcionado por: </string>
+    <string name="contact_wha">Contactar</string>
+    <string name="description">Descripción</string>
+    <string name="meeting">Lugar de encuentro</string>
+    <string name="itinerary">Itinerario</string>
+    <string name="includes">Incluye</string>
+    <string name="destination">Destino</string>
+
     <string name="log_in">Iniciar sesion</string>
     <string name="about_us">Sobre Nosotros</string>
     <string name="profile">Perfil</string>

@@ -13,6 +13,13 @@
     <string name="others">Others</string>
     <string name="upcoming">Upcoming tours</string>
     <string name="recent">Recently uploaded tours</string>
+    <string name="provided_by">Provided by: </string>
+    <string name="contact_wha">Contact</string>
+    <string name="description">Description</string>
+    <string name="meeting">Meeting place</string>
+    <string name="itinerary">Itinerary</string>
+    <string name="includes">Includes</string>
+    <string name="destination">Destination</string>
     <string name="log_in">Log In</string>
     <string name="about_us">About Us</string>
     <string name="profile">Profile</string>
