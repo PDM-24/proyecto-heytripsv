@@ -29,13 +29,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.coderunners.heytripsv.R
+import com.coderunners.heytripsv.ui.navigation.ScreenRoute
 import com.coderunners.heytripsv.ui.theme.DSpacer
 import com.coderunners.heytripsv.ui.theme.MainGreen
 import com.coderunners.heytripsv.ui.theme.TextGray
 import com.coderunners.heytripsv.ui.theme.White
 
 @Composable
-fun ProfileScreen(innerPadding: PaddingValues) {
+fun ProfileScreen(innerPadding: PaddingValues, navController: NavController) {
     Column (
         modifier = Modifier
             .padding(innerPadding)
@@ -62,7 +63,7 @@ fun ProfileScreen(innerPadding: PaddingValues) {
         Spacer(modifier = Modifier.height(10.dp))
         Divider(color = DSpacer, thickness = 1.dp)
         Spacer(modifier = Modifier.height(10.dp))
-        Button(onClick = { navController.navigate(ScreenRoute.AboutUsScreen.route) },
+        Button(onClick = { navController.navigate(ScreenRoute.AboutUs.route)  },
             modifier = Modifier.fillMaxWidth(0.8f)
                 .padding(horizontal = 16.dp),
             colors = ButtonDefaults.buttonColors(
