@@ -28,6 +28,17 @@
     <string name="text_support">If you want to support us, you can do so through the Buy me a coffee platform</string>
     <string name="buy_coffee">Buy me a coffee</string>
     <string name="btn_about">About Us</string>
+    <string name="email">Email address</string>
+    <string name="password">Password</string>
+    <string name="fg_password">Forgot Password</string>
+    <string name="register">Sign In</string>
+    <string name="dont_re">Don´t you have an account?</string>
+    <string name="sign_up">Sign Up</string>
+
+
+
+
+
 
 
 </resources>

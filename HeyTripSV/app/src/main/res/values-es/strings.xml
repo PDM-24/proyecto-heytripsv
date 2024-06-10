@@ -30,4 +30,13 @@
     <string name="text_support">Si deseas apoyarnos, puedes hacerlo por medio de la plataforma Buy me a coffee </string>
     <string name="buy_coffee">Buy me a coffee</string>
     <string name="btn_about">Acerca de nosotros</string>
+    <string name="email">Correo electrónico</string>
+    <string name="password">Contraseña</string>
+    <string name="fg_password">Olvidé mi contraseña</string>
+    <string name="register">Ingresar</string>
+    <string name="dont_re">¿No tienes cuenta?</string>
+    <string name="sign_up">Registrate</string>
+
+
+
 </resources>
