@@ -34,6 +34,11 @@
     <string name="register">Sign In</string>
     <string name="dont_re">Don´t you have an account?</string>
     <string name="sign_up">Sign Up</string>
+    <string name="create_ac">Create Account</string>
+    <string name="name">Name</string>
+    <string name="confirm_pass">Confirm Password</string>
+    <string name="agency">Register as an agency</string>
+
 
 
 
