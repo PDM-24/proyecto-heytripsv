@@ -11,6 +11,6 @@ sealed class ScreenRoute (var route: String) {
     object PostView : ScreenRoute("postView")
     object LogIn : ScreenRoute("logIn")
     object ForgotPassword : ScreenRoute("forgotPassword")
-    object SignUp: ScreenRoute("signUp")
+    object CreateAccount : ScreenRoute("createAccount")
 
 }

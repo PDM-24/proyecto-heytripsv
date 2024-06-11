@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.coderunners.heytripsv.ui.screen.AboutUsScreen
+import com.coderunners.heytripsv.ui.screen.CreateAccount
 import com.coderunners.heytripsv.ui.screen.LogIn
 import com.coderunners.heytripsv.ui.screen.MainScreen
 import com.coderunners.heytripsv.ui.screen.PostViewModel
@@ -40,8 +41,8 @@ fun NavBarGraph(
         composable(ScreenRoute.ForgotPassword.route){
 
         }
-        composable(ScreenRoute.SignUp.route){
-
+        composable(ScreenRoute.CreateAccount.route){
+            CreateAccount(innerPadding, navController)
         }
 
 
