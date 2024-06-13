@@ -12,7 +12,7 @@
     <string name="routes">Routes</string>
     <string name="others">Others</string>
     <string name="upcoming">Upcoming tours</string>
-    <string name="recent">Recently uploaded tours</string>
+    <string name="recently">Recently uploaded tours</string>
     <string name="provided_by">Provided by: </string>
     <string name="contact_wha">Contact</string>
     <string name="description">Description</string>
@@ -28,6 +28,9 @@
     <string name="text_support">If you want to support us, you can do so through the Buy me a coffee platform</string>
     <string name="buy_coffee">Buy me a coffee</string>
     <string name="btn_about">About Us</string>
+    <string name="sort_by">Sort by</string>
+    <string name="closest">Closest</string>
+    <string name="recent">Recent</string>
     <string name="email">Email address</string>
     <string name="password">Password</string>
     <string name="fg_password">Forgot Password</string>

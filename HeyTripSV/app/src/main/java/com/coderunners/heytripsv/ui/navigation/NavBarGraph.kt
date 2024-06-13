@@ -5,11 +5,12 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.ui.screen.AboutUsScreen
 import com.coderunners.heytripsv.ui.screen.CreateAccount
 import com.coderunners.heytripsv.ui.screen.LogIn
+import com.coderunners.heytripsv.ui.screen.CategoryScreen
 import com.coderunners.heytripsv.ui.screen.MainScreen
-import com.coderunners.heytripsv.ui.screen.PostViewModel
 import com.coderunners.heytripsv.ui.screen.PostViewScreen
 import com.coderunners.heytripsv.ui.screen.ProfileScreen
 
@@ -17,17 +18,17 @@ import com.coderunners.heytripsv.ui.screen.ProfileScreen
 fun NavBarGraph(
     navController: NavHostController,
     innerPadding: PaddingValues,
-    postViewModel: PostViewModel
+    mainViewModel: MainViewModel
 ){
     NavHost(
         navController = navController,
         startDestination = ScreenRoute.Home.route
     ){
         composable(ScreenRoute.Home.route){
-            MainScreen(innerPadding, postViewModel, onClick = {navController.navigate(ScreenRoute.PostView.route)})
+            MainScreen(innerPadding, mainViewModel, navController)
         }
         composable(ScreenRoute.PostView.route){
-            PostViewScreen(innerPadding, postViewModel)
+            PostViewScreen(innerPadding, mainViewModel)
         }
             composable(ScreenRoute.Profile.route){
                 ProfileScreen(innerPadding, navController)
@@ -43,6 +44,11 @@ fun NavBarGraph(
         }
         composable(ScreenRoute.CreateAccount.route){
             CreateAccount(innerPadding, navController)
+        }
+        composable(ScreenRoute.Category.route){
+            CategoryScreen(innerPadding = innerPadding, mainViewModel = mainViewModel) {
+                navController.navigate(ScreenRoute.PostView.route)
+            }
         }
 
 

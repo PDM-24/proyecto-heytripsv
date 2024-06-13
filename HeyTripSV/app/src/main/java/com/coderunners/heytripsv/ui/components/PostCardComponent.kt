@@ -47,11 +47,3 @@ fun PostCard(post: PostDataModel, onClick: () -> Unit){
         Text(text = (post.date + " - $" + "%.2f".format(post.price)), modifier = Modifier.padding(10.dp, 0.dp), fontSize = 12.sp, color = NavGray)
     }
 }
-
-@Preview
-@Composable
-fun PrevCard(){
-    PostCard(post = PostDataModel(id = 1, title = "Volcan de Santa Ana", image = R.drawable.default_image, date = "12/05/2024", price = 12.50f)) {
-
-    }
-}

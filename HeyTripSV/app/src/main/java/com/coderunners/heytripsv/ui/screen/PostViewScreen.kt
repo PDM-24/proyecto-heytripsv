@@ -41,6 +41,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.R
 import com.coderunners.heytripsv.model.PostDataModel
 import com.coderunners.heytripsv.ui.theme.AddGreen
@@ -58,7 +59,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 @Composable
 fun PostViewScreen(
     innerPadding: PaddingValues,
-    viewModel: PostViewModel
+    viewModel: MainViewModel
 ){
     val post = viewModel.selectedPost.collectAsState()
 
