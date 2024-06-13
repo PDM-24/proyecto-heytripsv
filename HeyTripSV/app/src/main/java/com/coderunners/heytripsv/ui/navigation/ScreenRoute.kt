@@ -10,4 +10,6 @@ sealed class ScreenRoute (var route: String){
 
     object PostView : ScreenRoute("postView")
 
+    object Category : ScreenRoute("category")
+
 }
