@@ -41,6 +41,9 @@
     <string name="name">Name</string>
     <string name="confirm_pass">Confirm Password</string>
     <string name="agency">Register as an agency</string>
+    <string name="search">Search</string>
+    <string name="price_range">Price Range</string>
+    <string name="filter">Filter</string>
 
 
 

@@ -13,6 +13,7 @@ import com.coderunners.heytripsv.ui.screen.CategoryScreen
 import com.coderunners.heytripsv.ui.screen.MainScreen
 import com.coderunners.heytripsv.ui.screen.PostViewScreen
 import com.coderunners.heytripsv.ui.screen.ProfileScreen
+import com.coderunners.heytripsv.ui.screen.SearchScreen
 
 @Composable
 fun NavBarGraph(
@@ -49,6 +50,9 @@ fun NavBarGraph(
             CategoryScreen(innerPadding = innerPadding, mainViewModel = mainViewModel) {
                 navController.navigate(ScreenRoute.PostView.route)
             }
+        }
+        composable(ScreenRoute.Search.route){
+            SearchScreen(innerPadding)
         }
 
 

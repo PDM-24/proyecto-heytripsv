@@ -43,6 +43,10 @@
     <string name="name">Nombre</string>
     <string name="confirm_pass">Confirmar contraseña</string>
     <string name="agency">Registrarme como agencia</string>
+    <string name="search">Búsqueda</string>
+    <string name="price_range">Rango de precio</string>
+    <string name="filter">Filtro</string>
+
 
 
 
