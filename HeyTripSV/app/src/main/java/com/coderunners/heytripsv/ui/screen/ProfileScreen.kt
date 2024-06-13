@@ -48,7 +48,7 @@ fun ProfileScreen(innerPadding: PaddingValues, navController: NavController) {
         Spacer(modifier = Modifier.height(10.dp))
         Divider(color = DSpacer, thickness = 1.dp)
         Spacer(modifier = Modifier.height(10.dp))
-            Button(onClick = { /*TODO*/ },
+            Button(onClick = { navController.navigate(ScreenRoute.LogIn.route)},
                 modifier = Modifier.fillMaxWidth(0.8f)
                     .padding(horizontal = 16.dp),
                 colors = ButtonDefaults.buttonColors(

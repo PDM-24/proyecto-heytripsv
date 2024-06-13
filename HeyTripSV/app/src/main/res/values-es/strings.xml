@@ -33,4 +33,17 @@
     <string name="sort_by">Ordenar por</string>
     <string name="closest">Más próximo</string>
     <string name="recent">Más reciente</string>
+    <string name="email">Correo electrónico</string>
+    <string name="password">Contraseña</string>
+    <string name="fg_password">Olvidé mi contraseña</string>
+    <string name="register">Ingresar</string>
+    <string name="dont_re">¿No tienes cuenta?</string>
+    <string name="sign_up">Registrate</string>
+    <string name="create_ac">Crear Cuenta</string>
+    <string name="name">Nombre</string>
+    <string name="confirm_pass">Confirmar contraseña</string>
+    <string name="agency">Registrarme como agencia</string>
+
+
+
 </resources>

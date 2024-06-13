@@ -7,6 +7,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.ui.screen.AboutUsScreen
+import com.coderunners.heytripsv.ui.screen.CreateAccount
+import com.coderunners.heytripsv.ui.screen.LogIn
 import com.coderunners.heytripsv.ui.screen.CategoryScreen
 import com.coderunners.heytripsv.ui.screen.MainScreen
 import com.coderunners.heytripsv.ui.screen.PostViewScreen
@@ -34,6 +36,15 @@ fun NavBarGraph(
         composable(ScreenRoute.AboutUs.route){
                 AboutUsScreen(innerPadding)
             }
+        composable(ScreenRoute.LogIn.route){
+            LogIn(innerPadding, navController)
+        }
+        composable(ScreenRoute.ForgotPassword.route){
+
+        }
+        composable(ScreenRoute.CreateAccount.route){
+            CreateAccount(innerPadding, navController)
+        }
         composable(ScreenRoute.Category.route){
             CategoryScreen(innerPadding = innerPadding, mainViewModel = mainViewModel) {
                 navController.navigate(ScreenRoute.PostView.route)
