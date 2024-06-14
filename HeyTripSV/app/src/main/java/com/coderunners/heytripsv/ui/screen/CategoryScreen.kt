@@ -95,7 +95,9 @@ fun CategoryScreen(
             }
         }
         items(categoryList.value){
-            PostCardHorizontal(post = it, onClick = { onClick() })
+            PostCardHorizontal(post = it, onClick = {
+                mainViewModel.saveSelectedPost(it)
+                onClick() })
         }
 
     }

@@ -10,6 +10,7 @@ val PostList = mutableListOf<PostDataModel>(
         "12/05/2024",
         12.5f,
         "Sivartrips",
+        1,
         "76504265",
         "\uD83D\uDCAA\uD83C\uDFFC Dificultad: Intermedia 06/10 -- 12 Kilómetros\n" +
                 "\u2028⌚ Tiempo estimado de recorrido: 3 horas de ascenso // 2 horas y media de descenso",
@@ -25,6 +26,7 @@ val PostList = mutableListOf<PostDataModel>(
         "25/05/2024",
         15f,
         "Sivartrips",
+        1,
         "76504265",
         "Ven a disfrutar a la playa los cobanos",
         "Gasolinera Dos Los Héroes",
@@ -39,6 +41,7 @@ val PostList = mutableListOf<PostDataModel>(
         "30/05/2024",
         11f,
         "Sivartrips",
+        1,
         "76504265",
         "\uD83D\uDCAA\uD83C\uDFFC Dificultad: Intermedia 06/10 -- 12 Kilómetros\n" +
                 "\u2028⌚ Tiempo estimado de recorrido: 3 horas de ascenso // 2 horas y media de descenso",
