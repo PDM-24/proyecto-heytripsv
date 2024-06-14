@@ -4,8 +4,10 @@ import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
+import com.coderunners.heytripsv.model.AgencyDataModel
 import com.coderunners.heytripsv.model.PostDataModel
 import com.coderunners.heytripsv.model.PostList
+import com.coderunners.heytripsv.model.agencyData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.Locale
@@ -19,6 +21,9 @@ class MainViewModel: ViewModel() {
 
     private val _selectedCategory = MutableStateFlow("")
     val selectedCategory = _selectedCategory.asStateFlow()
+
+    private val _selectedAgency = MutableStateFlow(AgencyDataModel())
+    val selectedAgency = _selectedAgency.asStateFlow()
 
     fun saveSelectedPost(selectPost: PostDataModel) {
         _selectedPost.value = selectPost
@@ -38,6 +43,10 @@ class MainViewModel: ViewModel() {
         }.toMutableList()
     }
 
+    fun saveSelectedAgency(agency: Int){
+        //Obtiene el id de la agencia y obtiene la info de esa agenccia
+        _selectedAgency.value = agencyData
+    }
 
 
 }

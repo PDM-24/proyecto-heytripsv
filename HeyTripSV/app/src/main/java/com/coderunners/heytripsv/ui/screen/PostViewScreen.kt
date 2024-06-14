@@ -2,6 +2,7 @@ package com.coderunners.heytripsv.ui.screen
 
 import android.view.MotionEvent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,8 +11,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -23,9 +26,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
@@ -33,6 +38,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ParagraphStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -41,9 +47,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.R
 import com.coderunners.heytripsv.model.PostDataModel
+import com.coderunners.heytripsv.ui.navigation.ScreenRoute
 import com.coderunners.heytripsv.ui.theme.AddGreen
 import com.coderunners.heytripsv.ui.theme.NavGray
 import com.coderunners.heytripsv.ui.theme.TextGray
@@ -59,7 +67,8 @@ import com.google.maps.android.compose.rememberCameraPositionState
 @Composable
 fun PostViewScreen(
     innerPadding: PaddingValues,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    navController: NavHostController
 ){
     val post = viewModel.selectedPost.collectAsState()
 
@@ -80,6 +89,8 @@ fun PostViewScreen(
             .padding(innerPadding)
             .verticalScroll(rememberScrollState(), columnScrollingEnabled.value),
     ) {
+
+        //CAMBIAR POR ASYNCIMAGE AL OBTENERLA DE LA BASE
         Image(
             modifier = Modifier
                 .fillMaxWidth()
@@ -90,7 +101,16 @@ fun PostViewScreen(
         )
         Text(text = post.value.title, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp), fontSize = 18.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         Text(text = (post.value.date + " - $" + "%.2f".format(post.value.price)), modifier = Modifier.padding(10.dp, 0.dp), color = NavGray)
-        Text(text = (stringResource(R.string.provided_by) + " " + post.value.agency), modifier = Modifier.padding(10.dp, 0.dp, 10.dp, 10.dp), color = NavGray)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(10.dp)
+        ) {
+            Text(text = (stringResource(R.string.provided_by) + " " ), modifier = Modifier.wrapContentHeight(), color = NavGray)
+            ClickableText(text = AnnotatedString(post.value.agency), modifier = Modifier.wrapContentHeight(), style = TextStyle(color = Color(0xFF3366BB))) {
+                viewModel.saveSelectedAgency(post.value.agencyId)
+                navController.navigate(ScreenRoute.Agency.route)
+            }
+        }
         Button(onClick = { /*TODO*/ },
             colors = ButtonDefaults.buttonColors(
                 containerColor = AddGreen
