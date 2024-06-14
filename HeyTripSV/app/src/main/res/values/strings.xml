@@ -41,12 +41,12 @@
     <string name="name">Name</string>
     <string name="confirm_pass">Confirm Password</string>
     <string name="agency">Register as an agency</string>
-
-
-
-
-
-
+    <string name="save_logged">To see your saved posts sign into your account</string>
+    <string name="one_day_before">1 day before the event</string>
+    <string name="two_day_before">2 days before the event</string>
+    <string name="three_day_before">3 days before the event</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
 
 
 </resources>
