@@ -14,6 +14,7 @@ import com.coderunners.heytripsv.ui.screen.CategoryScreen
 import com.coderunners.heytripsv.ui.screen.MainScreen
 import com.coderunners.heytripsv.ui.screen.PostViewScreen
 import com.coderunners.heytripsv.ui.screen.ProfileScreen
+import com.coderunners.heytripsv.ui.screen.SavedScreen
 
 @Composable
 fun NavBarGraph(
@@ -56,6 +57,9 @@ fun NavBarGraph(
             AgencyScreen(mainViewModel = mainViewModel, innerPadding = innerPadding, onClick = {navController.navigate(ScreenRoute.PostView.route)} )
         }
 
+        composable(ScreenRoute.Saved.route){
+            SavedScreen(mainViewModel = mainViewModel, innerPadding = innerPadding, navController = navController)
+        }
 
     }
 }

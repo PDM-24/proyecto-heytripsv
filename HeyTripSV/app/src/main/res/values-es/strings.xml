@@ -43,7 +43,12 @@
     <string name="name">Nombre</string>
     <string name="confirm_pass">Confirmar contraseña</string>
     <string name="agency">Registrarme como agencia</string>
-
+    <string name="save_logged">Para ver las publicaciones guardadas debes iniciar sesión</string>
+    <string name="one_day_before">1 día antes del evento</string>
+    <string name="two_day_before">2 días antes del evento</string>
+    <string name="three_day_before">3 días antes del evento</string>
+    <string name="confirm">Confirmar</string>
+    <string name="cancel">Cancelar</string>
 
 
 </resources>
