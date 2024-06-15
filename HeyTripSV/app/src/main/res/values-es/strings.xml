@@ -21,7 +21,6 @@
     <string name="itinerary">Itinerario</string>
     <string name="includes">Incluye</string>
     <string name="destination">Destino</string>
-
     <string name="log_in">Iniciar sesion</string>
     <string name="about_us">Sobre Nosotros</string>
     <string name="profile">Perfil</string>
@@ -53,6 +52,23 @@
     <string name="change_passw">Cambiar contraseña</string>
     <string name="new_pass">Nueva contraseña</string>
     <string name="pass_missmatch">Las contraseñas ingresadas deben coincidir para realizar el cambio de contraseña</string>
-    <string name="pass_missmatch_title">Contraseñas no coinciden</string>
+    <string name="pass_missmatch_title">Contraseñas no coinciden</string>=======
+    <string name="save_logged">Para ver las publicaciones guardadas debes iniciar sesión</string>
+    <string name="one_day_before">1 día antes del evento</string>
+    <string name="two_day_before">2 días antes del evento</string>
+    <string name="three_day_before">3 días antes del evento</string>
+    <string name="confirm">Confirmar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="report_post1">La publicación no contiene un tour</string>
+    <string name="report_post2">Imagen inapropiada</string>
+    <string name="report_post3">Descripción inapropiada</string>
+    <string name="report_other">Otro...</string>
+    <string name="report_acc1">Cuenta falsa</string>
+    <string name="report_acc2">Publica contenido inadecuado</string>
+    <string name="report_acc3">Descripción inapropiada</string>
+    <string name="report">Reportar</string>
+    <string name="search">Búsqueda</string>
+    <string name="price_range">Rango de precio</string>
+    <string name="filter">Filtro</string>
 
 </resources>

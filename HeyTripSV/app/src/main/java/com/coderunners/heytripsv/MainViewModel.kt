@@ -25,6 +25,10 @@ class MainViewModel: ViewModel() {
     private val _selectedAgency = MutableStateFlow(AgencyDataModel())
     val selectedAgency = _selectedAgency.asStateFlow()
 
+    //TODO: Vaciar el valor por defecto (Se va a obtener de la base)
+    private val _savedPostList = MutableStateFlow(PostList)
+    val savedPostList = _savedPostList.asStateFlow()
+
     fun saveSelectedPost(selectPost: PostDataModel) {
         _selectedPost.value = selectPost
     }
@@ -44,8 +48,13 @@ class MainViewModel: ViewModel() {
     }
 
     fun saveSelectedAgency(agency: Int){
-        //Obtiene el id de la agencia y obtiene la info de esa agenccia
+        //TODO: Obtener el id de la agencia y obtener la info de esa agenccia
         _selectedAgency.value = agencyData
+    }
+
+    fun getSavedPosts(){
+        //TODO: Obtener la lista de posts guardados del usuario loggeado
+
     }
 
 

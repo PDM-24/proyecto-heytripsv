@@ -1,8 +1,10 @@
 package com.coderunners.heytripsv.ui.screen
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,21 +14,29 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -45,10 +55,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.R
 import com.coderunners.heytripsv.ui.components.PostCardHorizontal
+import com.coderunners.heytripsv.ui.components.ReportDialog
+import com.coderunners.heytripsv.ui.theme.MainGreen
 import com.coderunners.heytripsv.ui.theme.NavGray
+import com.coderunners.heytripsv.ui.theme.White
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,8 +71,26 @@ fun AgencyScreen(mainViewModel: MainViewModel, innerPadding: PaddingValues, onCl
     var expanded by remember {
         mutableStateOf(false)
     }
-    var filtros = arrayOf(stringResource(id = R.string.closest), stringResource(id = R.string.recent))
+    val filtros = arrayOf(stringResource(id = R.string.closest), stringResource(id = R.string.recent))
     var selectedText by remember { mutableStateOf(filtros[0]) }
+
+    val radioOptions = listOf(
+        stringResource(R.string.report_acc1), stringResource(R.string.report_acc2), stringResource(R.string.report_acc3), stringResource(R.string.report_acc4), stringResource(R.string.report_other)
+    )
+
+
+    val reportDialog = remember {
+        mutableStateOf(false)
+    }
+
+    when(reportDialog.value){
+        true -> {
+            ReportDialog(radioOptions = radioOptions, onDismissRequest = {reportDialog.value = false}, onConfirm = {
+                //TODO: Enviar el reporte
+            })
+        }
+        false -> { reportDialog.value = false }
+    }
 
     LazyColumn(
         modifier = Modifier
@@ -78,7 +110,15 @@ fun AgencyScreen(mainViewModel: MainViewModel, innerPadding: PaddingValues, onCl
                     Image(painter = painterResource(id = agency.value.image), contentDescription = "Photo",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.clip(CircleShape))
-                    Text(text = agency.value.name, fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.padding(10.dp))
+                    Row (verticalAlignment = Alignment.CenterVertically){
+                        Text(text = agency.value.name, fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.padding(10.dp))
+                        Icon(painter = painterResource(R.drawable.flag), contentDescription = "Flag", modifier = Modifier
+                            .size(32.dp)
+                            .clickable {
+                                reportDialog.value = true
+                            })
+                    }
+
                 }
             }
             Text(text = agency.value.desc)
@@ -116,7 +156,9 @@ fun AgencyScreen(mainViewModel: MainViewModel, innerPadding: PaddingValues, onCl
             HorizontalDivider(thickness = 2.dp)
             Row(modifier = Modifier.padding(10.dp, 10.dp, 10.dp, 20.dp)) {
                 Text(text = stringResource(id = R.string.sort_by) + ":",
-                    modifier = Modifier.wrapContentHeight().padding(10.dp))
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .padding(10.dp))
                 ExposedDropdownMenuBox(
                     expanded = expanded,
                     onExpandedChange = {

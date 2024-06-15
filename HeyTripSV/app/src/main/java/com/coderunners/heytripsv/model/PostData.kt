@@ -19,7 +19,8 @@ data class PostDataModel(
     val itinerary: List<Itinerary> = listOf(),
     val includes: List<String> = listOf(),
     val category: String = "",
-    val position: Position = Position(0.0, 0.0)
+    val position: Position = Position(0.0, 0.0),
+    val user: String = ""
 )
 
 data class Position(

@@ -1,8 +1,10 @@
 package com.coderunners.heytripsv.ui.screen
 
 import android.view.MotionEvent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,16 +12,25 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -47,12 +58,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.R
 import com.coderunners.heytripsv.model.PostDataModel
+import com.coderunners.heytripsv.ui.components.ReportDialog
 import com.coderunners.heytripsv.ui.navigation.ScreenRoute
 import com.coderunners.heytripsv.ui.theme.AddGreen
+import com.coderunners.heytripsv.ui.theme.MainGreen
 import com.coderunners.heytripsv.ui.theme.NavGray
 import com.coderunners.heytripsv.ui.theme.TextGray
 import com.coderunners.heytripsv.ui.theme.White
@@ -70,6 +84,10 @@ fun PostViewScreen(
     viewModel: MainViewModel,
     navController: NavHostController
 ){
+    val radioOptions = listOf(
+        stringResource(R.string.report_post1), stringResource(R.string.report_post2), stringResource(R.string.report_post3), stringResource(R.string.report_post4), stringResource(R.string.report_other)
+    )
+
     val post = viewModel.selectedPost.collectAsState()
 
     val cameraPositionState = rememberCameraPositionState {
@@ -77,6 +95,18 @@ fun PostViewScreen(
     }
     val columnScrollingEnabled = remember { mutableStateOf(true) }
 
+    val reportDialog = remember {
+        mutableStateOf(false)
+    }
+
+    when(reportDialog.value){
+        true -> {
+            ReportDialog(radioOptions = radioOptions, onDismissRequest = { reportDialog.value = false }, onConfirm = {
+                //TODO: Enviar reporte
+            })
+        }
+        false -> { reportDialog.value = false }
+    }
     // Use a LaunchedEffect keyed on the camera moving state to enable column scrolling when the camera stops moving
     LaunchedEffect(cameraPositionState.isMoving) {
         if (!cameraPositionState.isMoving) {
@@ -99,7 +129,14 @@ fun PostViewScreen(
             contentDescription = "Photo",
             contentScale = ContentScale.Crop
         )
-        Text(text = post.value.title, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp), fontSize = 18.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Row(verticalAlignment = Alignment.CenterVertically){
+            Text(text = post.value.title, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp), fontSize = 18.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Icon(painter = painterResource(R.drawable.flag), contentDescription = "Flag", modifier = Modifier
+                .size(32.dp)
+                .clickable {
+                    reportDialog.value = true
+                })
+        }
         Text(text = (post.value.date + " - $" + "%.2f".format(post.value.price)), modifier = Modifier.padding(10.dp, 0.dp), color = NavGray)
         Row(
             verticalAlignment = Alignment.CenterVertically,
