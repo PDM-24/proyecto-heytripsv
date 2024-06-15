@@ -42,6 +42,17 @@
     <string name="name">Nombre</string>
     <string name="confirm_pass">Confirmar contraseña</string>
     <string name="agency">Registrarme como agencia</string>
+    <string name="recover_email">Ingresa el correo asociado a esta cuenta par recibir el código de confirmación.</string>
+    <string name="recover_pass">¿Olvidaste tu contraseña?</string>
+    <string name="send_code">Enviar código</string>
+    <string name="conf_code">Código de confirmación</string>
+    <string name="conf_cod_inst">Ingresa el código de confirmación que hemos enviado a tu correo</string>
+    <string name="conf_ac">Accept</string>
+    <string name="send_code_again">Enviar de nuevo el código</string>
+    <string name="change_passw">Cambiar contraseña</string>
+    <string name="new_pass">Nueva contraseña</string>
+    <string name="pass_missmatch">Las contraseñas ingresadas deben coincidir para realizar el cambio de contraseña</string>
+    <string name="pass_missmatch_title">Contraseñas no coinciden</string>=======
     <string name="save_logged">Para ver las publicaciones guardadas debes iniciar sesión</string>
     <string name="one_day_before">1 día antes del evento</string>
     <string name="two_day_before">2 días antes del evento</string>
