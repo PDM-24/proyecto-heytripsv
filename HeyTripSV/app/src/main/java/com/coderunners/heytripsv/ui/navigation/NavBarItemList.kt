@@ -16,7 +16,7 @@ fun navBarItemList(): List<NavBarItem> {
         ),
         NavBarItem(
             stringResource(id = R.string.navbar_search),
-            ScreenRoute.Search.route,
+            ScreenRoute.EditAgency.route,
             ImageVector.vectorResource(id = R.drawable.magnify)
         ),
         NavBarItem(

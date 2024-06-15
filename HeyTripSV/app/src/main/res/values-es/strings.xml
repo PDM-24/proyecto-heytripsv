@@ -59,5 +59,11 @@
     <string name="search">Búsqueda</string>
     <string name="price_range">Rango de precio</string>
     <string name="filter">Filtro</string>
+    <string name="edit_agency">Editar perfil</string>
+    <string name="dui">DUI del representante</string>
+    <string name="contact_num">Número de contacto</string>
+    <string name="profile_pic">Foto de perfil</string>
+    <string name="select_image">Seleccionar imagen</string>
+    <string name="btn_accept">Aceptar</string>
 
 </resources>
