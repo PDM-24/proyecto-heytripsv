@@ -41,15 +41,24 @@
     <string name="name">Name</string>
     <string name="confirm_pass">Confirm Password</string>
     <string name="agency">Register as an agency</string>
+    <string name="save_logged">To see your saved posts sign into your account</string>
+    <string name="one_day_before">1 day before the event</string>
+    <string name="two_day_before">2 days before the event</string>
+    <string name="three_day_before">3 days before the event</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="report_post1">The post does not contain a tour</string>
+    <string name="report_post2">Inappropiate image</string>
+    <string name="report_post3">Inappropiate description</string>
+    <string name="report_post4" translatable="false">Spam</string>
+    <string name="report_other">Other...</string>
+    <string name="report_acc1">Fake account</string>
+    <string name="report_acc2">Posts inappropiate content</string>
+    <string name="report_acc3">Inappropiate description</string>
+    <string name="report_acc4" translatable="false">Spam</string>
+    <string name="report">Report</string>
     <string name="search">Search</string>
     <string name="price_range">Price Range</string>
     <string name="filter">Filter</string>
-
-
-
-
-
-
-
 
 </resources>

@@ -14,5 +14,6 @@ sealed class ScreenRoute (var route: String) {
     object CreateAccount : ScreenRoute("createAccount")
 
     object Category : ScreenRoute("category")
+    object Agency : ScreenRoute("agency")
 
 }
