@@ -71,4 +71,12 @@
     <string name="search">Search</string>
     <string name="price_range">Price Range</string>
     <string name="filter">Filter</string>
+    <string name="edit_agency">Edit profile</string>
+    <string name="dui">DUI of the representative</string>
+    <string name="contact_num">Contact number</string>
+    <string name="instagram" translatable="false">Instagram</string>
+    <string name="facebook" translatable="false">Facebook</string>
+    <string name="profile_pic">Profile picture</string>
+    <string name="select_image">Select image</string>
+    <string name="btn_accept">Accept</string>
 </resources>

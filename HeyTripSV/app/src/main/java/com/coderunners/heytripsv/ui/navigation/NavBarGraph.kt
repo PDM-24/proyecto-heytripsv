@@ -11,6 +11,7 @@ import com.coderunners.heytripsv.ui.screen.AgencyScreen
 import com.coderunners.heytripsv.ui.screen.CreateAccount
 import com.coderunners.heytripsv.ui.screen.LogIn
 import com.coderunners.heytripsv.ui.screen.CategoryScreen
+import com.coderunners.heytripsv.ui.screen.EditAgencyScreen
 import com.coderunners.heytripsv.ui.screen.ChangePass
 import com.coderunners.heytripsv.ui.screen.ConfirmCode
 import com.coderunners.heytripsv.ui.screen.ForgotPassword
@@ -73,6 +74,10 @@ fun NavBarGraph(
 
         composable(ScreenRoute.Saved.route){
             SavedScreen(mainViewModel = mainViewModel, innerPadding = innerPadding, navController = navController)
+        }
+
+        composable(ScreenRoute.EditAgency.route){
+            EditAgencyScreen(mainViewModel = mainViewModel, innerPadding = innerPadding)
         }
 
     }
