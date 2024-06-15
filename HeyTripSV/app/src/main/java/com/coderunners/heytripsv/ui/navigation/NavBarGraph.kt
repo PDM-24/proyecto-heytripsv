@@ -59,7 +59,7 @@ fun NavBarGraph(
             }
         }
         composable(ScreenRoute.Search.route){
-            SearchScreen(innerPadding)
+            SearchScreen(innerPadding,mainViewModel, navController)
         }
 
         composable(ScreenRoute.Agency.route){
