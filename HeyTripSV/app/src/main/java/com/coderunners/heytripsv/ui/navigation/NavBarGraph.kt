@@ -12,6 +12,9 @@ import com.coderunners.heytripsv.ui.screen.CreateAccount
 import com.coderunners.heytripsv.ui.screen.LogIn
 import com.coderunners.heytripsv.ui.screen.CategoryScreen
 import com.coderunners.heytripsv.ui.screen.EditAgencyScreen
+import com.coderunners.heytripsv.ui.screen.ChangePass
+import com.coderunners.heytripsv.ui.screen.ConfirmCode
+import com.coderunners.heytripsv.ui.screen.ForgotPassword
 import com.coderunners.heytripsv.ui.screen.MainScreen
 import com.coderunners.heytripsv.ui.screen.PostViewScreen
 import com.coderunners.heytripsv.ui.screen.ProfileScreen
@@ -45,7 +48,7 @@ fun NavBarGraph(
             LogIn(innerPadding, navController)
         }
         composable(ScreenRoute.ForgotPassword.route){
-
+            ForgotPassword(innerPadding, navController)
         }
         composable(ScreenRoute.CreateAccount.route){
             CreateAccount(innerPadding, navController)
@@ -61,6 +64,12 @@ fun NavBarGraph(
 
         composable(ScreenRoute.Agency.route){
             AgencyScreen(mainViewModel = mainViewModel, innerPadding = innerPadding, onClick = {navController.navigate(ScreenRoute.PostView.route)} )
+        }
+        composable(ScreenRoute.ConfirmationCode.route){
+            ConfirmCode(innerPadding = innerPadding, navController = navController)
+        }
+        composable(ScreenRoute.ChangePassowrd.route){
+            ChangePass(innerPadding = innerPadding, navController = navController)
         }
 
         composable(ScreenRoute.Saved.route){
