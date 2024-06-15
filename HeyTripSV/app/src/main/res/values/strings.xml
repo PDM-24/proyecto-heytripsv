@@ -41,12 +41,17 @@
     <string name="name">Name</string>
     <string name="confirm_pass">Confirm Password</string>
     <string name="agency">Register as an agency</string>
-
-
-
-
-
-
+    <string name="recover_email">Type in your email associated to your account so you can receive your confirmation code.</string>
+    <string name="recover_pass">Forgot your password?</string>
+    <string name="send_code">Send code</string>
+    <string name="conf_code">Confirmation code</string>
+    <string name="conf_cod_inst">Type in the confirmation code we have sent to the email you provided</string>
+    <string name="conf_ac">Accept</string>
+    <string name="send_code_again">Send again the confirmation code</string>
+    <string name="change_passw">Change password</string>
+    <string name="new_pass">New Password</string>
+    <string name="pass_missmatch">The passwords entered need to match in order to change the password</string>
+    <string name="pass_missmatch_title">Password mismatch</string>
 
 
 </resources>
