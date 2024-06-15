@@ -21,7 +21,6 @@
     <string name="itinerary">Itinerario</string>
     <string name="includes">Incluye</string>
     <string name="destination">Destino</string>
-
     <string name="log_in">Iniciar sesion</string>
     <string name="about_us">Sobre Nosotros</string>
     <string name="profile">Perfil</string>
@@ -57,6 +56,8 @@
     <string name="report_acc2">Publica contenido inadecuado</string>
     <string name="report_acc3">Descripción inapropiada</string>
     <string name="report">Reportar</string>
-
+    <string name="search">Búsqueda</string>
+    <string name="price_range">Rango de precio</string>
+    <string name="filter">Filtro</string>
 
 </resources>

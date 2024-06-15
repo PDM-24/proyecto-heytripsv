@@ -57,6 +57,8 @@
     <string name="report_acc3">Inappropiate description</string>
     <string name="report_acc4" translatable="false">Spam</string>
     <string name="report">Report</string>
-
+    <string name="search">Search</string>
+    <string name="price_range">Price Range</string>
+    <string name="filter">Filter</string>
 
 </resources>
