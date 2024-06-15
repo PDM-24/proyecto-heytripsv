@@ -43,15 +43,15 @@ validators.registerAgencyValidator = [
                 return false;
             }
         }).withMessage("Invalid DUI"),
-    body("phone")
+    body("number")
         .notEmpty().withMessage("A phone number is required")
         //El telefono lo recibe sin guion
         .isMobilePhone("es-SV").withMessage("Phone number not valid"),
     body("password")
         .notEmpty().withMessage("A password is required")
         .matches(passwordRegex).withMessage("Password format not valid"),
-    body("instagram").optional().isAlphanumeric().withMessage("Instagram handle not valid"),
-    body("facebook").optional().isAlphanumeric().withMessage("Facebook name not valid")
+    body("instagram").optional(),
+    body("facebook").optional()
 ];
 
 validators.registerUserValidator = [

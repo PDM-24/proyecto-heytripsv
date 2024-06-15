@@ -1,5 +1,7 @@
 const User = require('../models/User.model');
 const Agency = require('../models/Agency.model');
+const axios = require('axios')
+const cloudinary = require('cloudinary')
 const { createToken, verifyToken } = require("../utils/jwt.tools");
 const { sendEmailWithNodemailer } = require("../utils/email.tools");
 
@@ -79,7 +81,7 @@ controller.registerAgency = async (req, res, next) => {
         formData.append("signature", signature);
 
         const dataRes = await axios.post(
-            process.env.CLOUDINARY_URL,
+            process.env.CLOUDINARY_U,
             formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
@@ -167,7 +169,7 @@ controller.login = async (req, res, next) => {
         _tokens = [token, ..._tokens];
         user.tokens = _tokens;
         await user.save();
-        return res.status(200).json({ token: token, role: "agency" })
+        return res.status(200).json({ token: token, role: "user" })
 
     } catch (error) {
         next(error)
