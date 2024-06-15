@@ -49,6 +49,14 @@
     <string name="three_day_before">3 días antes del evento</string>
     <string name="confirm">Confirmar</string>
     <string name="cancel">Cancelar</string>
+    <string name="report_post1">La publicación no contiene un tour</string>
+    <string name="report_post2">Imagen inapropiada</string>
+    <string name="report_post3">Descripción inapropiada</string>
+    <string name="report_other">Otro...</string>
+    <string name="report_acc1">Cuenta falsa</string>
+    <string name="report_acc2">Publica contenido inadecuado</string>
+    <string name="report_acc3">Descripción inapropiada</string>
+    <string name="report">Reportar</string>
 
 
 </resources>
