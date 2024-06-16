@@ -7,7 +7,8 @@ const controller = {}
 controller.findReported = async (req, res, next) => {
     try {
 
-        const agencies = await Agency.find({ reports: { $exists: true, $not: { $size: 0 } } }).sort({ createdAt: -1 }).populate("reports.user", "name");
+        const agencies = await Agency.find({ reports: { $exists: true, $not: { $size: 0 } } }, '_id email name dui description image instagram facebook reports').sort({ createdAt: -1 }).populate("reports.user", "name");
+
 
         return res.status(200).json(agencies);
 

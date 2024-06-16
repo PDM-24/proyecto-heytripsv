@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const agencyController = require('../controllers/agency.controller')
-const { authentication, authorization } = require("../middlewares/auth.middlewares");
+const { authentication, authorization, checkRepeatedEmail } = require("../middlewares/auth.middlewares");
 const { validateId, reportValidator } = require("../validators/post.validators")
 const runValidation = require('../validators/index.middleware');
 
@@ -13,6 +13,6 @@ router.get('/reported/', authentication, authorization, runValidation, agencyCon
 router.patch("/report/:id", authentication, validateId, reportValidator, runValidation, agencyController.reportAgency);
 
 //Editar perfil
-router.post("/edit-profile/", authentication, runValidation, agencyController.editOwn);
+router.post("/edit-profile/", authentication, checkRepeatedEmail,runValidation, agencyController.editOwn);
 
 module.exports = router;
