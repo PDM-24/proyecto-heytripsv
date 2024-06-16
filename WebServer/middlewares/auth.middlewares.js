@@ -70,25 +70,51 @@ middlewares.authentication = async (req, res, next) => {
     }
 }
 
-middlewares.authorization =  async (req, res, next) => {
-        
-        //Antes de este middleware debe de haber pasado por la autenticacion
-        try {
-            const user = req.user;
-            //Verificar si es admin
-            const isAdmin = user.admin;
+middlewares.authorization = async (req, res, next) => {
 
-            //Si no esta, devolver 403
-            if (!isAdmin) {
-                return res.status(403).json({ error: "Forbidden" });
-            }
+    //Antes de este middleware debe de haber pasado por la autenticacion
+    try {
+        const user = req.user;
+        //Verificar si es admin
+        const isAdmin = user.admin;
 
-            next();
-
-        } catch (error) {
-            console.error(error)
-            return res.status(500).json({ error: "Internal server error" })
+        //Si no esta, devolver 403
+        if (!isAdmin) {
+            return res.status(403).json({ error: "Forbidden" });
         }
+
+        next();
+
+    } catch (error) {
+        console.error(error)
+        return res.status(500).json({ error: "Internal server error" })
     }
+}
+
+
+middlewares.checkRepeatedEmail = async (req, res, next) => {
+    try {
+        const { _id } = req.user || false
+        const { email } = req.body
+        let user, agency
+
+        if (_id) {
+            user = await User.findOne({ $and: [{ email: email }, { _id: { $ne: _id } }] });
+            agency = await Agency.findOne({ $and: [{ email: email }, { _id: { $ne: _id } }] });
+        } else {
+            user = await User.findOne({ email: email });
+            agency = await Agency.findOne({ email: email});
+        }
+
+        if (user || agency) {
+            return res.status(500).json({ error: "There is already an account with that email" })
+        }
+
+        next();
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: "Internal server error" })
+    }
+}
 
 module.exports = middlewares;
