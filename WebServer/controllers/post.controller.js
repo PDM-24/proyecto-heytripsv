@@ -1,4 +1,5 @@
 const Post = require("../models/Post.model")
+const User = require("../models/User.model")
 const axios = require("axios");
 const cloudinary = require("cloudinary");
 
@@ -33,6 +34,62 @@ controller.findRecent = async (req, res, next) => {
 
     } catch (error) {
         next(error)
+    }
+}
+
+//Obtener las publicaciones reportadas
+controller.findReported = async (req, res, next) => {
+    try {
+
+        const posts = await Post.find({ reports: { $exists: true, $not: { $size: 0 } } }).sort({ createdAt: -1 }).populate("agency", "name email").populate("reports.user", "name");
+
+        return res.status(200).json(posts);
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+//Reportar post
+controller.reportPost = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { content } = req.body;
+        const { _id } = req.user;
+
+        let post = await Post.findOne({ _id: id });
+        let user = await User.findOne({_id: _id})
+
+        if (!post) {
+            return res.status(404).json({ error: "Post not found" })
+        }
+        if (!user) {
+            return res.status(403).json({error: "Forbidden"})
+        }
+
+        let _reports = post.reports;
+
+        const prevIndex = _reports.findIndex(r => r.user.equals(_id));
+
+        if (prevIndex >= 0) {
+            //El comentario ya existe
+            const _report = _reports[prevIndex];
+            _report.content = content;
+            _reports[prevIndex] = _report;
+        } else {
+            //El comentario no existe
+            _reports = [..._reports, { user: _id, content: content }]
+
+        }
+        //Guardamos el post - commit
+        post["reports"] = _reports;
+        const newPost = (await post.save());
+
+        //Retornamos el post actualizado
+        return res.status(200).json({ newPost });
+
+    } catch (error) {
+        next(error);
     }
 }
 
@@ -87,14 +144,14 @@ controller.savePost = async (req, res, next) => {
             const signature = cloudinary.utils.api_sign_request({
                 timestamp: timestamp,
                 public_id: savedPost._id,
-                upload_preset: "FoundHound",
+                upload_preset: "HeyTripSV",
                 overwrite: true
             }, process.env.CLOUDINARY_SECRET);
             const b64 = Buffer.from(req.file.buffer).toString("base64");
             let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
             const formData = new FormData();
             formData.append("file", dataURI);
-            formData.append("upload_preset", "FoundHound");
+            formData.append("upload_preset", "HeyTripSV");
             formData.append("cloud_name", "dlmtei8cc")
             formData.append("public_id", savedPost._id);
             formData.append("overwrite", true);

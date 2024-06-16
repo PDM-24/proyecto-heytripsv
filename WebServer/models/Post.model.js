@@ -59,6 +59,20 @@ const postSchema = new Schema({
         type: Number,
         required: true
     },
+    reports: {
+        type: [{
+            user: {
+                type: Schema.Types.ObjectId,
+                ref: "User",
+                required: true,
+            },
+            content: {
+                type: String,
+                required: true
+            },
+        }],
+        default: []  
+    },
     agency: {
         type: Schema.Types.ObjectId,
         ref: "Agency"

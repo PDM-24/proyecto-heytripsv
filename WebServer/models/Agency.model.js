@@ -55,6 +55,20 @@ const agencySchema = new Schema({
     salt: {
         type: String
     },
+    reports: {
+        type: [{
+            user: {
+                type: Schema.Types.ObjectId,
+                ref: "User",
+                required: true,
+            },
+            content: {
+                type: String,
+                required: true
+            },
+        }],
+        default: []  
+    },
     tokens: {
         type: [String],
         default: []
