@@ -37,6 +37,10 @@ const userSchema = new Schema({
     tokens: {
         type: [String],
         default: []
+    },
+    admin: {
+        type: Boolean,
+        default: false
     }
 }, {timestamps: true});
 

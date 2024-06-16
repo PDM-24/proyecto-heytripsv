@@ -45,10 +45,10 @@ middlewares.authentication = async (req, res, next) => {
             }
 
             //Verificar la peticion para añadir la informacion del usuario
-            req.user = user;
+            req.user = agency;
             req.token = token;
 
-            next();
+            return next();
 
         }
 
@@ -70,18 +70,17 @@ middlewares.authentication = async (req, res, next) => {
     }
 }
 
-middlewares.authorization = (requiredRole = ROLES.ADMIN) => {
-    return async (req, res, next) => {
+middlewares.authorization =  async (req, res, next) => {
+        
         //Antes de este middleware debe de haber pasado por la autenticacion
         try {
-            const { roles } = req.user;
-            //Verificar si el rol requerido esta en la coleccion
-            const isAuth = roles.includes(requiredRole);
-            const isAdmin = roles.includes(ROLES.ADMIN);
+            const user = req.user;
+            //Verificar si es admin
+            const isAdmin = user.admin;
 
             //Si no esta, devolver 403
-            if (!isAuth && !isAdmin) {
-                return res.status(403).json({ error: "Prohibido" });
+            if (!isAdmin) {
+                return res.status(403).json({ error: "Forbidden" });
             }
 
             next();
@@ -91,5 +90,5 @@ middlewares.authorization = (requiredRole = ROLES.ADMIN) => {
             return res.status(500).json({ error: "Internal server error" })
         }
     }
-}
+
 module.exports = middlewares;

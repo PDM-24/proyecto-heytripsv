@@ -108,7 +108,6 @@ controller.login = async (req, res, next) => {
     try {
         //Obtener la info identificador, contrasenia y el rol
         const { email, password } = req.body;
-        const { role } = req.params;
         let user, agency;
 
         //Verificar si el usuario existe basado en el rol
@@ -169,7 +168,8 @@ controller.login = async (req, res, next) => {
         _tokens = [token, ..._tokens];
         user.tokens = _tokens;
         await user.save();
-        return res.status(200).json({ token: token, role: "user" })
+        let role = user.admin ? "admin" : "user";
+        return res.status(200).json({ token: token, role: role })
 
     } catch (error) {
         next(error)

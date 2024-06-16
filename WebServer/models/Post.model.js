@@ -12,6 +12,10 @@ const postSchema = new Schema({
         trim: true,
         required: true
     },
+    date: {
+        type: Date,
+        required: true
+    },
     meeting: {
         type: String,
         trim: true,
@@ -49,6 +53,7 @@ const postSchema = new Schema({
     },
     image: {
         type: String,
+        default: "https://res.cloudinary.com/dlmtei8cc/image/upload/v1718430757/zjyr4khxybczk6hjibw9.jpg"
     },
     price: {
         type: Number,
