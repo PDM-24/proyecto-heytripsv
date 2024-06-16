@@ -49,7 +49,6 @@ fun ReportedScreen(
                     .fillMaxSize()
                     .background(Color.White)
             ) {
-                // Toggle buttons para Publicaciones y Cuentas
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -71,7 +70,6 @@ fun ReportedScreen(
                     Text("Ordenar por: A-Z", color = Color.Gray)
                 }
 
-                // Reported items/accounts list
                 LazyColumn(
                     modifier = Modifier.padding(16.dp)
                 ) {
@@ -104,7 +102,7 @@ fun ToggleButton(
         ),
         shape = RoundedCornerShape(20.dp),
         border = BorderStroke(1.dp, Color.Gray),
-        modifier = Modifier.width(150.dp) // Set a fixed width for both buttons
+        modifier = Modifier.width(150.dp)
     ) {
         Text(text)
     }
@@ -141,7 +139,7 @@ fun ReportedItem(item: ReportedItem) {
                     onClick = { /* Handle approve */ },
                     modifier = Modifier
                         .background(MainGreen, shape = RoundedCornerShape(4.dp))
-                        .size(32.dp) // Set the size of the button
+                        .size(32.dp)
                 ) {
                     Icon(Icons.Filled.Check, contentDescription = "Approve", tint = Color.White)
                 }
@@ -149,7 +147,7 @@ fun ReportedItem(item: ReportedItem) {
                     onClick = { /* Handle delete */ },
                     modifier = Modifier
                         .background(Color(0xFFCC0000), shape = RoundedCornerShape(4.dp))
-                        .size(32.dp) // Set the size of the button
+                        .size(32.dp)
                 ) {
                     Icon(Icons.Filled.Delete, contentDescription = "Delete", tint = Color.White)
                 }
@@ -189,7 +187,7 @@ fun ReportedAccount(account: ReportedAccount) {
                     onClick = { /* Handle approve */ },
                     modifier = Modifier
                         .background(MainGreen, shape = RoundedCornerShape(4.dp))
-                        .size(32.dp) // Set the size of the button
+                        .size(32.dp)
                 ) {
                     Icon(Icons.Filled.Check, contentDescription = "Approve", tint = Color.White)
                 }
@@ -197,7 +195,7 @@ fun ReportedAccount(account: ReportedAccount) {
                     onClick = { /* Handle delete */ },
                     modifier = Modifier
                         .background(Color(0xFFCC0000), shape = RoundedCornerShape(4.dp))
-                        .size(32.dp) // Set the size of the button
+                        .size(32.dp)
                 ) {
                     Icon(Icons.Filled.Delete, contentDescription = "Delete", tint = Color.White)
                 }
