@@ -138,6 +138,7 @@ fun LogIn(innerPadding: PaddingValues, navController: NavController) {
         )
         Spacer(modifier = Modifier.height(15.dp))
         Button(onClick = {
+                         navController.navigate(ScreenRoute.userProfile.route)
         },
             modifier = Modifier
                 .fillMaxWidth(0.8f)

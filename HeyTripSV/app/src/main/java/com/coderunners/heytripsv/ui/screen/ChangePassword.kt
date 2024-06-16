@@ -99,13 +99,12 @@ fun ChangePass(innerPadding : PaddingValues, navController: NavController){
                 .padding(horizontal = 16.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MainGreen
-
             ),
             border = BorderStroke(1.dp, color = Color.White),
             shape = RoundedCornerShape(7.dp),
             enabled = newPassword.value.isNotBlank() && newPasswordConf.value.isNotBlank()
         ) {
-            Text(text = stringResource(R.string.send_code), color = Color.White)
+            Text(text = stringResource(R.string.confirm_pass), color = Color.White)
         }
 
         if (similarityStatus.value && dialogStatus.value){
@@ -113,7 +112,7 @@ fun ChangePass(innerPadding : PaddingValues, navController: NavController){
                 title = {
                     Text(
                         text = stringResource(R.string.pass_missmatch_title),
-                        color = TextGray,
+                        color = Color.Black,
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
@@ -123,7 +122,7 @@ fun ChangePass(innerPadding : PaddingValues, navController: NavController){
                 text = {
                     Text(
                         text = stringResource(R.string.pass_missmatch),
-                        color = TextGray,
+                        color = Color.Black,
                         textAlign = TextAlign.Justify,
                         modifier = Modifier
                             .fillMaxWidth(0.9f)
