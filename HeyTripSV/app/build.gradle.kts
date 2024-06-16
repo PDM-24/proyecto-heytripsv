@@ -64,6 +64,7 @@ android {
 
 dependencies {
 
+    implementation(libs.cronet.embedded)
     val nav_version = "2.7.7"
     // Navigation
     implementation("androidx.navigation:navigation-compose:$nav_version")
