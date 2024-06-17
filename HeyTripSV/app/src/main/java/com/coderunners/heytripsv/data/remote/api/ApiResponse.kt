@@ -1,4 +1,4 @@
-package com.coderunners.heytripsv.data.api
+package com.coderunners.heytripsv.data.remote.api
 
 import com.coderunners.heytripsv.utils.Constants
 import com.google.gson.annotations.SerializedName
