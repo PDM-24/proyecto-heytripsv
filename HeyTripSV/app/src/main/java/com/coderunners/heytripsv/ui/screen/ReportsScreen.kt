@@ -122,7 +122,7 @@ fun ReportedItem(item: ReportedItem) {
             Image(
                 painter = painterResource(id = item.imageRes),
                 contentDescription = null,
-                modifier = Modifier.size(80.dp)
+                modifier = Modifier.size(100.dp)
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(
