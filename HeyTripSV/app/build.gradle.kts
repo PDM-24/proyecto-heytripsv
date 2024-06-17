@@ -64,9 +64,19 @@ android {
 
 dependencies {
 
+    //retrofit
+    val retrofit_version = "2.11.0"
+    implementation ("com.squareup.retrofit2:retrofit:$retrofit_version")
+    implementation ("com.squareup.retrofit2:converter-gson:$retrofit_version")
+
+    // Room
+    val room_version = "2.6.1"
+    implementation("androidx.room:room-runtime:$room_version")
+    implementation("android.room:room-ktx:$room_version")
     implementation(libs.cronet.embedded)
-    val nav_version = "2.7.7"
+
     // Navigation
+    val nav_version = "2.7.7"
     implementation("androidx.navigation:navigation-compose:$nav_version")
     implementation ("com.google.maps.android:maps-compose:4.4.1")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
