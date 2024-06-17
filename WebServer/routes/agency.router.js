@@ -13,6 +13,6 @@ router.get('/reported/', authentication, authorization, runValidation, agencyCon
 router.patch("/report/:id", authentication, validateId, reportValidator, runValidation, agencyController.reportAgency);
 
 //Editar perfil
-router.post("/edit-profile/", authentication, checkRepeatedEmail,runValidation, agencyController.editOwn);
+router.post("/edit-profile/", authentication, checkRepeatedEmail, runValidation, agencyController.editOwn);
 
 module.exports = router;

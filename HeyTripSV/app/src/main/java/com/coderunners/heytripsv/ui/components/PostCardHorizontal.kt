@@ -43,6 +43,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import coil.compose.AsyncImage
 import com.coderunners.heytripsv.R
 import com.coderunners.heytripsv.model.PostDataModel
 import com.coderunners.heytripsv.ui.navigation.ScreenRoute
@@ -160,14 +161,11 @@ fun PostCardHorizontal(post: PostDataModel, onClick: () -> Unit, save: Boolean =
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Image(
-                modifier = Modifier
-                    .aspectRatio(1f)
-                    .clip(RoundedCornerShape(12.dp)),
-                painter = painterResource(id = post.image),
-                contentDescription = "Photo",
-                contentScale = ContentScale.Crop
-            )
+            AsyncImage(model = post.image, contentDescription = post.title, modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Crop)
             if (save){
                 Column(
                     modifier = Modifier

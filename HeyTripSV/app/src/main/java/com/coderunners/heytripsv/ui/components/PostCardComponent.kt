@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.coderunners.heytripsv.R
 import com.coderunners.heytripsv.model.PostDataModel
 import com.coderunners.heytripsv.ui.theme.NavGray
@@ -32,17 +33,15 @@ fun PostCard(post: PostDataModel, onClick: () -> Unit){
     Card(
         modifier = Modifier
             .clickable { onClick() }
-            .size(200.dp, 275.dp).padding(5.dp),
+            .size(200.dp, 275.dp)
+            .padding(5.dp),
         colors = CardDefaults.cardColors(containerColor = White)
     ) {
-        Image(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f).clip(RoundedCornerShape(12.dp)),
-            painter = painterResource(id = post.image),
-            contentDescription = "Photo",
-            contentScale = ContentScale.Crop
-        )
+        AsyncImage(model = post.image, contentDescription = post.title, modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(1f)
+            .clip(RoundedCornerShape(12.dp)),
+            contentScale = ContentScale.Crop)
         Text(text = post.title, color = TextGray, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp), fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         Text(text = (post.date + " - $" + "%.2f".format(post.price)), modifier = Modifier.padding(10.dp, 0.dp), fontSize = 12.sp, color = NavGray)
     }

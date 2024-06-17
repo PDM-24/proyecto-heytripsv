@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.R
 import com.coderunners.heytripsv.model.PostDataModel
@@ -120,15 +121,11 @@ fun PostViewScreen(
             .verticalScroll(rememberScrollState(), columnScrollingEnabled.value),
     ) {
 
-        //CAMBIAR POR ASYNCIMAGE AL OBTENERLA DE LA BASE
-        Image(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1.5f),
-            painter = painterResource(id = post.value.image),
-            contentDescription = "Photo",
-            contentScale = ContentScale.Crop
-        )
+        AsyncImage(model = post.value.image, contentDescription = post.value.title, modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(1f)
+            .clip(RoundedCornerShape(12.dp)),
+            contentScale = ContentScale.Crop)
         Row(verticalAlignment = Alignment.CenterVertically){
             Text(text = post.value.title, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp), fontSize = 18.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Icon(painter = painterResource(R.drawable.flag), contentDescription = "Flag", modifier = Modifier

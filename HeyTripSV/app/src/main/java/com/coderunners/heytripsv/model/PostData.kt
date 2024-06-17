@@ -3,16 +3,13 @@ package com.coderunners.heytripsv.model
 import com.coderunners.heytripsv.R
 
 data class PostDataModel(
-    //TODO: STRING - MONGOOBJECTID
-    val id: Int = 0,
+    val id: String = "",
     val title: String = "",
-
-    //TODO: STRING - LINK DE IMAGEN
-    val image: Int = R.drawable.default_image,
+    val image: String = "",
     val date: String = "",
-    val price: Float = 0f,
+    val price: Double = 0.0,
     val agency: String = "",
-    val agencyId: Int = 0,
+    val agencyId: String = "",
     val phone: String = "",
     val description: String = "",
     val meeting: String = "",

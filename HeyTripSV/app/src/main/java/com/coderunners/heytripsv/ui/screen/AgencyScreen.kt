@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -56,6 +57,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import coil.compose.AsyncImage
 import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.R
 import com.coderunners.heytripsv.ui.components.PostCardHorizontal
@@ -107,9 +109,11 @@ fun AgencyScreen(mainViewModel: MainViewModel, innerPadding: PaddingValues, onCl
             ){
                 Column(horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxWidth()) {
-                    Image(painter = painterResource(id = agency.value.image), contentDescription = "Photo",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.clip(CircleShape))
+                    AsyncImage(model = agency.value.image, contentDescription = agency.value.name, modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                        .clip(RoundedCornerShape(12.dp)),
+                        contentScale = ContentScale.Crop)
                     Row (verticalAlignment = Alignment.CenterVertically){
                         Text(text = agency.value.name, fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.padding(10.dp))
                         Icon(painter = painterResource(R.drawable.flag), contentDescription = "Flag", modifier = Modifier
