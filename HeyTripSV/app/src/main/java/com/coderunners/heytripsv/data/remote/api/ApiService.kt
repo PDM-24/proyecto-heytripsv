@@ -21,4 +21,8 @@ interface ApiService {
     @GET(value = Constants.API_PATH + Constants.GET_TRIP_UPCOMING)
     suspend fun getUpcoming(): PostListResponse
 
+    @Headers(value = ["Content-Type: application/json"])
+    @GET(value = Constants.API_PATH + Constants.GET_TRIP_RECENT)
+    suspend fun getRecent(): PostListResponse
+
 }
