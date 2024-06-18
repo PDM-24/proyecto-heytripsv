@@ -20,6 +20,7 @@ import com.coderunners.heytripsv.ui.screen.PostViewScreen
 import com.coderunners.heytripsv.ui.screen.ProfileScreen
 import com.coderunners.heytripsv.ui.screen.SavedScreen
 import com.coderunners.heytripsv.ui.screen.SearchScreen
+import com.coderunners.heytripsv.ui.screen.UserProfile
 
 
 @Composable
@@ -59,7 +60,7 @@ fun NavBarGraph(
             }
         }
         composable(ScreenRoute.Search.route){
-            SearchScreen(innerPadding)
+            SearchScreen(innerPadding,mainViewModel, navController)
         }
 
         composable(ScreenRoute.Agency.route){
@@ -78,6 +79,9 @@ fun NavBarGraph(
 
         composable(ScreenRoute.EditAgency.route){
             EditAgencyScreen(mainViewModel = mainViewModel, innerPadding = innerPadding)
+        }
+        composable(ScreenRoute.userProfile.route){
+            UserProfile(innerPadding = innerPadding, navController = navController)
         }
 
     }

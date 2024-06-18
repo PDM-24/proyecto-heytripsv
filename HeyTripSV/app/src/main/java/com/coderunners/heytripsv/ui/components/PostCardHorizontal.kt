@@ -2,6 +2,8 @@ package com.coderunners.heytripsv.ui.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,6 +43,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import coil.compose.AsyncImage
 import com.coderunners.heytripsv.R
 import com.coderunners.heytripsv.model.PostDataModel
 import com.coderunners.heytripsv.ui.navigation.ScreenRoute
@@ -76,6 +79,7 @@ fun PostCardHorizontal(post: PostDataModel, onClick: () -> Unit, save: Boolean =
                         .fillMaxWidth()
                         .height(250.dp)
                         .padding(10.dp),
+
                     shape = RoundedCornerShape(16.dp),
                 ) {
                     radioOptions.forEach { text ->
@@ -149,21 +153,19 @@ fun PostCardHorizontal(post: PostDataModel, onClick: () -> Unit, save: Boolean =
             .clickable { onClick() }
             .height(200.dp)
             .fillMaxWidth()
-            .padding(5.dp),
-    ) {
+            .padding(10.dp),
+        colors = CardDefaults.cardColors(White)
+    )  {
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Image(
-                modifier = Modifier
-                    .aspectRatio(1f)
-                    .clip(RoundedCornerShape(12.dp)),
-                painter = painterResource(id = post.image),
-                contentDescription = "Photo",
-                contentScale = ContentScale.Crop
-            )
+            AsyncImage(model = post.image, contentDescription = post.title, modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Crop)
             if (save){
                 Column(
                     modifier = Modifier
@@ -187,8 +189,12 @@ fun PostCardHorizontal(post: PostDataModel, onClick: () -> Unit, save: Boolean =
                 Column(
                     modifier = Modifier.padding(0.dp, 5.dp, 5.dp, 0.dp)
                 ) {
-                    Text(text = post.title, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp), fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text(text = (post.date + " - $" + "%.2f".format(post.price)), modifier = Modifier.padding(10.dp, 0.dp), fontSize = 12.sp, color = NavGray)
+                    Box(modifier = Modifier.fillMaxWidth()){
+                        Column {
+                            Text(text = post.title, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp), fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(text = (post.date + " - $" + "%.2f".format(post.price)), modifier = Modifier.padding(10.dp, 0.dp), fontSize = 12.sp, color = NavGray)
+                        }
+                    }
                 }
             }
 

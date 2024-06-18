@@ -10,6 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModelProvider
 import com.coderunners.heytripsv.ui.navigation.navBarItemList
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -18,9 +19,9 @@ import com.coderunners.heytripsv.ui.navigation.NavBarGraph
 import com.coderunners.heytripsv.ui.theme.HeyTripSVTheme
 
 class MainActivity : ComponentActivity() {
-    private val mainViewModel = MainViewModel()
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+        val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         super.onCreate(savedInstanceState)
         setContent {
             HeyTripSVTheme {

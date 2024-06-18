@@ -20,5 +20,6 @@ sealed class ScreenRoute (var route: String) {
     object ConfirmationCode : ScreenRoute("confirmationCode")
 
     object ChangePassowrd : ScreenRoute("changePass")
+    object userProfile : ScreenRoute("userProf")
 
 }

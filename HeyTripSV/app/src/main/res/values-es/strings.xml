@@ -85,5 +85,11 @@
     <string name="includes_placeholder">Lista de elementos que incluye el precio</string>
     <string name="description_placeholder">"Descripción del tour o detalles adicionales "</string>
     <string name="publication_image">Imagen de publicación</string>
+    <string name="sign_out">Cerrar Sesión</string>
+    <string name="edit_profile">Editar perfil</string>
+    <string name="new_username">Editar Nombre</string>
+    <string name="new_email">Editar Correo</string>
+    <string name="save_changes">Guardar cambios</string>
+    <string name="no_posts">No hay publicaciones que mostrar</string>
 
 </resources>

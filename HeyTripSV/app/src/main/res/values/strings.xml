@@ -88,4 +88,11 @@
     <string name="includes_placeholder">List of items included in the price</string>
     <string name="description_placeholder">Tour description or additional details</string>
     <string name="publication_image">Publication image</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="edit_profile">Edit profile</string>
+    <string name="new_username">Edit Name</string>
+    <string name="new_email">Edit Email</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="no_posts">There are no posts to show</string>
+
 </resources>
