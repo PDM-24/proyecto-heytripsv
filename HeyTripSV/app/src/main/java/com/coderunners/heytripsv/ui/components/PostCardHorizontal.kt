@@ -179,7 +179,8 @@ fun PostCardHorizontal(post: PostDataModel, onClick: () -> Unit, save: Boolean =
                             Text(text = (post.date + " - $" + "%.2f".format(post.price)), modifier = Modifier.padding(10.dp, 0.dp), fontSize = 12.sp, color = NavGray)
                         }
                     }
-                    Icon(imageVector = if (notificationEnabled.value) Icons.Default.Notifications else Icons.Outlined.Notifications, contentDescription = "Notification", modifier = Modifier.clickable {
+                    Icon(tint = Color.Black,
+                        imageVector = if (notificationEnabled.value) Icons.Default.Notifications else Icons.Outlined.Notifications, contentDescription = "Notification", modifier = Modifier.clickable {
                         //TODO: Manejar las notificaciones
                         dialogNotificationOpen.value = true
                     })
