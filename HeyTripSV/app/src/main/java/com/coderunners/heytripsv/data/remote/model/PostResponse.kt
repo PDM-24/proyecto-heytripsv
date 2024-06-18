@@ -1,5 +1,6 @@
 package com.coderunners.heytripsv.data.remote.model
 
+import com.coderunners.heytripsv.model.PostDataModel
 import com.google.gson.annotations.SerializedName
 
 data class PostListResponse(

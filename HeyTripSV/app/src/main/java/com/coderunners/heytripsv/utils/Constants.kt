@@ -12,7 +12,7 @@ object Constants {
     const val GET_TRIP_RECENT ="/post/recent/"
 
     //Obtener post por agencia
-    const val  GET_AGENCY = "/agency/:id"
+    const val  GET_AGENCY = "/post/agency/"
 
     //Obtener post reportados
     const val   GET_REPORTED_POST= "/post/reported/"

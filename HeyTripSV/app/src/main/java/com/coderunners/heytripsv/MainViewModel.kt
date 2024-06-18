@@ -40,6 +40,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _selectedPost = MutableStateFlow(PostDataModel())
     val selectedPost = _selectedPost.asStateFlow()
 
+    private val _agencyId = MutableStateFlow("")
+    val agencyId = _agencyId.asStateFlow()
+
     private val _categoryList = MutableStateFlow(mutableListOf<PostDataModel>())
     val categoryList = _categoryList.asStateFlow()
 
@@ -74,6 +77,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _selectedPost.value = selectPost
     }
 
+    fun setAgencyId(id: String){
+        _agencyId.value = id
+    }
+
     fun saveSelectedCategory(category: String){
         _selectedCategory.value = category
         _categoryList.value = PostList.filter {
@@ -86,12 +93,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 else -> false
             }
         }.toMutableList()
-    }
-
-
-    fun saveSelectedAgency(agency: String){
-        //TODO: Obtener el id de la agencia y obtener la info de esa agenccia
-        _selectedAgency.value = agencyData
     }
 
     fun getSavedPosts(){
@@ -190,6 +191,50 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 Log.i("MainViewModel", e.toString())
                 _uiState.value = UiState.Error("There was an error connecting to the database")
             }
+        }
+    }
+
+    //Función para obtener la información de la agencia
+    fun getAgencyData(id: String){
+        viewModelScope.launch (Dispatchers.IO){
+            try {
+                _uiState.value = UiState.Loading
+                val obtainedAgency = api.getAgency(id)
+                _selectedAgency.value = AgencyDataModel(
+                    id = obtainedAgency.agency.id,
+                    name = obtainedAgency.agency.name,
+                    desc = obtainedAgency.agency.description,
+                    email = obtainedAgency.agency.email,
+                    dui = obtainedAgency.agency.dui,
+                    image = obtainedAgency.agency.image,
+                    number = obtainedAgency.agency.number,
+                    instagram = obtainedAgency.agency.instagram,
+                    facebook = obtainedAgency.agency.facebook,
+                    postList = obtainedAgency.posts.map { post->
+                        PostDataModel(
+                            id = post.id,
+                            title = post.title,
+                            image = post.image,
+                            date = isoDateFormat(post.date),
+                            price = post.price,
+                            agencyId = post.agency.id,
+                            agency = post.agency.name,
+                            phone = post.agency.number,
+                            description = post.description,
+                            meeting = post.meeting,
+                            itinerary = post.itinerary.map { it -> Itinerary(isoDateFormat(it.time, true), it.event) },
+                            includes = post.includes,
+                            category = post.category,
+                            position = Position(post.lat, post.long))
+                    }.toMutableList()
+                )
+                Log.i("MainVewModel", "Agency retrieved correctly")
+                _uiState.value = UiState.Success("Agency retrieved correctly")
+            }catch (e: Exception){
+                Log.i("MainVewModel", e.toString())
+                _uiState.value = UiState.Error(e.toString())
+            }
+
         }
     }
 
