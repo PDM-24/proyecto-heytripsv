@@ -1,5 +1,6 @@
 const Post = require("../models/Post.model")
 const User = require("../models/User.model")
+const Agency = require("../models/Agency.model")
 const axios = require("axios");
 const cloudinary = require("cloudinary");
 
@@ -96,8 +97,9 @@ controller.reportPost = async (req, res, next) => {
 controller.findFromAgency = async(req, res, next) => {
     try {
         const {id} = req.params;
+        const agency = await Agency.findOne({_id: id}, "_id email name dui number description image instagram facebook")
         const posts = await Post.find({agency: id}, undefined, {sort: [{createdAt: -1}]}).populate("agency", "name number");
-        return res.status(200).json({ posts});
+        return res.status(200).json({agency, posts});
     } catch (error) {
         next(error)
     }
@@ -178,7 +180,7 @@ controller.savePost = async (req, res, next) => {
             return res.status(500).json({ error: "There was an error saving the post" });
         }
 
-        return res.status(200).json({ savedPost });
+        return res.status(200).json({ result: "Post saved" });
 
     } catch (error) {
         next(error);

@@ -162,7 +162,6 @@ fun PostCardHorizontal(post: PostDataModel, onClick: () -> Unit, save: Boolean =
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             AsyncImage(model = post.image, contentDescription = post.title, modifier = Modifier
-                .fillMaxWidth()
                 .aspectRatio(1f)
                 .clip(RoundedCornerShape(12.dp)),
                 contentScale = ContentScale.Crop)
@@ -176,7 +175,7 @@ fun PostCardHorizontal(post: PostDataModel, onClick: () -> Unit, save: Boolean =
                 ) {
                     Box(modifier = Modifier.fillMaxWidth()){
                         Column {
-                            Text(text = post.title, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp), fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(text = post.title, color = TextGray, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp), fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             Text(text = (post.date + " - $" + "%.2f".format(post.price)), modifier = Modifier.padding(10.dp, 0.dp), fontSize = 12.sp, color = NavGray)
                         }
                     }
@@ -191,7 +190,7 @@ fun PostCardHorizontal(post: PostDataModel, onClick: () -> Unit, save: Boolean =
                 ) {
                     Box(modifier = Modifier.fillMaxWidth()){
                         Column {
-                            Text(text = post.title, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp), fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(text = post.title, color = TextGray, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp), fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             Text(text = (post.date + " - $" + "%.2f".format(post.price)), modifier = Modifier.padding(10.dp, 0.dp), fontSize = 12.sp, color = NavGray)
                         }
                     }

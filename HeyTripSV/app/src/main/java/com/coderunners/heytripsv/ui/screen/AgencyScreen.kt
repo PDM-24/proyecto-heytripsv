@@ -1,5 +1,7 @@
 package com.coderunners.heytripsv.ui.screen
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,6 +32,7 @@ import androidx.compose.material.icons.filled.Call
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -41,6 +44,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,12 +55,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.R
@@ -65,6 +71,7 @@ import com.coderunners.heytripsv.ui.components.ReportDialog
 import com.coderunners.heytripsv.ui.theme.MainGreen
 import com.coderunners.heytripsv.ui.theme.NavGray
 import com.coderunners.heytripsv.ui.theme.White
+import com.coderunners.heytripsv.utils.UiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -109,11 +116,8 @@ fun AgencyScreen(mainViewModel: MainViewModel, innerPadding: PaddingValues, onCl
             ){
                 Column(horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxWidth()) {
-                    AsyncImage(model = agency.value.image, contentDescription = agency.value.name, modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f)
-                        .clip(RoundedCornerShape(12.dp)),
-                        contentScale = ContentScale.Crop)
+                    AsyncImage(model = agency.value.image, contentDescription = agency.value.name, contentScale = ContentScale.Crop,
+                        modifier = Modifier.size(200.dp).aspectRatio(1f).clip(CircleShape))
                     Row (verticalAlignment = Alignment.CenterVertically){
                         Text(text = agency.value.name, fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.padding(10.dp))
                         Icon(painter = painterResource(R.drawable.flag), contentDescription = "Flag", modifier = Modifier
