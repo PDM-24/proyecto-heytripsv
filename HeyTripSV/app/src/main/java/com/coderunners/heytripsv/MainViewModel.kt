@@ -22,6 +22,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -56,6 +59,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _upcomingPosts = MutableStateFlow(mutableListOf<PostDataModel>())
     val upcomingPosts = _upcomingPosts.asStateFlow()
 
+    private val _recentPosts = MutableStateFlow(mutableListOf<PostDataModel>())
+    val recentPosts = _recentPosts.asStateFlow()
+
+    //Función para parsear el formato que devuelve la API a dd/MM/yyyy o HH:mm
+    private fun isoDateFormat(dateToFormat: String, time: Boolean = false): String{
+        val dateStr = dateToFormat.removeSuffix("Z")
+        val dateTime = LocalDateTime.parse(dateStr)
+
+        val formatter = DateTimeFormatter.ofPattern(if (!time) "dd/MM/yyyy" else "hh:mm a")
+        return dateTime.format(formatter)
+    }
     fun saveSelectedPost(selectPost: PostDataModel) {
         _selectedPost.value = selectPost
     }
@@ -74,6 +88,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }.toMutableList()
     }
 
+
     fun saveSelectedAgency(agency: String){
         //TODO: Obtener el id de la agencia y obtener la info de esa agenccia
         _selectedAgency.value = agencyData
@@ -88,9 +103,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _ownAgency.value = agency
     }
 
-    //TODO: Obtener ambas listas
-    fun getUpcomingList(){
-        viewModelScope.launch (Dispatchers.IO){
+    //Función que setea las listas de posts de la pantalla de inicio
+    fun getHomePostList(){
+        viewModelScope.launch(Dispatchers.IO){
+            try {
+                _uiState.value = UiState.Loading
+                getUpcomingList()
+                getRecentList()
+                _uiState.value = UiState.Success("Posts retrieved correctly")
+            }catch (e: Exception){
+                _uiState.value = UiState.Error("Error retrieving posts")
+            }
+        }
+    }
+
+    //Función a ejecutar para obtener los post próximos
+    suspend fun getUpcomingList(){
+        return withContext(Dispatchers.IO){
             var apiPostList = PostListResponse()
             try {
                 _uiState.value = UiState.Loading
@@ -102,27 +131,64 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                             id = post.id,
                             title = post.title,
                             image = post.image,
-                            //TODO: formatear fecha
-                            date = post.date,
+                            date = isoDateFormat(post.date),
                             price = post.price,
                             agencyId = post.agency.id,
                             agency = post.agency.name,
                             phone = post.agency.number,
                             description = post.description,
                             meeting = post.meeting,
-                            itinerary = post.itinerary.map { it -> Itinerary(it.time, it.event) },
+                            itinerary = post.itinerary.map { it -> Itinerary(isoDateFormat(it.time, true), it.event) },
                             includes = post.includes,
                             category = post.category,
                             position = Position(post.lat, post.long)
                         )
                     )
                 }
-                _uiState.value = UiState.Success("Post obtenidos")
-                Log.i("MainViewModel", "Post Obtenidos")
+                //_uiState.value = UiState.Success("Posts retrieved correctly")
+                Log.i("MainViewModel", "Posts retrieved correctly")
 
             }catch (e: Exception){
                 Log.i("MainViewModel", e.toString())
-                _uiState.value = UiState.Error("Ha ocurrido un error conectando a la base de datos")
+                _uiState.value = UiState.Error("There was an error connecting to the database")
+            }
+        }
+    }
+
+    //Función a ejecutar para obtener los post recientes
+    suspend fun getRecentList(){
+        return withContext(Dispatchers.IO){
+            var apiPostList = PostListResponse()
+            try {
+                //_uiState.value = UiState.Loading
+                apiPostList = api.getRecent()
+                _recentPosts.value = mutableListOf<PostDataModel>()
+                for (post in apiPostList.posts){
+                    _recentPosts.value.add(
+                        PostDataModel(
+                            id = post.id,
+                            title = post.title,
+                            image = post.image,
+                            date = isoDateFormat(post.date),
+                            price = post.price,
+                            agencyId = post.agency.id,
+                            agency = post.agency.name,
+                            phone = post.agency.number,
+                            description = post.description,
+                            meeting = post.meeting,
+                            itinerary = post.itinerary.map { it -> Itinerary(isoDateFormat(it.time, true), it.event) },
+                            includes = post.includes,
+                            category = post.category,
+                            position = Position(post.lat, post.long)
+                        )
+                    )
+                }
+                //_uiState.value = UiState.Success("Posts retrieved correctly")
+                Log.i("MainViewModel", "Posts retrieved correctly")
+
+            }catch (e: Exception){
+                Log.i("MainViewModel", e.toString())
+                _uiState.value = UiState.Error("There was an error connecting to the database")
             }
         }
     }

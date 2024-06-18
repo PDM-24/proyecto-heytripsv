@@ -84,5 +84,6 @@
     <string name="new_username">Edit Name</string>
     <string name="new_email">Edit Email</string>
     <string name="save_changes">Save Changes</string>
+    <string name="no_posts">There are no posts to show</string>
 
 </resources>
