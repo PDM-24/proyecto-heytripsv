@@ -29,11 +29,11 @@ data class PostApi(
     @SerializedName(value = "price")
     val price: Double = 0.0,
     @SerializedName(value = "includes")
-    val includes: List<String> = listOf(),
+    val includes: MutableList<String> = mutableListOf(),
     @SerializedName(value = "image")
     val image: String = "",
     @SerializedName(value = "itinerary")
-    val itinerary: List<ItineraryApi> = listOf(),
+    val itinerary: MutableList<ItineraryApi> = mutableListOf(),
     @SerializedName(value = "agency")
     val agency: AgencyPostApi = AgencyPostApi()
 

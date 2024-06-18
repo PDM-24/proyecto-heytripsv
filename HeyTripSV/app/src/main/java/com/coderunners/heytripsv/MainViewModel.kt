@@ -1,14 +1,12 @@
 package com.coderunners.heytripsv
 
 import android.app.Application
-import android.content.Context
-import android.content.res.Configuration
+import android.net.Uri
 import android.util.Log
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.coderunners.heytripsv.data.remote.api.ApiClient
+import com.coderunners.heytripsv.data.remote.model.ItineraryApi
 import com.coderunners.heytripsv.data.remote.model.PostListResponse
 import com.coderunners.heytripsv.model.AgencyDataModel
 import com.coderunners.heytripsv.model.Itinerary
@@ -25,7 +23,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -52,8 +49,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _ownAgency = MutableStateFlow(AgencyDataModel())
     val ownAgency = _ownAgency.asStateFlow()
 
-    private val _postAgency = MutableStateFlow(PostDataModel())
-    val postAgency = _postAgency.asStateFlow()
 
     //TODO: Vaciar el valor por defecto (Se va a obtener de la base)
     private val _savedPostList = MutableStateFlow(PostList)
@@ -192,6 +187,33 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }catch (e: Exception){
                 Log.i("MainViewModel", e.toString())
                 _uiState.value = UiState.Error("There was an error connecting to the database")
+            }
+        }
+    }
+
+    fun addPost(
+        postDataModel: PostDataModel,
+        image: Uri? = Uri.parse("https://res.cloudinary.com/dlmtei8cc/image/upload/v1718430757/zjyr4khxybczk6hjibw9.jpg")){
+        viewModelScope.launch(Dispatchers.IO){
+            try {
+                _uiState.value = UiState.Loading
+                val response = api.addPost(
+                    authHeader = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI2NjZlMDM5OGNjYWYxYTFlNGEwMGIzZTAiLCJleHAiOjE3MTk3OTg5OTMsImlhdCI6MTcxODUwMjk5M30.MVkhyzGELqiQIhrIQoWJCVgXzXJKVvZVj30yYaCmwt0",
+                    title = postDataModel.title,
+                    description = postDataModel.description,
+                    date = postDataModel.date,
+                    meeting = postDataModel.meeting,
+                    category = postDataModel.category,
+                    lat = postDataModel.position.lat,
+                    long = postDataModel.position.long,
+                    price =postDataModel.price,
+                    includes = postDataModel.includes,
+                    image= image,
+                    itinerary = postDataModel.itinerary.map{ it -> ItineraryApi(it.time, it.event)}
+                )
+                _uiState.value = UiState.Success(response.toString())
+            }catch (e: Exception){
+                _uiState.value = UiState.Error("Error retrieving posts")
             }
         }
     }

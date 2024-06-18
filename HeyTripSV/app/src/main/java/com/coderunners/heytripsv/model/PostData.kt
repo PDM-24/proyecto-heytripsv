@@ -1,7 +1,5 @@
 package com.coderunners.heytripsv.model
 
-import com.coderunners.heytripsv.R
-
 data class PostDataModel(
     val id: String = "",
     val title: String = "",
@@ -13,8 +11,8 @@ data class PostDataModel(
     val phone: String = "",
     val description: String = "",
     val meeting: String = "",
-    val itinerary: List<Itinerary> = listOf(),
-    val includes: List<String> = listOf(),
+    val itinerary: List<Itinerary> = mutableListOf(),
+    val includes: MutableList<String> = mutableListOf(),
     val category: String = "",
     val position: Position = Position(0.0, 0.0),
     val user: String = ""
@@ -26,6 +24,6 @@ data class Position(
 )
 
 data class Itinerary(
-    val time: String,
-    val event: String
+    var time: String,
+    var event: String
 )

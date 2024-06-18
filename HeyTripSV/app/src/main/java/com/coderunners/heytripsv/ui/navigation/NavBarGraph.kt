@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.ui.screen.AboutUsScreen
+import com.coderunners.heytripsv.ui.screen.AddPostScreen
 import com.coderunners.heytripsv.ui.screen.AgencyScreen
 import com.coderunners.heytripsv.ui.screen.CreateAccount
 import com.coderunners.heytripsv.ui.screen.LogIn
@@ -21,6 +22,7 @@ import com.coderunners.heytripsv.ui.screen.ProfileScreen
 import com.coderunners.heytripsv.ui.screen.SavedScreen
 import com.coderunners.heytripsv.ui.screen.SearchScreen
 import com.coderunners.heytripsv.ui.screen.UserProfile
+import com.google.maps.android.compose.AdvancedMarker
 
 
 @Composable
@@ -83,6 +85,8 @@ fun NavBarGraph(
         composable(ScreenRoute.userProfile.route){
             UserProfile(innerPadding = innerPadding, navController = navController)
         }
-
+        composable(ScreenRoute.addPost.route){
+            AddPostScreen(innerPadding = innerPadding, mainViewModel = mainViewModel)
+        }
     }
 }
