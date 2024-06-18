@@ -28,6 +28,9 @@ class MainViewModel: ViewModel() {
     private val _ownAgency = MutableStateFlow(AgencyDataModel())
     val ownAgency = _ownAgency.asStateFlow()
 
+    private val _postAgency = MutableStateFlow(PostDataModel())
+    val postAgency = _postAgency.asStateFlow()
+
     //TODO: Vaciar el valor por defecto (Se va a obtener de la base)
     private val _savedPostList = MutableStateFlow(PostList)
     val savedPostList = _savedPostList.asStateFlow()
