@@ -150,7 +150,9 @@ fun PostViewScreen(
         UiState.Ready -> {}
         is UiState.Success -> {
             viewModel.setStateToReady()
-            navController.navigate(ScreenRoute.Agency.route)
+            if (navController.currentBackStackEntry?.destination?.route == ScreenRoute.PostView.route){
+                navController.navigate(ScreenRoute.Agency.route)
+            }
         }
     }
 

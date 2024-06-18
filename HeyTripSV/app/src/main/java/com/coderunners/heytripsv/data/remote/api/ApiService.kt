@@ -5,6 +5,7 @@ import com.coderunners.heytripsv.data.remote.model.PostListResponse
 import com.coderunners.heytripsv.utils.Constants
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -30,5 +31,9 @@ interface ApiService {
     @Headers(value = ["Content-Type: application/json"])
     @GET(value = Constants.API_PATH + Constants.GET_AGENCY + "{id}")
     suspend fun getAgency(@Path("id") id : String): AgencyResponse
+
+    @Headers(value = ["Content-Type: application/json"])
+    @GET(value = Constants.API_PATH + Constants.GET_SAVED_USER)
+    suspend fun getSaved(@Header("Authorization") authHeader: String): PostListResponse
 
 }
