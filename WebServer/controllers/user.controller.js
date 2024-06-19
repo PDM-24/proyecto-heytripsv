@@ -31,7 +31,14 @@ controller.editOwn = async (req, res, next) => {
 controller.getSaved = async(req, res, next) => {
     try{
         const {_id} = req.user
-        const user = await User.findOne({_id: _id}).populate("saved", "title description date meeting itinerary includes category lat long image price agency")
+        const user = await User.findOne({_id: _id}).populate({
+            path: 'saved',
+            select: 'title description date meeting itinerary includes category lat long image price agency',
+            populate: {
+                path: 'agency',
+                select: 'name number'
+            }
+        });
 
         if (!user) {
             return res.status(404).json({error: "Not found"})

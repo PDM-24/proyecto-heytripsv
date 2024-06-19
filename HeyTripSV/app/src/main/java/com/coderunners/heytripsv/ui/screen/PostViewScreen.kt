@@ -1,11 +1,13 @@
 package com.coderunners.heytripsv.ui.screen
 
 import android.view.MotionEvent
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -25,6 +27,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
@@ -44,6 +47,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -59,6 +63,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.coderunners.heytripsv.MainViewModel
@@ -71,6 +76,7 @@ import com.coderunners.heytripsv.ui.theme.MainGreen
 import com.coderunners.heytripsv.ui.theme.NavGray
 import com.coderunners.heytripsv.ui.theme.TextGray
 import com.coderunners.heytripsv.ui.theme.White
+import com.coderunners.heytripsv.utils.UiState
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -114,6 +120,41 @@ fun PostViewScreen(
             columnScrollingEnabled.value = true
         }
     }
+    // Estado para controlar el estado de la interfaz desde viewModel
+    val postViewState = viewModel.uiState.collectAsState()
+
+    when(postViewState.value){
+        is UiState.Error -> {
+            val message = (postViewState.value as UiState.Error).msg
+            Toast.makeText(LocalContext.current, message, Toast.LENGTH_SHORT).show()
+            viewModel.setStateToReady()
+        }
+        UiState.Loading -> {
+            Dialog(
+                onDismissRequest = { },
+                DialogProperties(
+                    dismissOnBackPress = false,
+                    dismissOnClickOutside = false
+                )
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .background(Color.Transparent)
+                ){
+                    CircularProgressIndicator()
+                }
+            }
+        }
+        UiState.Ready -> {}
+        is UiState.Success -> {
+            viewModel.setStateToReady()
+            if (navController.currentBackStackEntry?.destination?.route == ScreenRoute.PostView.route){
+                navController.navigate(ScreenRoute.Agency.route)
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -141,8 +182,7 @@ fun PostViewScreen(
         ) {
             Text(text = (stringResource(R.string.provided_by) + " " ), modifier = Modifier.wrapContentHeight(), color = NavGray)
             ClickableText(text = AnnotatedString(post.value.agency), modifier = Modifier.wrapContentHeight(), style = TextStyle(color = Color(0xFF3366BB))) {
-                viewModel.saveSelectedAgency(post.value.agencyId)
-                navController.navigate(ScreenRoute.Agency.route)
+                viewModel.getAgencyData(post.value.agencyId)
             }
         }
         Button(onClick = { /*TODO*/ },

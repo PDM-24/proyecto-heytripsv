@@ -37,6 +37,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _selectedPost = MutableStateFlow(PostDataModel())
     val selectedPost = _selectedPost.asStateFlow()
 
+    private val _agencyId = MutableStateFlow("")
+    val agencyId = _agencyId.asStateFlow()
+
     private val _categoryList = MutableStateFlow(mutableListOf<PostDataModel>())
     val categoryList = _categoryList.asStateFlow()
 
@@ -49,9 +52,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _ownAgency = MutableStateFlow(AgencyDataModel())
     val ownAgency = _ownAgency.asStateFlow()
 
-
-    //TODO: Vaciar el valor por defecto (Se va a obtener de la base)
-    private val _savedPostList = MutableStateFlow(PostList)
+    private val _savedPostList = MutableStateFlow(mutableListOf<PostDataModel>())
     val savedPostList = _savedPostList.asStateFlow()
 
     private val _upcomingPosts = MutableStateFlow(mutableListOf<PostDataModel>())
@@ -62,14 +63,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //Función para parsear el formato que devuelve la API a dd/MM/yyyy o HH:mm
     private fun isoDateFormat(dateToFormat: String, time: Boolean = false): String{
-        val dateStr = dateToFormat.removeSuffix("Z")
-        val dateTime = LocalDateTime.parse(dateStr)
+        try {
+            val dateStr = dateToFormat.removeSuffix("Z")
+            val dateTime = LocalDateTime.parse(dateStr)
 
-        val formatter = DateTimeFormatter.ofPattern(if (!time) "dd/MM/yyyy" else "hh:mm a")
-        return dateTime.format(formatter)
+            val formatter = DateTimeFormatter.ofPattern(if (!time) "dd/MM/yyyy" else "hh:mm a")
+            return dateTime.format(formatter)
+        }catch(e: Exception){
+            Log.i("MainViewModel", e.toString())
+            return if (time) "HH-mm a" else "dd/MM/yyyy"
+        }
     }
     fun saveSelectedPost(selectPost: PostDataModel) {
         _selectedPost.value = selectPost
+    }
+
+    fun setAgencyId(id: String){
+        _agencyId.value = id
     }
 
     fun saveSelectedCategory(category: String){
@@ -84,17 +94,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 else -> false
             }
         }.toMutableList()
-    }
-
-
-    fun saveSelectedAgency(agency: String){
-        //TODO: Obtener el id de la agencia y obtener la info de esa agenccia
-        _selectedAgency.value = agencyData
-    }
-
-    fun getSavedPosts(){
-        //TODO: Obtener la lista de posts guardados del usuario loggeado
-
     }
 
     fun setOwnAgency(agency: AgencyDataModel){
@@ -187,6 +186,87 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }catch (e: Exception){
                 Log.i("MainViewModel", e.toString())
                 _uiState.value = UiState.Error("There was an error connecting to the database")
+            }
+        }
+    }
+
+    //Función para obtener la información de la agencia
+    fun getAgencyData(id: String){
+        viewModelScope.launch (Dispatchers.IO){
+            try {
+                _uiState.value = UiState.Loading
+                val obtainedAgency = api.getAgency(id)
+                _selectedAgency.value = AgencyDataModel(
+                    id = obtainedAgency.agency.id,
+                    name = obtainedAgency.agency.name,
+                    desc = obtainedAgency.agency.description,
+                    email = obtainedAgency.agency.email,
+                    dui = obtainedAgency.agency.dui,
+                    image = obtainedAgency.agency.image,
+                    number = obtainedAgency.agency.number,
+                    instagram = obtainedAgency.agency.instagram,
+                    facebook = obtainedAgency.agency.facebook,
+                    postList = obtainedAgency.posts.map { post->
+                        PostDataModel(
+                            id = post.id,
+                            title = post.title,
+                            image = post.image,
+                            date = isoDateFormat(post.date),
+                            price = post.price,
+                            agencyId = post.agency.id,
+                            agency = post.agency.name,
+                            phone = post.agency.number,
+                            description = post.description,
+                            meeting = post.meeting,
+                            itinerary = post.itinerary.map { it -> Itinerary(isoDateFormat(it.time, true), it.event) },
+                            includes = post.includes,
+                            category = post.category,
+                            position = Position(post.lat, post.long))
+                    }.toMutableList()
+                )
+                Log.i("MainVewModel", "Agency retrieved correctly")
+                _uiState.value = UiState.Success("Agency retrieved correctly")
+            }catch (e: Exception){
+                Log.i("MainVewModel", e.toString())
+                _uiState.value = UiState.Error(e.toString())
+            }
+
+        }
+    }
+
+    //Función para obtener los posts guardados de un usuario usando el token
+    fun getSavedPosts(){
+        viewModelScope.launch(Dispatchers.IO){
+            try {
+                _uiState.value = UiState.Loading
+                //TODO: obtener el token del datastore (login)
+                val apiList = api.getSaved("Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI2NjZkZjg2YzdhOWMyN2NmM2M4ODBkMjMiLCJleHAiOjE3MTk4MDE5MTYsImlhdCI6MTcxODUwNTkxNn0.Lb45PXk_UXFoFPDVcA-yROLNr4Ljm-7plqkqIFbAiLA")
+                _savedPostList.value = mutableListOf()
+                for (post in apiList.posts){
+                    _savedPostList.value.add(
+                        PostDataModel(
+                            id = post.id,
+                            title = post.title,
+                            image = post.image,
+                            date = isoDateFormat(post.date),
+                            price = post.price,
+                            agencyId = post.agency.id,
+                            agency = post.agency.name,
+                            phone = post.agency.number,
+                            description = post.description,
+                            meeting = post.meeting,
+                            itinerary = post.itinerary.map { it -> Itinerary(isoDateFormat(it.time, true), it.event) },
+                            includes = post.includes,
+                            category = post.category,
+                            position = Position(post.lat, post.long)
+                        )
+                    )
+                }
+                Log.i("MainVewModel", "Posts retrieved correctly")
+                _uiState.value = UiState.Success("Posts retrieved correctly")
+            }catch (e: Exception){
+                Log.i("MainVewModel", e.toString())
+                _uiState.value = UiState.Error(e.toString())
             }
         }
     }

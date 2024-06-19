@@ -2,6 +2,7 @@ package com.coderunners.heytripsv.data.remote.api
 
 import android.net.Uri
 import com.coderunners.heytripsv.data.remote.model.ItineraryApi
+import com.coderunners.heytripsv.data.remote.model.AgencyResponse
 import com.coderunners.heytripsv.data.remote.model.PostListResponse
 import com.coderunners.heytripsv.utils.Constants
 import retrofit2.http.Body
@@ -46,4 +47,12 @@ interface ApiService {
         @Part("image") image: Uri?,
         @Part("itinerary") itinerary: List<ItineraryApi>
         ) : APIResponseSuccesful
+    @Headers(value = ["Content-Type: application/json"])
+    @GET(value = Constants.API_PATH + Constants.GET_AGENCY + "{id}")
+    suspend fun getAgency(@Path("id") id : String): AgencyResponse
+
+    @Headers(value = ["Content-Type: application/json"])
+    @GET(value = Constants.API_PATH + Constants.GET_SAVED_USER)
+    suspend fun getSaved(@Header("Authorization") authHeader: String): PostListResponse
+
 }
