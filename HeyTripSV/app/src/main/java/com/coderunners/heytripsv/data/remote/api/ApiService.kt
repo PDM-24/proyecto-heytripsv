@@ -10,6 +10,7 @@ import com.coderunners.heytripsv.utils.Constants
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
@@ -63,4 +64,10 @@ interface ApiService {
     @Headers(value = ["Content-Type: application/json "])
     @POST(value= Constants.API_PATH + Constants.POST_LOGIN)
     suspend fun logIn(@Body logInBody: LogInBody): LogInResponse
+
+    @Headers(value = ["Content-Type: application/json"])
+    @DELETE(value = Constants.API_PATH + Constants.DELETE_POST + "{postId}")
+    suspend fun deletePost(
+        @Header("Authorization") authHeader: String,
+        @Path("postId") postId: String): APIResponseSuccesful
 }
