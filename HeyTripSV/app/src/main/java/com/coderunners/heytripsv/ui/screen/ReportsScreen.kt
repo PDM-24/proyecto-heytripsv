@@ -15,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -122,34 +123,39 @@ fun ReportedItem(item: ReportedItem) {
             Image(
                 painter = painterResource(id = item.imageRes),
                 contentDescription = null,
-                modifier = Modifier.size(100.dp)
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(RoundedCornerShape(16.dp))
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(item.title, fontWeight = FontWeight.Bold)
-                Text(item.description, color = Color.Gray)
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                IconButton(
-                    onClick = { /* Handle approve */ },
-                    modifier = Modifier
-                        .background(MainGreen, shape = RoundedCornerShape(4.dp))
-                        .size(32.dp)
-                ) {
-                    Icon(Icons.Filled.Check, contentDescription = "Approve", tint = Color.White)
-                }
-                IconButton(
-                    onClick = { /* Handle delete */ },
-                    modifier = Modifier
-                        .background(Color(0xFFCC0000), shape = RoundedCornerShape(4.dp))
-                        .size(32.dp)
-                ) {
-                    Icon(Icons.Filled.Delete, contentDescription = "Delete", tint = Color.White)
+                Column {
+                    Text(item.description, color = Color.Gray)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        IconButton(
+                            onClick = { /* Handle approve */ },
+                            modifier = Modifier
+                                .background(MainGreen, shape = RoundedCornerShape(4.dp))
+                                .size(32.dp)
+                        ) {
+                            Icon(Icons.Filled.Check, contentDescription = "Approve", tint = Color.White)
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        IconButton(
+                            onClick = { /* Handle delete */ },
+                            modifier = Modifier
+                                .background(Color(0xFFCC0000), shape = RoundedCornerShape(4.dp))
+                                .size(32.dp)
+                        ) {
+                            Icon(Icons.Filled.Delete, contentDescription = "Delete", tint = Color.White)
+                        }
+                    }
                 }
             }
         }
@@ -170,7 +176,9 @@ fun ReportedAccount(account: ReportedAccount) {
             Image(
                 painter = painterResource(id = account.imageRes),
                 contentDescription = null,
-                modifier = Modifier.size(80.dp)
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(RoundedCornerShape(12.dp))
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(
@@ -179,6 +187,7 @@ fun ReportedAccount(account: ReportedAccount) {
                 Text(account.username, fontWeight = FontWeight.Bold)
                 Text(account.reason, color = Color.Gray)
             }
+            Spacer(modifier = Modifier.weight(1f))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)

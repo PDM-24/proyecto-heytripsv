@@ -74,6 +74,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _recentPosts = MutableStateFlow(mutableListOf<PostDataModel>())
     val recentPosts = _recentPosts.asStateFlow()
 
+    // Variable para el rol de administrador
+    private val _isAdmin = MutableStateFlow(false)
+    val isAdmin = _isAdmin.asStateFlow()
+
     //Función para parsear el formato que devuelve la API a dd/MM/yyyy o HH:mm
     private fun isoDateFormat(dateToFormat: String, time: Boolean = false): String{
         try {
@@ -342,4 +346,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.value = UiState.Ready
     }
 
+    //Funcion para eliminar post
+    fun deletePost(postId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                _uiState.value = UiState.Loading
+                val response = api.deletePost("Bearer " + datastore.getToken(), postId)
+                // Actualizar la lista de posts eliminando el post con el postId
+                val updatedPosts = _upcomingPosts.value.filter { it.id != postId }
+                _upcomingPosts.value = updatedPosts.toMutableList()
+                _uiState.value = UiState.Success("El post ha sido eliminado exitosamente!")
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "Error eliminando post: $e")
+                _uiState.value = UiState.Error("Error eliminando post")
+            }
+        }
+    }
 }

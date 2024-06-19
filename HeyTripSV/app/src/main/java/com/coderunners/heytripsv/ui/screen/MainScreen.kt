@@ -14,10 +14,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -47,13 +53,13 @@ import com.coderunners.heytripsv.ui.theme.White
 import com.coderunners.heytripsv.utils.UiState
 
 @Composable
-fun MainScreen( innerPadding: PaddingValues, mainViewModel: MainViewModel, navController: NavHostController ){
+fun MainScreen(innerPadding: PaddingValues, mainViewModel: MainViewModel, navController: NavHostController) {
     val context = LocalContext.current
     val updateScreenState = mainViewModel.uiState.collectAsState()
     val loading = remember {
         mutableStateOf(false)
     }
-    when(updateScreenState.value){
+    when (updateScreenState.value) {
         is UiState.Error -> {
             val message = (updateScreenState.value as UiState.Error).msg
             Toast.makeText(LocalContext.current, message, Toast.LENGTH_SHORT).show()
@@ -72,33 +78,42 @@ fun MainScreen( innerPadding: PaddingValues, mainViewModel: MainViewModel, navCo
 
     val upcomingList = mainViewModel.upcomingPosts.collectAsState()
     val recentList = mainViewModel.recentPosts.collectAsState()
+    val isAdmin = mainViewModel.isAdmin.collectAsState()
 
-    LaunchedEffect (Unit){
+    LaunchedEffect(Unit) {
         mainViewModel.getHomePostList()
     }
 
-    Column (
+    Column(
         modifier = Modifier
             .padding(innerPadding)
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
-    ){
+    ) {
         //Categories
         Row(
             modifier = Modifier
                 .background(MainGreen)
                 .fillMaxWidth()
                 .padding(15.dp)
-        ){
-            Column(
-
-            ) {
-                Text(text = stringResource(R.string.categories), color = TextGray, modifier = Modifier.padding(5.dp, 0.dp, 5.dp, 0.dp), fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                Text(text = stringResource(R.string.categories_desc), color = White, modifier = Modifier.padding(5.dp))
+        ) {
+            Column {
+                Text(
+                    text = stringResource(R.string.categories),
+                    color = TextGray,
+                    modifier = Modifier.padding(5.dp, 0.dp, 5.dp, 0.dp),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
+                )
+                Text(
+                    text = stringResource(R.string.categories_desc),
+                    color = White,
+                    modifier = Modifier.padding(5.dp)
+                )
                 Row(
                     modifier = Modifier.fillMaxWidth()
-                ){
-                    Column (
+                ) {
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth(0.5f)
                             .padding(5.dp)
@@ -106,7 +121,7 @@ fun MainScreen( innerPadding: PaddingValues, mainViewModel: MainViewModel, navCo
                         Button(onClick = {
                             mainViewModel.saveSelectedCategory(context.resources.getString(R.string.beaches))
                             navController.navigate(ScreenRoute.Category.route)
-                                         },
+                        },
                             modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = White
@@ -116,7 +131,7 @@ fun MainScreen( innerPadding: PaddingValues, mainViewModel: MainViewModel, navCo
                         Button(onClick = {
                             mainViewModel.saveSelectedCategory(context.resources.getString(R.string.towns))
                             navController.navigate(ScreenRoute.Category.route)
-                                         },
+                        },
                             modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = White
@@ -126,7 +141,7 @@ fun MainScreen( innerPadding: PaddingValues, mainViewModel: MainViewModel, navCo
                         Button(onClick = {
                             mainViewModel.saveSelectedCategory(context.resources.getString(R.string.others))
                             navController.navigate(ScreenRoute.Category.route)
-                                         },
+                        },
                             modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = White
@@ -134,7 +149,7 @@ fun MainScreen( innerPadding: PaddingValues, mainViewModel: MainViewModel, navCo
                             Text(text = stringResource(R.string.others), color = TextGray)
                         }
                     }
-                    Column (
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth(1f)
                             .padding(5.dp)
@@ -142,7 +157,7 @@ fun MainScreen( innerPadding: PaddingValues, mainViewModel: MainViewModel, navCo
                         Button(onClick = {
                             mainViewModel.saveSelectedCategory(context.resources.getString(R.string.mountains))
                             navController.navigate(ScreenRoute.Category.route)
-                                         },
+                        },
                             modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = White
@@ -152,7 +167,7 @@ fun MainScreen( innerPadding: PaddingValues, mainViewModel: MainViewModel, navCo
                         Button(onClick = {
                             mainViewModel.saveSelectedCategory(context.resources.getString(R.string.routes))
                             navController.navigate(ScreenRoute.Category.route)
-                                         },
+                        },
                             modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = White
@@ -170,52 +185,43 @@ fun MainScreen( innerPadding: PaddingValues, mainViewModel: MainViewModel, navCo
             modifier = Modifier.padding(10.dp)
         ) {
             Column {
-                Text(text = stringResource(id = R.string.upcoming), fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(0.dp, 10.dp))
-                if (loading.value){
+                Text(
+                    text = stringResource(id = R.string.upcoming),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(0.dp, 10.dp)
+                )
+                if (loading.value) {
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                         CircularProgressIndicator(modifier = Modifier.size(30.dp, 30.dp))
                     }
                 } else {
-                    if (upcomingList.value.size == 0){
-                        Text(text = stringResource(id = R.string.no_posts), modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(15.dp), textAlign = TextAlign.Center)
+                    if (upcomingList.value.size == 0) {
+                        Text(
+                            text = stringResource(id = R.string.no_posts),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(15.dp),
+                            textAlign = TextAlign.Center
+                        )
                     }
                     LazyRow {
-                        items(upcomingList.value){
-                                postItem ->
+                        items(upcomingList.value) { postItem ->
                             PostCard(post = postItem) {
-                                mainViewModel.saveSelectedPost(postItem)
-                                navController.navigate(ScreenRoute.PostView.route)
+                                mainViewModel.deletePost(postItem.id)
                             }
-                        }
-                    }
-                }
-            }
-        }
-        Spacer(modifier = Modifier.padding(5.dp))
-        //PostCards
-        Row(
-            modifier = Modifier.padding(10.dp)
-        ) {
-            Column {
-                Text(text = stringResource(id = R.string.recently), fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(0.dp, 10.dp))
-                if (loading.value){
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                        CircularProgressIndicator(modifier = Modifier.size(30.dp, 30.dp))
-                    }
-                } else {
-                    if (recentList.value.size == 0){
-                        Text(text = stringResource(id = R.string.no_posts), modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(15.dp), textAlign = TextAlign.Center)
-                    }
-                    LazyRow {
-                        items(recentList.value){
-                                postItem ->
-                            PostCard(post = postItem) {
-                                mainViewModel.saveSelectedPost(postItem)
-                                navController.navigate(ScreenRoute.PostView.route)
+                            if (isAdmin.value) {
+                                IconButton(
+                                    onClick = {
+                                        mainViewModel.deletePost(postItem.id)
+                                    },
+                                    modifier = Modifier
+                                        .padding(start = 8.dp)
+                                        .size(32.dp)
+                                        .background(Color(0xFFCC0000), shape = RoundedCornerShape(4.dp))
+                                ) {
+                                    Icon(Icons.Filled.Delete, contentDescription = "Delete", tint = Color.White)
+                                }
                             }
                         }
                     }
