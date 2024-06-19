@@ -19,6 +19,7 @@ import com.coderunners.heytripsv.ui.screen.ForgotPassword
 import com.coderunners.heytripsv.ui.screen.MainScreen
 import com.coderunners.heytripsv.ui.screen.PostViewScreen
 import com.coderunners.heytripsv.ui.screen.ProfileScreen
+import com.coderunners.heytripsv.ui.screen.RegisterAgency
 import com.coderunners.heytripsv.ui.screen.SavedScreen
 import com.coderunners.heytripsv.ui.screen.SearchScreen
 import com.coderunners.heytripsv.ui.screen.UserProfile
@@ -88,5 +89,9 @@ fun NavBarGraph(
         composable(ScreenRoute.addPost.route){
             AddPostScreen(innerPadding = innerPadding, mainViewModel = mainViewModel)
         }
+        composable(ScreenRoute.RegisterAgency.route){
+            RegisterAgency(innerPadding = innerPadding, navController = navController)
+        }
+
     }
 }
