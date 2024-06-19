@@ -49,7 +49,7 @@ fun NavBarGraph(
                 AboutUsScreen(innerPadding)
             }
         composable(ScreenRoute.LogIn.route){
-            LogIn(innerPadding, navController)
+            LogIn(innerPadding, navController, mainViewModel)
         }
         composable(ScreenRoute.ForgotPassword.route){
             ForgotPassword(innerPadding, navController)

@@ -1,8 +1,12 @@
 package com.coderunners.heytripsv.ui.screen
 
 import android.text.style.ForegroundColorSpan
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -10,15 +14,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -37,27 +46,80 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
+import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.R
+import com.coderunners.heytripsv.model.LogInData
 import com.coderunners.heytripsv.ui.navigation.ScreenRoute
 import com.coderunners.heytripsv.ui.theme.MainGreen
 import com.coderunners.heytripsv.ui.theme.TextGray
+import com.coderunners.heytripsv.utils.UiState
+import com.google.android.gms.common.api.Status
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
 
 @Composable
-fun PasswordTextField() {
-    var password by remember { mutableStateOf("") }
+fun LogIn(innerPadding: PaddingValues, navController: NavController, mainViewModel: MainViewModel) {
+    val logInData = remember {
+        mutableStateOf(LogInData())
+    }
+    val logInViewState = mainViewModel.uiState.collectAsState()
 
-    OutlinedTextField(
-        value = password,
-        onValueChange = { password = it },
-        visualTransformation = PasswordVisualTransformation(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-    )
-}
+    when(logInViewState.value) {
+        is UiState.Error -> {
+            val message = (logInViewState.value as UiState.Error).msg
+            Toast.makeText(LocalContext.current, message, Toast.LENGTH_SHORT).show()
+            mainViewModel.setStateToReady()
+        }
 
-@Composable
-fun LogIn(innerPadding: PaddingValues, navController: NavController) {
-    val email = remember { mutableStateOf("") }
+        UiState.Loading -> {
+            Dialog(
+                onDismissRequest = { },
+                DialogProperties(
+                    dismissOnBackPress = false,
+                    dismissOnClickOutside = false
+                )
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .background(Color.Transparent)
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+        }
+
+        UiState.Ready -> {}
+        is UiState.Success -> {
+            mainViewModel.setStateToReady()
+            
+            LaunchedEffect(Unit) {
+                mainViewModel.datastore.getRole().collect { response ->
+                    if (response != null) {
+                        Log.i("viewModel", response)
+                    } else{
+                        Log.i("viewModel", "nada")
+                    }
+                    if (response == "agency") {
+                        //TODO: PANTALLA INICIAL AGENCY
+                    } else if (response == "admin") {
+                        //TODO: PANTALLA INICIAL admin
+
+                    }else{
+                        navController.navigate(ScreenRoute.Home.route)
+                     }
+                }
+
+            }
+        }
+    }
+
     val annotatedStringPass = AnnotatedString.Builder().apply {
 
         append(stringResource(id = R.string.fg_password))
@@ -107,9 +169,9 @@ fun LogIn(innerPadding: PaddingValues, navController: NavController) {
 
         Spacer(modifier = Modifier.height(10.dp))
         OutlinedTextField(
-            value = email.value,
+            value = logInData.value.email,
             onValueChange = {
-                email.value = it
+                logInData.value = logInData.value.copy(email = it)
             },
             placeholder = { Text("") },
         )
@@ -123,7 +185,12 @@ fun LogIn(innerPadding: PaddingValues, navController: NavController) {
                 .padding(horizontal = 16.dp)
         )
         Spacer(modifier = Modifier.height(10.dp))
-        PasswordTextField()
+        OutlinedTextField(
+            value = logInData.value.password,
+            onValueChange = { logInData.value = logInData.value.copy(password = it) },
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+        )
         Spacer(modifier = Modifier.height(15.dp))
         ClickableText(
             text = annotatedStringPass,
@@ -138,7 +205,7 @@ fun LogIn(innerPadding: PaddingValues, navController: NavController) {
         )
         Spacer(modifier = Modifier.height(15.dp))
         Button(onClick = {
-                         navController.navigate(ScreenRoute.userProfile.route)
+                mainViewModel.LogIn(logInData.value)
         },
             modifier = Modifier
                 .fillMaxWidth(0.8f)
