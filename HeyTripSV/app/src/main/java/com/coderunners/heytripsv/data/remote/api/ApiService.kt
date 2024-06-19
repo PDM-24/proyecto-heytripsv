@@ -5,6 +5,8 @@ import com.coderunners.heytripsv.data.remote.model.ItineraryApi
 import com.coderunners.heytripsv.data.remote.model.AgencyResponse
 import com.coderunners.heytripsv.data.remote.model.PostListResponse
 import com.coderunners.heytripsv.utils.Constants
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -12,6 +14,7 @@ import retrofit2.http.Headers
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
@@ -35,17 +38,17 @@ interface ApiService {
     @POST(value = Constants.API_PATH + Constants.POST_CREATE)
     suspend fun addPost(
         @Header("Authorization") authHeader: String,
-        @Part("title") title : String,
-        @Part("description") description: String,
-        @Part("date") date: String,
-        @Part("meeting") meeting: String,
-        @Part("category") category: String,
-        @Part("lat") lat: Double,
-        @Part("long") long: Double,
-        @Part("price") price: Double,
-        @Part("includes") includes: List<String>,
-        @Part("image") image: Uri?,
-        @Part("itinerary") itinerary: List<ItineraryApi>
+        @Part("title") title: RequestBody,
+        @Part("description") description: RequestBody,
+        @Part("date") date: RequestBody,
+        @Part("meeting") meeting: RequestBody,
+        @Part("category") category: RequestBody,
+        @Part("lat") lat: RequestBody,
+        @Part("long") long: RequestBody,
+        @Part("price") price: RequestBody,
+        @Part includes: List<MultipartBody.Part>,
+        @Part image: MultipartBody.Part?,
+        @Part itinerary: List<MultipartBody.Part>
         ) : APIResponseSuccesful
     @Headers(value = ["Content-Type: application/json"])
     @GET(value = Constants.API_PATH + Constants.GET_AGENCY + "{id}")

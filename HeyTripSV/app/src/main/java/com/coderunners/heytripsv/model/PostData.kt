@@ -11,9 +11,9 @@ data class PostDataModel(
     val phone: String = "",
     val description: String = "",
     val meeting: String = "",
-    val itinerary: List<Itinerary> = mutableListOf(),
+    val itinerary: MutableList<Itinerary> = mutableListOf(),
     val includes: MutableList<String> = mutableListOf(),
-    val category: String = "",
+    val category: String = "Playas",
     val position: Position = Position(0.0, 0.0),
     val user: String = ""
 )

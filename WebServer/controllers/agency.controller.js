@@ -105,14 +105,14 @@ controller.editOwn = async (req, res, next) => {
         const signature = cloudinary.utils.api_sign_request({
             timestamp: timestamp,
             public_id: _id,
-            upload_preset: "HeyTripSV",
+            upload_preset: "FoundHound",
             overwrite: true
         }, process.env.CLOUDINARY_SECRET);
         const b64 = Buffer.from(req.file.buffer).toString("base64");
         let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
         const formData = new FormData();
         formData.append("file", dataURI);
-        formData.append("upload_preset", "HeyTripSV");
+        formData.append("upload_preset", "FoundHound");
         formData.append("cloud_name", "dlmtei8cc")
         formData.append("public_id", _id);
         formData.append("overwrite", true);

@@ -1,6 +1,7 @@
 package com.coderunners.heytripsv.ui.screen
 
 import android.net.Uri
+import android.util.Log
 import android.view.MotionEvent
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -74,12 +75,16 @@ fun AddPostScreen(
     mainViewModel: MainViewModel,
     innerPadding: PaddingValues
     ) {
-
+    val context = LocalContext.current
     val selectedImage= remember { mutableStateOf<Uri?>(null) }
     val count = remember { mutableStateOf(1) }
     val itiCount = remember { mutableStateOf(1) }
     val selectedDate = remember { mutableStateOf(LocalDate.now())}
-    val post = remember { mutableStateOf(PostDataModel(position = Position(13.699217, -89.1921333))) }
+    val priceText = remember { mutableStateOf("") }
+    val post = remember { mutableStateOf(PostDataModel(
+        position = Position(13.699217, -89.1921333),
+        itinerary = mutableListOf(Itinerary("", "")),
+        includes = mutableListOf(""))) }
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(post.value.position.lat, post.value.position.long), 10f)
     }
@@ -125,148 +130,148 @@ fun AddPostScreen(
         }
     }
 
-        Column(
+        LazyColumn(
             modifier = androidx.compose.ui.Modifier
                 .padding(innerPadding)
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState()),
+                .fillMaxWidth(),
+            userScrollEnabled = columnScrollingEnabled.value,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(75.dp))
-            Text(
-                text = stringResource(R.string.add_tour),
-                color = TextGray,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 35.sp
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = stringResource(R.string.title),
-                color = TextGray,
-                fontWeight = FontWeight.Normal,
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .padding(horizontal = 10.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                value = post.value.title,
-                onValueChange = {post.value = post.value.copy(title = it)},
-                placeholder = { Text("") },
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = stringResource(R.string.date),
-                color = TextGray,
-                fontWeight = FontWeight.Normal,
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .padding(horizontal = 10.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
+            item {
+                Spacer(modifier = Modifier.height(75.dp))
+                Text(
+                    text = stringResource(R.string.add_tour),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 35.sp
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringResource(R.string.title),
+                    fontWeight = FontWeight.Normal,
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .padding(horizontal = 10.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = post.value.title,
+                    onValueChange = {post.value = post.value.copy(title = it)},
+                    placeholder = { Text("") },
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringResource(R.string.date),
+                    fontWeight = FontWeight.Normal,
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .padding(horizontal = 10.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
 
-            CustomDatePicker(value = selectedDate.value ) {
-                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                selectedDate.value = it
-                post.value = post.value.copy(date = selectedDate.value.format(formatter))
+                CustomDatePicker(value = selectedDate.value ) {
+                    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                    selectedDate.value = it
+                    post.value = post.value.copy(date = selectedDate.value.format(formatter))
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringResource(R.string.price),
+                    fontWeight = FontWeight.Normal,
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .padding(horizontal = 10.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = priceText.value,
+                    onValueChange = {
+                        priceText.value = it},
+                    placeholder = { Text("") },
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringResource(R.string.meeting_place),
+                    fontWeight = FontWeight.Normal,
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .padding(horizontal = 10.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = post.value.meeting,
+                    onValueChange = {post.value = post.value.copy(meeting = it)},
+                    placeholder = { Text("") },
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringResource(R.string.includes),
+                    fontWeight = FontWeight.Normal,
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .padding(horizontal = 10.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
             }
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = stringResource(R.string.price),
-                color = TextGray,
-                fontWeight = FontWeight.Normal,
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .padding(horizontal = 10.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                value = post.value.price.toString(),
-                onValueChange = {post.value = post.value.copy(price = it.toDouble())},
-                placeholder = { Text("") },
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = stringResource(R.string.meeting_place),
-                color = TextGray,
-                fontWeight = FontWeight.Normal,
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .padding(horizontal = 10.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                value = post.value.meeting,
-                onValueChange = {post.value = post.value.copy(meeting = it)},
-                placeholder = { Text("") },
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = stringResource(R.string.includes),
-                color = TextGray,
-                fontWeight = FontWeight.Normal,
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .padding(horizontal = 10.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            LazyColumn {
                 items(count.value){ index->
                 OutlinedTextField(
                     modifier = Modifier
                         .height(100.dp),
-                    value = post.value.includes[index-1],
-                    onValueChange = {post.value.includes[index-1]= it},
+                    value = post.value.includes[index],
+                    onValueChange = {
+                        val newList = post.value.includes.toMutableList().apply {
+                            this[index] = it
+                        }
+                        post.value = post.value.copy(includes = newList)},
                     placeholder = { Text(stringResource(id = R.string.includes_placeholder)) },
                 )
                 }
                 item {
-                    Button(onClick = { count.value =count.value+1}) {
+                    Button(onClick = {
+                        post.value.includes.add("")
+                        count.value =count.value+1}) {
                         Icon(imageVector = Icons.Default.Add, contentDescription = null)
                     }
                 }
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringResource(R.string.description),
+                    fontWeight = FontWeight.Normal,
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .padding(horizontal = 10.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    modifier = Modifier
+                        .height(200.dp),
+                    value = post.value.description,
+                    onValueChange = {post.value = post.value.copy(description = it)},
+                    placeholder = { Text(stringResource(id = R.string.description_placeholder)) },
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringResource(R.string.publication_image),
+                    fontWeight = FontWeight.Normal,
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .padding(horizontal = 10.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                PhotoSelectorView(selectImage = {selectedImage.value= it
+                Log.i("Selected image", selectedImage.value.toString())})
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringResource(R.string.itinerary),
+                    fontWeight = FontWeight.Normal,
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .padding(horizontal = 10.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
             }
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = stringResource(R.string.description),
-                color = TextGray,
-                fontWeight = FontWeight.Normal,
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .padding(horizontal = 10.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                modifier = Modifier
-                    .height(200.dp),
-                value = post.value.description,
-                onValueChange = {post.value = post.value.copy(description = it)},
-                placeholder = { Text(stringResource(id = R.string.description_placeholder)) },
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = stringResource(R.string.publication_image),
-                color = TextGray,
-                fontWeight = FontWeight.Normal,
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .padding(horizontal = 10.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            PhotoSelectorView(selectImage = {selectedImage.value= it})
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = stringResource(R.string.itinerary),
-                color = TextGray,
-                fontWeight = FontWeight.Normal,
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .padding(horizontal = 10.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            LazyColumn {
                 items(itiCount.value){ index->
                     Row (
                         modifier = Modifier
@@ -276,15 +281,24 @@ fun AddPostScreen(
                         OutlinedTextField(
                             modifier = Modifier
                                 .fillMaxWidth(0.25f),
-                            value = post.value.itinerary[index-1].time,
-                            onValueChange = {post.value.itinerary[index-1].time= it},
+                            value = post.value.itinerary[index].time,
+                            onValueChange = {
+                                val newList = post.value.itinerary.toMutableList().apply {
+                                    this[index] = this[index].copy(time = it)
+                                }
+                                post.value = post.value.copy(itinerary = newList)},
                             placeholder = { Text(stringResource(id = R.string.includes_placeholder)) },
                         )
                         OutlinedTextField(
                             modifier = Modifier
                                 .fillMaxWidth(1f),
-                            value = post.value.itinerary[index-1].event,
-                            onValueChange = {post.value.itinerary[index-1].event= it},
+                            value = post.value.itinerary[index].event,
+                            onValueChange = {
+                                val newList = post.value.itinerary.toMutableList().apply {
+                                    this[index] = this[index].copy(event = it)
+                                }
+                                post.value = post.value.copy(itinerary = newList)
+                                            },
                             placeholder = { Text(stringResource(id = R.string.includes_placeholder)) },
                         )
 
@@ -292,94 +306,109 @@ fun AddPostScreen(
 
                 }
                 item {
-                    Button(onClick = { itiCount.value +=1}) {
+                    Button(onClick = {
+                        post.value.itinerary.add(Itinerary("", ""))
+                        itiCount.value +=1}) {
                         Icon(imageVector = Icons.Default.Add, contentDescription = null)
                     }
                 }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-            Column(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .verticalScroll(rememberScrollState(), columnScrollingEnabled.value),
-            ){
-                //Componente del mapa (Lo tengo en un row para centrarlo)
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxWidth()
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
+                Column(
+                    modifier = Modifier
+                        .padding(innerPadding),
                 ){
-                    GoogleMap(
-                        modifier = Modifier
-                            .fillMaxWidth(0.8f)
-                            .aspectRatio(1.25f)
-                            .pointerInteropFilter(
-                                onTouchEvent = {
-                                    when (it.action) {
-                                        MotionEvent.ACTION_DOWN -> {
-                                            columnScrollingEnabled.value = false
-                                            false
-                                        }
+                    //Componente del mapa
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    ){
+                        GoogleMap(
+                            modifier = Modifier
+                                .fillMaxWidth(0.8f)
+                                .aspectRatio(1.25f)
+                                .pointerInteropFilter(
+                                    onTouchEvent = {
+                                        when (it.action) {
+                                            MotionEvent.ACTION_DOWN -> {
+                                                columnScrollingEnabled.value = false
+                                                false
+                                            }
 
-                                        else -> {
-                                            true
+                                            else -> {
+                                                true
+                                            }
                                         }
-                                    }
-                                }),
-                        onMapClick = {
-                                ubicacion ->
-                            post.value = post.value.copy(position = Position(ubicacion.latitude, ubicacion.longitude))
-                            marcador.value = MarkerState(LatLng(ubicacion.latitude, ubicacion.longitude))
-                        },
-                        cameraPositionState = cameraPositionState
-                    ) {
-                        Marker(
-                            state = marcador.value,
-                            title = post.value.title
-                        )
+                                    }),
+                            onMapClick = {
+                                    ubicacion ->
+                                post.value = post.value.copy(
+                                    position = Position(ubicacion.latitude, ubicacion.longitude),
+                                    price = priceText.value.toDouble()
+                                )
+                                marcador.value = MarkerState(LatLng(ubicacion.latitude, ubicacion.longitude))
+                            },
+                            cameraPositionState = cameraPositionState
+                        ) {
+                            Marker(
+                                state = marcador.value,
+                                title = post.value.title
+                            )
+                        }
                     }
                 }
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Button(
-                    onClick = {
-                              mainViewModel.addPost(post.value.copy(itinerary = post.value.itinerary.map {
-                                  it-> Itinerary(
-                                  timeToIso(it.time), it.event) }),
-                                  selectedImage.value)
-                    },
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth(0.5f)
-                        .padding(horizontal = 16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MainGreen),
-                    border = BorderStroke(1.dp, color = Color.White),
-                    shape = RoundedCornerShape(7.dp)
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = stringResource(id = R.string.btn_accept), color = Color.White)
+                    Button(
+                        onClick = {
+                            mainViewModel.addPost(
+                                context,
+                                post.value.copy(itinerary = post.value.itinerary.map { it-> Itinerary(
+                                timeToIso(it.time), it.event) }.toMutableList()),
+                                selectedImage.value)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth(0.5f)
+                            .padding(horizontal = 16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MainGreen),
+                        border = BorderStroke(1.dp, color = Color.White),
+                        shape = RoundedCornerShape(7.dp)
+                    ) {
+                        Text(text = stringResource(id = R.string.btn_accept), color = Color.White)
+                    }
                 }
+                Spacer(modifier = Modifier.height(15.dp))
             }
-            Spacer(modifier = Modifier.height(15.dp))
+
+
         }}
 
 fun timeToIso (time: String): String{
-    // Parse the time string to LocalTime
-    val time = LocalTime.parse(time, DateTimeFormatter.ofPattern("HH:mm"))
+
+    //Desired format
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
 
     // Get today's date as LocalDate
     val today = LocalDate.now()
 
+    Log.i("view", time)
+    if (time.trim() == ""){
+        val hour = LocalTime.parse("00:00", DateTimeFormatter.ofPattern("HH:mm"))
+        val dateTime = LocalDateTime.of(today, hour)
+       return dateTime.format(formatter)
+    }
+
+    // Parse the time string to LocalTime
+    val hour = LocalTime.parse(time, DateTimeFormatter.ofPattern("HH:mm"))
+
     // Combine today's date and parsed time to LocalDateTime
-    val dateTime = LocalDateTime.of(today, time)
+    val dateTime = LocalDateTime.of(today, hour)
 
     // Format the LocalDateTime to the desired format
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-    val formattedDateTime = dateTime.format(formatter)
-
-    return formattedDateTime
+    return dateTime.format(formatter)
 }
