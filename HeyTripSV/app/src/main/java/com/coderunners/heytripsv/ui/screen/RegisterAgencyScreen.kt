@@ -1,5 +1,7 @@
 package com.coderunners.heytripsv.ui.screen
 
+import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -51,6 +53,7 @@ fun RegisterAgency(
     var contactnumber = remember { mutableStateOf("") }
     var instagram = remember { mutableStateOf("") }
     var facebook = remember { mutableStateOf("") }
+    val selectedImage= remember { mutableStateOf<Uri?>(null) }
 
     Column(
         modifier = Modifier
@@ -182,9 +185,7 @@ fun RegisterAgency(
                 .padding(horizontal = 10.dp)
         )
         Spacer(modifier = Modifier.height(8.dp))
-        PhotoSelectorView(
-            maxSelectionCount = 1
-        )
+        PhotoSelectorView(selectImage = {selectedImage.value= it})
         Spacer(modifier = Modifier.height(15.dp))
         Column(
             modifier = Modifier

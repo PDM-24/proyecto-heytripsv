@@ -8,13 +8,16 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.coderunners.heytripsv.data.remote.api.ApiClient
 import com.coderunners.heytripsv.data.remote.model.ItineraryApi
+import com.coderunners.heytripsv.data.remote.model.LogInBody
 import com.coderunners.heytripsv.data.remote.model.PostListResponse
 import com.coderunners.heytripsv.model.AgencyDataModel
 import com.coderunners.heytripsv.model.Itinerary
+import com.coderunners.heytripsv.model.LogInData
 import com.coderunners.heytripsv.model.Position
 import com.coderunners.heytripsv.model.PostDataModel
 import com.coderunners.heytripsv.model.PostList
 import com.coderunners.heytripsv.model.agencyData
+import com.coderunners.heytripsv.repository.DataStore
 import com.coderunners.heytripsv.utils.UiState
 import com.coderunners.heytripsv.utils.createFilePart
 import com.coderunners.heytripsv.utils.createItineraryParts
@@ -34,6 +37,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //ESTADO DE APP (LOADING)
     private val _uiState = MutableStateFlow<UiState>(UiState.Ready)
     val uiState : StateFlow<UiState> = _uiState
+
+    //VARIABLE DATASTORE
+    private val viewModelContext = getApplication<Application>()
+        .applicationContext
+    val datastore = DataStore(viewModelContext)
 
     //VARIABLES API Y ROOM
     private val api = ApiClient.apiService
@@ -309,7 +317,27 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
+    //Funcion para el LogIn
+    fun LogIn(logInData: LogInData){
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                _uiState.value = UiState.Loading
+                //TODO: Guardar token y rol
 
+
+                val response = api.logIn(LogInBody(
+                    email = logInData.email,
+                    password = logInData.password
+                ))
+                datastore.saveRole(response.role)
+                datastore.saveToken(response.token)
+                _uiState.value = UiState.Success("Logged in correctly")
+            }catch (e: Exception){
+                Log.i("ViewModel", e.toString())
+                _uiState.value = UiState.Error("Error Logging in")
+            }
+        }
+    }
     fun setStateToReady() {
         _uiState.value = UiState.Ready
     }

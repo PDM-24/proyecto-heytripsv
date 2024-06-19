@@ -3,6 +3,8 @@ package com.coderunners.heytripsv.data.remote.api
 import android.net.Uri
 import com.coderunners.heytripsv.data.remote.model.ItineraryApi
 import com.coderunners.heytripsv.data.remote.model.AgencyResponse
+import com.coderunners.heytripsv.data.remote.model.LogInBody
+import com.coderunners.heytripsv.data.remote.model.LogInResponse
 import com.coderunners.heytripsv.data.remote.model.PostListResponse
 import com.coderunners.heytripsv.utils.Constants
 import okhttp3.MultipartBody
@@ -58,4 +60,7 @@ interface ApiService {
     @GET(value = Constants.API_PATH + Constants.GET_SAVED_USER)
     suspend fun getSaved(@Header("Authorization") authHeader: String): PostListResponse
 
+    @Headers(value = ["Content-Type: application/json "])
+    @POST(value= Constants.API_PATH + Constants.POST_LOGIN)
+    suspend fun logIn(@Body logInBody: LogInBody): LogInResponse
 }
