@@ -2,7 +2,7 @@ const Post = require("../models/Post.model")
 const User = require("../models/User.model")
 const Agency = require("../models/Agency.model")
 const axios = require("axios");
-const cloudinary = require("cloudinary");
+const cloudinary = require("cloudinary").v2;
 
 const controller = {}
 
@@ -113,7 +113,7 @@ controller.savePost = async (req, res, next) => {
         const { id } = req.params;
         let image = req.file ? true : false;
 
-        const { title, description, date, meeting, itinerary,
+        const { title, description, date, meeting, itinerary, 
             includes, category, lat, long, price } = req.body;
 
         let post = await Post.findById(id);
@@ -146,14 +146,14 @@ controller.savePost = async (req, res, next) => {
             const signature = cloudinary.utils.api_sign_request({
                 timestamp: timestamp,
                 public_id: savedPost._id,
-                upload_preset: "HeyTripSV",
+                upload_preset: "FoundHound",
                 overwrite: true
             }, process.env.CLOUDINARY_SECRET);
             const b64 = Buffer.from(req.file.buffer).toString("base64");
             let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
             const formData = new FormData();
             formData.append("file", dataURI);
-            formData.append("upload_preset", "HeyTripSV");
+            formData.append("upload_preset", "FoundHound");
             formData.append("cloud_name", "dlmtei8cc")
             formData.append("public_id", savedPost._id);
             formData.append("overwrite", true);
@@ -177,7 +177,7 @@ controller.savePost = async (req, res, next) => {
 
 
         if (!savedPost) {
-            return res.status(500).json({ error: "There was an error saving the post" });
+            return res.status(200).json({ result: "Post saved, but couldn't save the image" });
         }
 
         return res.status(200).json({ result: "Post saved" });

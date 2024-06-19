@@ -79,6 +79,15 @@
     <string name="profile_pic">Profile picture</string>
     <string name="select_image">Select image</string>
     <string name="btn_accept">Accept</string>
+    <string name="add_tour">Add tour</string>
+    <string name="title">Title</string>
+    <string name="date">Date</string>
+    <string name="price">Price</string>
+    <string name="meeting_place">Meeting place</string>
+    <string name="meeting_place_placeholder">Meeting place for departure</string>
+    <string name="includes_placeholder">List of items included in the price</string>
+    <string name="description_placeholder">Tour description or additional details</string>
+    <string name="publication_image">Publication image</string>
     <string name="sign_out">Sign Out</string>
     <string name="edit_profile">Edit profile</string>
     <string name="new_username">Edit Name</string>

@@ -76,6 +76,15 @@
     <string name="profile_pic">Foto de perfil</string>
     <string name="select_image">Seleccionar imagen</string>
     <string name="btn_accept">Aceptar</string>
+    <string name="add_tour">Agregar tour</string>
+    <string name="title">Título</string>
+    <string name="date">Fecha</string>
+    <string name="price">Precio</string>
+    <string name="meeting_place">Lugar de encuentro</string>
+    <string name="meeting_place_placeholder">Lugar de encuentro para la salida</string>
+    <string name="includes_placeholder">Lista de elementos que incluye el precio</string>
+    <string name="description_placeholder">"Descripción del tour o detalles adicionales "</string>
+    <string name="publication_image">Imagen de publicación</string>
     <string name="sign_out">Cerrar Sesión</string>
     <string name="edit_profile">Editar perfil</string>
     <string name="new_username">Editar Nombre</string>
