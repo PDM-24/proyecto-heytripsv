@@ -68,7 +68,7 @@ interface ApiService {
     suspend fun logIn(@Body logInBody: LogInBody): LogInResponse
 
     @Headers(value = ["Content-Type: application/json"])
-    @DELETE(value = Constants.API_PATH + Constants.DELETE_POST + "{postId}")
+    @DELETE(value = Constants.API_PATH + Constants.DELETE_POST )
     suspend fun deletePost(
         @Header("Authorization") authHeader: String,
         @Path("postId") postId: String): APIResponseSuccesful

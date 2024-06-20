@@ -193,7 +193,10 @@ fun MainScreen(innerPadding: PaddingValues, mainViewModel: MainViewModel, navCon
                     modifier = Modifier.padding(0.dp, 10.dp)
                 )
                 if (loading.value) {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
                         CircularProgressIndicator(modifier = Modifier.size(30.dp, 30.dp))
                     }
                 } else {
@@ -246,10 +249,6 @@ fun MainScreen(innerPadding: PaddingValues, mainViewModel: MainViewModel, navCon
                     }
                     LazyRow {
                         items(recentList.value) { postItem ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.End
-                            ) {
                                 PostCard(post = postItem, isAdmin = (userRole.value == "admin"), onClick =  {
                                     mainViewModel.saveSelectedPost(postItem)
                                     navController.navigate(ScreenRoute.PostView.route)
