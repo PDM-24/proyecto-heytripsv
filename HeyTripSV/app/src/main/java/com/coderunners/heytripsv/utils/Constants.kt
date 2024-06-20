@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 object Constants {
     //api service
-    const val BASE_URL = "http://192.168.58.112:3000"
+    const val BASE_URL = "http://192.168.1.12:3000"
     const val API_PATH ="/api"
 
     //Obtener post Home
@@ -18,15 +18,15 @@ object Constants {
     const val   GET_REPORTED_POST= "/post/reported/"
 
     //Actualizar post
-    const val POST_UPDATE = "/post/update/:id"
+    const val POST_UPDATE = "/post/update/"
     const val POST_CREATE = "/post/create/"
 
     //Reportar Post
-    const val PATCH_REPORT_POST = "/post/report/:id"
+    const val PATCH_REPORT_POST = "/post/report/"
 
     //Eliminar post
-    const val  DELETE_POST = "/post/own/:id"
-    const val  DELETE_POST_ID= "/post/:id"
+    const val  DELETE_POST = "/post/own/"
+    const val  DELETE_POST_ID= "/post/"
 
     //Registrar agencia
     const val POST_REGISTER_AGENCY = "/auth/register/agency/"
@@ -62,7 +62,7 @@ object Constants {
     const val GET_REPORTED_AGENCY ="/agency/reported/"
 
     //Reportar agencia
-    const val PATCH_REPORTED_AGENCY = "/agency/report/:id"
+    const val PATCH_REPORTED_AGENCY = "/agency/report/"
 
     //Editar perfil
     const val  POST_EDIT_PROFILE = "/user/edit-profile/"
