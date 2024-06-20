@@ -192,7 +192,10 @@ fun MainScreen(innerPadding: PaddingValues, mainViewModel: MainViewModel, navCon
                     modifier = Modifier.padding(0.dp, 10.dp)
                 )
                 if (loading.value) {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
                         CircularProgressIndicator(modifier = Modifier.size(30.dp, 30.dp))
                     }
                 } else {
@@ -207,20 +210,23 @@ fun MainScreen(innerPadding: PaddingValues, mainViewModel: MainViewModel, navCon
                     }
                     LazyRow {
                         items(upcomingList.value) { postItem ->
-                            PostCard(post = postItem) {
-                                mainViewModel.deletePost(postItem.id)
-                            }
-                            if (isAdmin.value) {
-                                IconButton(
-                                    onClick = {
-                                        mainViewModel.deletePost(postItem.id)
-                                    },
-                                    modifier = Modifier
-                                        .padding(start = 8.dp)
-                                        .size(32.dp)
-                                        .background(Color(0xFFCC0000), shape = RoundedCornerShape(4.dp))
-                                ) {
-                                    Icon(Icons.Filled.Delete, contentDescription = "Delete", tint = Color.White)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                PostCard(post = postItem) {
+                                    mainViewModel.deletePost(postItem.id)
+                                }
+                                if (isAdmin.value) {
+                                    IconButton(
+                                        onClick = { mainViewModel.deletePost(postItem.id) },
+                                        modifier = Modifier
+                                            .padding(start = 8.dp)
+                                            .size(32.dp)
+                                            .background(Color(0xFFCC0000), shape = RoundedCornerShape(4.dp))
+                                    ) {
+                                        Icon(Icons.Filled.Delete, contentDescription = "Delete", tint = Color.White)
+                                    }
                                 }
                             }
                         }
