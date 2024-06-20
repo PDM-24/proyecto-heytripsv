@@ -55,6 +55,7 @@ import com.coderunners.heytripsv.utils.UiState
 @Composable
 fun MainScreen(innerPadding: PaddingValues, mainViewModel: MainViewModel, navController: NavHostController) {
     val context = LocalContext.current
+    val userRole = mainViewModel.userRole.collectAsState()
     val updateScreenState = mainViewModel.uiState.collectAsState()
     val loading = remember {
         mutableStateOf(false)
@@ -210,24 +211,50 @@ fun MainScreen(innerPadding: PaddingValues, mainViewModel: MainViewModel, navCon
                     }
                     LazyRow {
                         items(upcomingList.value) { postItem ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.End
-                            ) {
-                                PostCard(post = postItem) {
-                                    mainViewModel.deletePost(postItem.id)
-                                }
-                                if (isAdmin.value) {
-                                    IconButton(
-                                        onClick = { mainViewModel.deletePost(postItem.id) },
-                                        modifier = Modifier
-                                            .padding(start = 8.dp)
-                                            .size(32.dp)
-                                            .background(Color(0xFFCC0000), shape = RoundedCornerShape(4.dp))
-                                    ) {
-                                        Icon(Icons.Filled.Delete, contentDescription = "Delete", tint = Color.White)
-                                    }
-                                }
+                            PostCard(post = postItem, isAdmin = (userRole.value == "admin"), onClick =  {
+                                mainViewModel.saveSelectedPost(postItem)
+                                navController.navigate(ScreenRoute.PostView.route)
+                            }, onDelete = {
+                                mainViewModel.deletePost(it)
+                            })
+                        }
+                    }
+                }
+            }
+        }
+        Spacer(modifier = Modifier.padding(5.dp))
+        Row(
+            modifier = Modifier.padding(10.dp)
+        ) {
+            Column {
+                Text(
+                    text = stringResource(id = R.string.recent),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(0.dp, 10.dp)
+                )
+                if (loading.value) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                        CircularProgressIndicator(modifier = Modifier.size(30.dp, 30.dp))
+                    }
+                } else {
+                    if (recentList.value.size == 0) {
+                        Text(
+                            text = stringResource(id = R.string.no_posts),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(15.dp),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                    LazyRow {
+                        items(recentList.value) { postItem ->
+                                PostCard(post = postItem, isAdmin = (userRole.value == "admin"), onClick =  {
+                                    mainViewModel.saveSelectedPost(postItem)
+                                    navController.navigate(ScreenRoute.PostView.route)
+                                }, onDelete = {
+                                    mainViewModel.deletePost(it)
+                                })
                             }
                         }
                     }

@@ -68,6 +68,7 @@ fun LogIn(innerPadding: PaddingValues, navController: NavController, mainViewMod
         mutableStateOf(LogInData())
     }
     val logInViewState = mainViewModel.uiState.collectAsState()
+    val userRole = mainViewModel.userRole.collectAsState()
 
     when(logInViewState.value) {
         is UiState.Error -> {
@@ -98,24 +99,13 @@ fun LogIn(innerPadding: PaddingValues, navController: NavController, mainViewMod
         UiState.Ready -> {}
         is UiState.Success -> {
             mainViewModel.setStateToReady()
-            
-            LaunchedEffect(Unit) {
-                mainViewModel.datastore.getRole().collect { response ->
-                    if (response != null) {
-                        Log.i("viewModel", response)
-                    } else{
-                        Log.i("viewModel", "nada")
-                    }
-                    if (response == "agency") {
-                        //TODO: PANTALLA INICIAL AGENCY
-                    } else if (response == "admin") {
-                        //TODO: PANTALLA INICIAL admin
 
-                    }else{
-                        navController.navigate(ScreenRoute.Home.route)
-                     }
-                }
-
+            if (userRole.value == "agency"){
+                //TODO: PANTALLA INICIAL AGENCY
+            }else if(userRole.value == "admin"){
+                //TODO: PANTALLA INICIAL ADMIN
+            } else {
+                navController.navigate(ScreenRoute.Home.route)
             }
         }
     }

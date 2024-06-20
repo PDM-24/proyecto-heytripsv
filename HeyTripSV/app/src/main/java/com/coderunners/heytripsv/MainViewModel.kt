@@ -10,6 +10,7 @@ import com.coderunners.heytripsv.data.remote.api.ApiClient
 import com.coderunners.heytripsv.data.remote.model.ItineraryApi
 import com.coderunners.heytripsv.data.remote.model.LogInBody
 import com.coderunners.heytripsv.data.remote.model.PostListResponse
+import com.coderunners.heytripsv.data.remote.model.ReportApiModel
 import com.coderunners.heytripsv.model.AgencyDataModel
 import com.coderunners.heytripsv.model.Itinerary
 import com.coderunners.heytripsv.model.LogInData
@@ -73,6 +74,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _recentPosts = MutableStateFlow(mutableListOf<PostDataModel>())
     val recentPosts = _recentPosts.asStateFlow()
+
+    //Flows para obtener el token y el rol en la vista
+    private val _userToken = MutableStateFlow("")
+    val userToken = _userToken.asStateFlow()
+        //Roles: agency, admin, user
+    private val _userRole = MutableStateFlow("")
+    val userRole = _userRole.asStateFlow()
 
     // Variable para el rol de administrador
     private val _isAdmin = MutableStateFlow(false)
@@ -314,7 +322,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     itinerary = createItineraryParts(postDataModel.itinerary.map{ it -> ItineraryApi(it.time, it.event)})
                 )
 
-                _uiState.value = UiState.Success(response.toString())
+                _uiState.value = UiState.Success(response.result)
             }catch (e: Exception){
                 Log.i("ViewModel", e.toString())
                 _uiState.value = UiState.Error("Error saving the post")
@@ -326,15 +334,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 _uiState.value = UiState.Loading
-                //TODO: Guardar token y rol
-
-
                 val response = api.logIn(LogInBody(
                     email = logInData.email,
                     password = logInData.password
                 ))
                 datastore.saveRole(response.role)
                 datastore.saveToken(response.token)
+                _userRole.value = response.role
+                _userToken.value = response.token
                 _uiState.value = UiState.Success("Logged in correctly")
             }catch (e: Exception){
                 Log.i("ViewModel", e.toString())
@@ -342,6 +349,26 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
+
+    //Función para reportar posts
+    fun reportPost(id: String, content: String){
+        viewModelScope.launch(Dispatchers.IO){
+            try {
+                datastore.getToken().collect(){
+                        token->
+                    _uiState.value = UiState.Loading
+                    val authHeader = "Bearer $token"
+                    val response = api.reportPost(authHeader, id, ReportApiModel(content))
+                    _uiState.value = UiState.Success(response.result)
+                }
+            }catch (e: Exception){
+                Log.i("ViewModel", e.toString())
+                _uiState.value = UiState.Error("Error reporting the post")
+            }
+        }
+
+    }
+
     fun setStateToReady() {
         _uiState.value = UiState.Ready
     }
