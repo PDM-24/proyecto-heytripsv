@@ -21,6 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.coderunners.heytripsv.R
 import com.coderunners.heytripsv.ui.theme.MainGreen
 
@@ -28,7 +29,9 @@ import com.coderunners.heytripsv.ui.theme.MainGreen
 @Composable
 fun ReportedScreen(
     reportedItems: List<ReportedItem>,
-    reportedAccounts: List<ReportedAccount>
+    reportedAccounts: List<ReportedAccount>,
+    innerPadding : PaddingValues,
+    navController : NavController
 ) {
     val (isPublicationsSelected, setIsPublicationsSelected) = remember { mutableStateOf(true) }
 
@@ -37,12 +40,13 @@ fun ReportedScreen(
             TopAppBar(
                 title = { Text("Reportados") },
                 navigationIcon = {
-                    IconButton(onClick = { /* Handle back navigation */ }) {
+                    IconButton(onClick = { navController.navigateUp() }) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                     }
                 }
             )
-        },
+        }
+        ,
         content = { innerPadding ->
             Column(
                 modifier = Modifier
@@ -215,17 +219,3 @@ fun ReportedAccount(account: ReportedAccount) {
 
 data class ReportedItem(val imageRes: Int, val title: String, val description: String)
 data class ReportedAccount(val imageRes: Int, val username: String, val reason: String)
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewReportedScreen() {
-    val reportedItems = listOf(
-        ReportedItem(R.drawable.default_image, "Playa los cóbanos", "Spam"),
-        ReportedItem(R.drawable.default_image, "Volcán de Izalco", "Descripción inapropiada")
-    )
-    val reportedAccounts = listOf(
-        ReportedAccount(R.drawable.default_image, "SantaTrips", "Lenguaje ofensivo"),
-        ReportedAccount(R.drawable.default_image, "VarelaGod", "Spam")
-    )
-    ReportedScreen(reportedItems, reportedAccounts)
-}
