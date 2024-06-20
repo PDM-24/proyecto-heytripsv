@@ -32,11 +32,12 @@ import com.coderunners.heytripsv.ui.theme.MainGreen
 import com.coderunners.heytripsv.ui.theme.White
 
 @Composable
-fun ReportDialog(radioOptions: List<String>, onDismissRequest: () -> Unit, onConfirm: () -> Unit){
+fun ReportDialog(radioOptions: List<String>, onDismissRequest: () -> Unit, onConfirm: (String) -> Unit){
     val selectedOption = remember {
         mutableStateOf(radioOptions[0])
     }
     val other = remember{ mutableStateOf("")}
+    val other_text = stringResource(R.string.report_other)
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
             modifier = Modifier
@@ -101,8 +102,7 @@ fun ReportDialog(radioOptions: List<String>, onDismissRequest: () -> Unit, onCon
                 }
                 Button(
                     onClick = {
-                        onConfirm()
-                        onDismissRequest()
+                        onConfirm(if (selectedOption.value == other_text) other.value else selectedOption.value)
                     },
                     modifier = Modifier
                         .fillMaxWidth(1f)

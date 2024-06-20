@@ -109,7 +109,16 @@ fun PostViewScreen(
     when(reportDialog.value){
         true -> {
             ReportDialog(radioOptions = radioOptions, onDismissRequest = { reportDialog.value = false }, onConfirm = {
-                //TODO: Enviar reporte
+                var content = ""
+
+                when(it){
+                    radioOptions[0] -> content = "La publicación no contiene un tour"
+                    radioOptions[1] -> content = "Imagen inapropiada"
+                    radioOptions[2] -> content = "Descripción inapropiada"
+                    radioOptions[3] -> content = "Spam"
+                    else -> content = it
+                }
+                viewModel.reportPost(post.value.id, content)
             })
         }
         false -> { reportDialog.value = false }
@@ -125,6 +134,7 @@ fun PostViewScreen(
 
     when(postViewState.value){
         is UiState.Error -> {
+            reportDialog.value = false
             val message = (postViewState.value as UiState.Error).msg
             Toast.makeText(LocalContext.current, message, Toast.LENGTH_SHORT).show()
             viewModel.setStateToReady()
@@ -149,9 +159,16 @@ fun PostViewScreen(
         }
         UiState.Ready -> {}
         is UiState.Success -> {
+
             viewModel.setStateToReady()
-            if (navController.currentBackStackEntry?.destination?.route == ScreenRoute.PostView.route){
-                navController.navigate(ScreenRoute.Agency.route)
+
+            if (reportDialog.value){
+                reportDialog.value = false
+                Toast.makeText(LocalContext.current, stringResource(id = R.string.post_reported), Toast.LENGTH_SHORT).show()
+            }else{
+                if (navController.currentBackStackEntry?.destination?.route == ScreenRoute.PostView.route){
+                    navController.navigate(ScreenRoute.Agency.route)
+                }
             }
         }
     }

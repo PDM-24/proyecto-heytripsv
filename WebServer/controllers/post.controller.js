@@ -87,7 +87,12 @@ controller.reportPost = async (req, res, next) => {
         const newPost = (await post.save());
 
         //Retornamos el post actualizado
-        return res.status(200).json({ newPost });
+        if (newPost) {
+            return res.status(200).json({ result: "Post reported" });
+        }else{
+            return res.status(500).json({error: "There was an error reporting the post"})
+        }
+        
 
     } catch (error) {
         next(error);

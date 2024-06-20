@@ -85,9 +85,9 @@ dependencies {
     ksp("androidx.room:room-compiler:$room_version")
 
     implementation(libs.cronet.embedded)
-
     // Navigation
     val nav_version = "2.7.7"
+
     implementation("androidx.navigation:navigation-compose:$nav_version")
     implementation ("com.google.maps.android:maps-compose:4.4.1")
 
