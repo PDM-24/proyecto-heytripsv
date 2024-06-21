@@ -74,6 +74,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _savedIDs = MutableStateFlow(mutableListOf(""))
     val savedIDs = _savedIDs.asStateFlow()
 
+
     private val _savedPostList = MutableStateFlow(mutableListOf<PostDataModel>())
     val savedPostList = _savedPostList.asStateFlow()
 
