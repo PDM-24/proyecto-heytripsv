@@ -67,6 +67,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _ownAgency = MutableStateFlow(AgencyDataModel())
     val ownAgency = _ownAgency.asStateFlow()
 
+    private val _savedIDs = MutableStateFlow(mutableListOf(""))
+    val savedIDs = _savedIDs.asStateFlow()
+
     private val _savedPostList = MutableStateFlow(mutableListOf<PostDataModel>())
     val savedPostList = _savedPostList.asStateFlow()
 
@@ -267,7 +270,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 _uiState.value = UiState.Success("Agency retrieved correctly")
             }catch (e: Exception){
                 Log.i("MainVewModel", e.toString())
-                _uiState.value = UiState.Error(e.toString())
+                _uiState.value = UiState.Error("There was an error retrieving the agency data")
             }
 
         }
@@ -315,7 +318,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }catch (e: Exception){
                 Log.i("MainVewModel", e.toString())
-                _uiState.value = UiState.Error(e.toString())
+                _uiState.value = UiState.Error("Error getting the saved posts")
             }
         }
     }
@@ -375,6 +378,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 datastore.saveToken(response.token)
                 _userRole.value = response.role
                 _userToken.value = response.token
+
+                if (response.role == "user"){
+                    _savedIDs.value = response.saved
+                }
+
                 _uiState.value = UiState.Success("Logged in correctly")
             }catch (e: Exception){
                 Log.i("ViewModel", e.toString())
@@ -411,8 +419,31 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun logOut(){
         viewModelScope.launch (Dispatchers.IO){
             try {
+                _uiState.value = UiState.Loading
                 datastore.saveRole("")
                 datastore.saveToken("")
+                _userToken.value = ""
+                _userRole.value = ""
+                _uiState.value = UiState.Success("Logged out correctly")
+            }catch (e: Exception){
+                Log.i("ViewModel", e.toString())
+                _uiState.value = UiState.Error("Error logging out")
+            }
+        }
+    }
+
+    //Función para guardar los posts
+    fun savePost(id: String){
+        viewModelScope.launch(Dispatchers.IO){
+            try {
+                datastore.getToken().collect(){
+                        token->
+                    _uiState.value = UiState.Loading
+                    val authHeader = "Bearer $token"
+                    val response = api.savePost(authHeader, id)
+                    _savedIDs.value = response.saved
+                    _uiState.value = UiState.Success("Post saved")
+                }
             }catch (e: Exception){
                 Log.i("ViewModel", e.toString())
                 _uiState.value = UiState.Error("Error reporting the post")
