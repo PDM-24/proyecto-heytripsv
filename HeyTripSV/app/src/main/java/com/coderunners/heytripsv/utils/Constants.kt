@@ -70,6 +70,9 @@ object Constants {
     //Guardar usuario
     const val GET_SAVED_USER = "/user/saved/"
 
+    //Guardar post
+    const val SAVE_POST = "/user/save/"
+
     //Api Response
     const val RESPONSE_SUCCESFUL = "result"
     const val RESPONSE_ERROR = "error"

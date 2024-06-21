@@ -82,6 +82,7 @@ import com.coderunners.heytripsv.utils.UiState
 @Composable
 fun AgencyScreen(mainViewModel: MainViewModel, currentRoute: String?, navController: NavController, onClick: () -> Unit){
     val agency = mainViewModel.selectedAgency.collectAsState()
+    val userRole = mainViewModel.userRole.collectAsState()
     var expanded by remember {
         mutableStateOf(false)
     }
@@ -99,6 +100,7 @@ fun AgencyScreen(mainViewModel: MainViewModel, currentRoute: String?, navControl
 
     when(reportDialog.value){
         true -> {
+            if (userRole.value == "user"){
             ReportDialog(radioOptions = radioOptions, onDismissRequest = {reportDialog.value = false}, onConfirm = {
                 var content = ""
 
@@ -110,7 +112,63 @@ fun AgencyScreen(mainViewModel: MainViewModel, currentRoute: String?, navControl
                     else -> it
                 }
                 mainViewModel.reportContent(agency.value.id, content, false)
-            })
+            })}else{
+                Dialog(onDismissRequest = {reportDialog.value = false}) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(250.dp)
+                            .padding(10.dp),
+                        shape = RoundedCornerShape(16.dp),
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(15.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ){
+                            Text(text = stringResource(id = R.string.report_agn_logged))
+                            Spacer(modifier = Modifier.padding(10.dp))
+                            Button(
+                                onClick = {
+                                    reportDialog.value = false
+                                    navController.navigate(ScreenRoute.LogIn.route)
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth(0.8f)
+                                    .padding(horizontal = 16.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MainGreen
+                                ),
+                                border = BorderStroke(1.dp, color = Color.White),
+                                shape = RoundedCornerShape(7.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.log_in),
+                                    color = Color.White
+                                )
+                            }
+                            Spacer(modifier = Modifier.padding(5.dp))
+                            Button(
+                                onClick = {
+                                    reportDialog.value = false
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth(0.8f)
+                                    .padding(horizontal = 16.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.White
+                                ),
+                                border = BorderStroke(1.dp, color = MainGreen),
+                                shape = RoundedCornerShape(7.dp)
+                            )
+                            {
+                                Text(text = stringResource(id = R.string.back))
+                            }
+                        }
+                    }
+                }
+            }
         }
         false -> { reportDialog.value = false }
     }

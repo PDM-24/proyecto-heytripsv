@@ -7,6 +7,7 @@ import com.coderunners.heytripsv.data.remote.model.LogInBody
 import com.coderunners.heytripsv.data.remote.model.LogInResponse
 import com.coderunners.heytripsv.data.remote.model.PostListResponse
 import com.coderunners.heytripsv.data.remote.model.ReportApiModel
+import com.coderunners.heytripsv.data.remote.model.savedPosts
 import com.coderunners.heytripsv.utils.Constants
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -88,4 +89,11 @@ interface ApiService {
         @Path("agencyId") agencyId: String,
         @Body reportApiModel: ReportApiModel
     ):APIResponseSuccesful
+
+    @Headers(value = ["Content-Type: application/json"])
+    @PATCH(value = Constants.API_PATH + Constants.SAVE_POST + "{id}")
+    suspend fun savePost(
+        @Header("Authorization") authHeader: String,
+        @Path("id") id: String
+    ):savedPosts
 }
