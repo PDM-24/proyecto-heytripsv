@@ -82,10 +82,34 @@ interface ApiService {
     ):APIResponseSuccesful
 
     @Headers(value = ["Content-Type: application/json"])
+    @GET(value = Constants.API_PATH + Constants.GET_REPORTED_POST)
+    suspend fun getReportedPosts(@Header("Authorization") authHeader: String): APIResponseSuccesful
+
+    @Headers(value = ["Content-Type: application/json"])
+    @DELETE(value = Constants.API_PATH + Constants.DELETE_REPORTED_POST + "{_id}")
+    suspend fun deleteReportedPost(
+        @Header("Authorization") authHeader: String,
+        @Path("postId") postId: String
+    ): APIResponseSuccesful
+
+    @Headers(value = ["Content-Type: application/json"])
+    @GET(Constants.API_PATH + Constants.GET_REPORTED_AGENCY)
+    suspend fun getReportedAgencies(
+        @Header("Authorization") authHeader: String
+    ): APIResponseSuccesful
+
+    @Headers(value = ["Content-Type: application/json"])
+    @DELETE(Constants.API_PATH + Constants.DELETE_REPORTED_AGENCY + "{_id}")
+    suspend fun deleteReportedAgency(
+        @Header("Authorization") authHeader: String,
+        @Path("agencyId") agencyId: String
+    ): APIResponseSuccesful
+  
     @PATCH(value = Constants.API_PATH + Constants.PATCH_REPORTED_AGENCY + "{agencyId}")
     suspend fun reportAgency(
         @Header("Authorization") authHeader: String,
         @Path("agencyId") agencyId: String,
         @Body reportApiModel: ReportApiModel
     ):APIResponseSuccesful
+  
 }
