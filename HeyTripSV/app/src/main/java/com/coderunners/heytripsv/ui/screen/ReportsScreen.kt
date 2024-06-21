@@ -3,6 +3,7 @@ package com.coderunners.heytripsv.ui.screen
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,34 +11,41 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.R
+import com.coderunners.heytripsv.data.remote.model.ReportApiModel
 import com.coderunners.heytripsv.ui.theme.MainGreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportedScreen(
-    reportedItems: List<ReportedItem>,
-    reportedAccounts: List<ReportedAccount>
+    mainViewModel: MainViewModel,
+    navController: NavController
 ) {
     val (isPublicationsSelected, setIsPublicationsSelected) = remember { mutableStateOf(true) }
+
+    SideEffect {
+        mainViewModel.getReportedAgency()
+        mainViewModel.getReportedPosts()
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Reportados") },
                 navigationIcon = {
-                    IconButton(onClick = { /* Handle back navigation */ }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Regresar")
                     }
                 }
             )
@@ -60,26 +68,54 @@ fun ReportedScreen(
                     ToggleButton("Cuentas", !isPublicationsSelected) { setIsPublicationsSelected(false) }
                 }
 
-                // Sorting option
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.Start
                 ) {
-                    Text("Ordenar por: A-Z", color = Color.Gray)
+                    Text(
+                        "Ordenar por: A-Z",
+                        color = Color.Gray,
+                        textDecoration = TextDecoration.Underline,
+                        modifier = Modifier.clickable {
+                            mainViewModel.sortReportedPostsAlphabetically()
+                        }
+                    )
                 }
 
                 LazyColumn(
                     modifier = Modifier.padding(16.dp)
                 ) {
                     if (isPublicationsSelected) {
-                        items(reportedItems) { item ->
-                            ReportedItem(item)
+                        items(mainViewModel.reportedPosts.value) { apiModel ->
+                            val reportedItem = ReportedPost(
+                                title = apiModel.title ?: "",
+                                description = apiModel.description ?: "",
+                                imageRes = R.drawable.default_image
+                            )
+                            ReportedPost(
+                                item = reportedItem,
+                                onDelete = { mainViewModel.deleteReportedPost(apiModel.id ?: "") },
+                                mainViewModel = mainViewModel,
+                                apiModel = apiModel
+                            )
                         }
                     } else {
-                        items(reportedAccounts) { account ->
-                            ReportedAccount(account)
+                        items(mainViewModel.reportedAgency.value) { apiModel ->
+                            val agency = apiModel.agency.firstOrNull()
+                            if (agency != null) {
+                                ReportedAgency(
+                                    account = ReportedAgencyData(
+                                        imageRes = R.drawable.default_image,
+                                        username = agency.name,
+                                        reason = apiModel.content
+                                    ),
+                                    onDelete = { mainViewModel.deleteReportedAgency(apiModel.id) },
+                                    apiModel = apiModel,
+                                    mainViewModel = mainViewModel
+                                )
+                            }
                         }
                     }
                 }
@@ -109,7 +145,39 @@ fun ToggleButton(
 }
 
 @Composable
-fun ReportedItem(item: ReportedItem) {
+fun ReportedPost(
+    item: ReportedPost,
+    onDelete: () -> Unit,
+    mainViewModel: MainViewModel,
+    apiModel: ReportApiModel
+) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Eliminar publicación") },
+            text = { Text("¿Estás seguro de que deseas eliminar esta publicación?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onDelete()
+                        showDialog = false
+                    }
+                ) {
+                    Text("Sí")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { showDialog = false }
+                ) {
+                    Text("No")
+                }
+            }
+        )
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -122,34 +190,39 @@ fun ReportedItem(item: ReportedItem) {
             Image(
                 painter = painterResource(id = item.imageRes),
                 contentDescription = null,
-                modifier = Modifier.size(100.dp)
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(RoundedCornerShape(16.dp))
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(item.title, fontWeight = FontWeight.Bold)
-                Text(item.description, color = Color.Gray)
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                IconButton(
-                    onClick = { /* Handle approve */ },
-                    modifier = Modifier
-                        .background(MainGreen, shape = RoundedCornerShape(4.dp))
-                        .size(32.dp)
-                ) {
-                    Icon(Icons.Filled.Check, contentDescription = "Approve", tint = Color.White)
-                }
-                IconButton(
-                    onClick = { /* Handle delete */ },
-                    modifier = Modifier
-                        .background(Color(0xFFCC0000), shape = RoundedCornerShape(4.dp))
-                        .size(32.dp)
-                ) {
-                    Icon(Icons.Filled.Delete, contentDescription = "Delete", tint = Color.White)
+                Column {
+                    Text(item.description, color = Color.Gray)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        IconButton(
+                            onClick = { showDialog = true },
+                            modifier = Modifier
+                                .background(MainGreen, shape = RoundedCornerShape(4.dp))
+                                .size(32.dp)
+                        ) {
+                            Icon(Icons.Filled.Check, contentDescription = "Approve", tint = Color.White)
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        IconButton(
+                            onClick = { showDialog = true },
+                            modifier = Modifier
+                                .background(Color(0xFFCC0000), shape = RoundedCornerShape(4.dp))
+                                .size(32.dp)
+                        ) {
+                            Icon(Icons.Filled.Delete, contentDescription = "Delete", tint = Color.White)
+                        }
+                    }
                 }
             }
         }
@@ -157,7 +230,39 @@ fun ReportedItem(item: ReportedItem) {
 }
 
 @Composable
-fun ReportedAccount(account: ReportedAccount) {
+fun ReportedAgency(
+    account: ReportedAgencyData,
+    onDelete: () -> Unit,
+    apiModel: ReportApiModel,
+    mainViewModel: MainViewModel
+) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Eliminar agencia") },
+            text = { Text("¿Estás seguro de que deseas eliminar esta agencia?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onDelete()
+                        showDialog = false
+                    }
+                ) {
+                    Text("Sí")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { showDialog = false }
+                ) {
+                    Text("No")
+                }
+            }
+        )
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -170,7 +275,9 @@ fun ReportedAccount(account: ReportedAccount) {
             Image(
                 painter = painterResource(id = account.imageRes),
                 contentDescription = null,
-                modifier = Modifier.size(80.dp)
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(RoundedCornerShape(12.dp))
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(
@@ -184,7 +291,7 @@ fun ReportedAccount(account: ReportedAccount) {
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 IconButton(
-                    onClick = { /* Handle approve */ },
+                    onClick = { showDialog = true },
                     modifier = Modifier
                         .background(MainGreen, shape = RoundedCornerShape(4.dp))
                         .size(32.dp)
@@ -192,7 +299,7 @@ fun ReportedAccount(account: ReportedAccount) {
                     Icon(Icons.Filled.Check, contentDescription = "Approve", tint = Color.White)
                 }
                 IconButton(
-                    onClick = { /* Handle delete */ },
+                    onClick = { showDialog = true },
                     modifier = Modifier
                         .background(Color(0xFFCC0000), shape = RoundedCornerShape(4.dp))
                         .size(32.dp)
@@ -204,19 +311,5 @@ fun ReportedAccount(account: ReportedAccount) {
     }
 }
 
-data class ReportedItem(val imageRes: Int, val title: String, val description: String)
-data class ReportedAccount(val imageRes: Int, val username: String, val reason: String)
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewReportedScreen() {
-    val reportedItems = listOf(
-        ReportedItem(R.drawable.default_image, "Playa los cóbanos", "Spam"),
-        ReportedItem(R.drawable.default_image, "Volcán de Izalco", "Descripción inapropiada")
-    )
-    val reportedAccounts = listOf(
-        ReportedAccount(R.drawable.default_image, "SantaTrips", "Lenguaje ofensivo"),
-        ReportedAccount(R.drawable.default_image, "VarelaGod", "Spam")
-    )
-    ReportedScreen(reportedItems, reportedAccounts)
-}
+data class ReportedPost(val imageRes: Int, val title: String, val description: String)
+data class ReportedAgencyData(val imageRes: Int, val username: String, val reason: String)

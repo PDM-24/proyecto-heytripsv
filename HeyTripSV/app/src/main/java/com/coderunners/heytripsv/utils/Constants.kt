@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 object Constants {
     //api service
-    const val BASE_URL = "http://192.168.1.12:3000"
+    const val BASE_URL = "http://192.168.1.6:3000"
     const val API_PATH ="/api"
 
     //Obtener post Home
@@ -18,15 +18,18 @@ object Constants {
     const val   GET_REPORTED_POST= "/post/reported/"
 
     //Actualizar post
-    const val POST_UPDATE = "/post/update/:id"
+    const val POST_UPDATE = "/post/update/"
     const val POST_CREATE = "/post/create/"
 
     //Reportar Post
-    const val PATCH_REPORT_POST = "/post/report/:id"
+    const val PATCH_REPORT_POST = "/post/report/"
 
     //Eliminar post
-    const val  DELETE_POST = "/post/own/:id"
-    const val  DELETE_POST_ID= "/post/:id"
+    const val  DELETE_POST_AGENCY = "/post/own/"
+    const val  DELETE_POST= "/post/"
+
+    //Eliminar post reportado
+    const val DELETE_REPORTED_POST  ="/post/undo-report/"
 
     //Registrar agencia
     const val POST_REGISTER_AGENCY = "/auth/register/agency/"
@@ -50,6 +53,7 @@ object Constants {
     //Recuperar cuenta
     const val POST_RECOVER_PASSWORD = "/auth/recovery-code/"
     const val POST_CONFIRM_CODE = "/auth/confirm-code/"
+    const val POST_CHANGE_PASSWORD = "/auth/change-password/"
 
     //Iniciar Sesion
     const val POST_LOGIN = "/auth/login/"
@@ -62,13 +66,19 @@ object Constants {
     const val GET_REPORTED_AGENCY ="/agency/reported/"
 
     //Reportar agencia
-    const val PATCH_REPORTED_AGENCY = "/agency/report/:id"
+    const val PATCH_REPORTED_AGENCY = "/agency/report/"
+
+    //Eliminar agencia reportada
+    const val DELETE_REPORTED_AGENCY = "/agency/undo-report"
 
     //Editar perfil
     const val  POST_EDIT_PROFILE = "/user/edit-profile/"
 
     //Guardar usuario
     const val GET_SAVED_USER = "/user/saved/"
+
+    //Guardar post
+    const val SAVE_POST = "/user/save/"
 
     //Api Response
     const val RESPONSE_SUCCESFUL = "result"

@@ -2,7 +2,7 @@ const Post = require("../models/Post.model")
 const User = require("../models/User.model")
 const Agency = require("../models/Agency.model")
 const axios = require("axios");
-const cloudinary = require("cloudinary");
+const cloudinary = require("cloudinary").v2;
 
 const controller = {}
 
@@ -32,6 +32,25 @@ controller.findRecent = async (req, res, next) => {
         }).populate("agency", "name number");
 
         return res.status(200).json({ posts, count: pagination ? await Post.countDocuments({ date: { $gt: Date.now() } }) : undefined });
+
+    } catch (error) {
+        next(error)
+    }
+}
+
+//Declarar publicación como buena (eliminar reporte)
+controller.undoReport = async (req, res, next) => {
+    try {
+        const {id} = req.params
+        const post = await Post.findOne({_id: id})
+        post.reports = []
+        const newPost = await post.save()
+        if (!newPost) {
+            return res.status(500).json({error: "Error removing the post from reported"})
+        }
+
+        const newList = await Post.find({ reports: { $exists: true, $not: { $size: 0 } } }).sort({ createdAt: -1 }).populate("agency", "name email").populate("reports.user", "name");
+        return res.status(200).json(newList)
 
     } catch (error) {
         next(error)
@@ -87,7 +106,12 @@ controller.reportPost = async (req, res, next) => {
         const newPost = (await post.save());
 
         //Retornamos el post actualizado
-        return res.status(200).json({ newPost });
+        if (newPost) {
+            return res.status(200).json({ result: "Post reported" });
+        }else{
+            return res.status(500).json({error: "There was an error reporting the post"})
+        }
+        
 
     } catch (error) {
         next(error);
@@ -113,10 +137,15 @@ controller.savePost = async (req, res, next) => {
         const { id } = req.params;
         let image = req.file ? true : false;
 
-        const { title, description, date, meeting, itinerary,
+        const { title, description, date, meeting, itinerary, 
             includes, category, lat, long, price } = req.body;
 
         let post = await Post.findById(id);
+        const agency = await Agency.findOne()
+
+        if (!agency) {
+            return res.status(403).json({error: "Forbidden"})
+        }
 
         if (!post) {
             post = new Post();
@@ -146,14 +175,14 @@ controller.savePost = async (req, res, next) => {
             const signature = cloudinary.utils.api_sign_request({
                 timestamp: timestamp,
                 public_id: savedPost._id,
-                upload_preset: "HeyTripSV",
+                upload_preset: "FoundHound",
                 overwrite: true
             }, process.env.CLOUDINARY_SECRET);
             const b64 = Buffer.from(req.file.buffer).toString("base64");
             let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
             const formData = new FormData();
             formData.append("file", dataURI);
-            formData.append("upload_preset", "HeyTripSV");
+            formData.append("upload_preset", "FoundHound");
             formData.append("cloud_name", "dlmtei8cc")
             formData.append("public_id", savedPost._id);
             formData.append("overwrite", true);
@@ -177,7 +206,7 @@ controller.savePost = async (req, res, next) => {
 
 
         if (!savedPost) {
-            return res.status(500).json({ error: "There was an error saving the post" });
+            return res.status(200).json({ result: "Post saved, but couldn't save the image" });
         }
 
         return res.status(200).json({ result: "Post saved" });

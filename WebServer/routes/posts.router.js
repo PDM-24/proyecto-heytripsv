@@ -21,6 +21,8 @@ router.post(["/create/", "/update/:id"], upload.single("image"), authentication,
 
 //Reportar post
 router.patch("/report/:id", authentication, validateId, reportValidator, runValidation, postController.reportPost);
+//Eliminar reporte
+router.patch("/undo-report/:id", authentication, validateId, runValidation, postController.undoReport);
 
 //Eliminar post
 router.delete('/own/:id', authentication, validateId, runValidation, postController.deleteOwn);

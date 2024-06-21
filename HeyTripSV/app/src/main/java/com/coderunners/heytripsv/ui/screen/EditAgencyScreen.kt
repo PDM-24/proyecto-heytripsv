@@ -1,5 +1,6 @@
 package com.coderunners.heytripsv.ui.screen
 
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,6 +44,8 @@ fun EditAgencyScreen(
     mainViewModel: MainViewModel,
     innerPadding: PaddingValues
 ) {
+
+    val selectedImage= remember { mutableStateOf<Uri?>(null) }
     val agency = mainViewModel.ownAgency.collectAsState()
 
     Column(
@@ -173,7 +178,7 @@ fun EditAgencyScreen(
                 .padding(horizontal = 10.dp)
         )
         Spacer(modifier = Modifier.height(8.dp))
-        PhotoSelectorView(maxSelectionCount = 1)
+        PhotoSelectorView(selectImage = {selectedImage.value=it})
         Spacer(modifier = Modifier.height(15.dp))
         Column(
             modifier = Modifier

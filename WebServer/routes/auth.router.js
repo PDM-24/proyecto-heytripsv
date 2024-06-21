@@ -6,7 +6,7 @@ const upload = multer({ storage: storage});
 const authController = require('../controllers/auth.controller');
 const runValidation = require('../validators/index.middleware');
 const { authentication, checkRepeatedEmail } = require("../middlewares/auth.middlewares");
-const { registerUserValidator, registerAgencyValidator, recoveryValidator, codeValidator } = require('../validators/auth.validators');
+const { registerUserValidator, registerAgencyValidator, recoveryValidator, codeValidator, newPassValidator } = require('../validators/auth.validators');
 
 //Registrar agencia
 router.post("/register/agency/", upload.single("image"), registerAgencyValidator, runValidation, authController.registerAgency);
@@ -16,6 +16,7 @@ router.post("/register/user/", registerUserValidator, checkRepeatedEmail, runVal
 //Recuperación de contra
 router.post("/recovery-code/", recoveryValidator, runValidation, authController.sendCode);
 router.post("/confirm-code/", codeValidator, runValidation, authController.compareCode);
+router.post("/change-password/", newPassValidator, runValidation, authController.changePassword);
 
 //Iniciar sesión
 router.post("/login/", authController.login);

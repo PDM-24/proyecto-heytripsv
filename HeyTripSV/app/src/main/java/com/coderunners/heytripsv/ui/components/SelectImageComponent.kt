@@ -34,22 +34,16 @@ import coil.compose.AsyncImage
 import com.coderunners.heytripsv.ui.theme.AddGreen
 import com.coderunners.heytripsv.ui.theme.MainGreen
 
-@Preview
 @Composable
-fun PhotoSelectorView(maxSelectionCount: Int = 1) {
-    var selectedImages by remember {
-        mutableStateOf<List<Uri?>>(emptyList())
-    }
+fun PhotoSelectorView(
+    selectImage: (Uri?) -> Unit
+    ) {
 
-    val buttonText = if (maxSelectionCount > 1) {
-        "Select up to $maxSelectionCount photos"
-    } else {
-        "Select a photo"
-    }
+    val buttonText = "Select a photo"
 
     val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { uri -> selectedImages = listOf(uri) }
+        onResult = { uri -> selectImage(uri) }
     )
 
 
