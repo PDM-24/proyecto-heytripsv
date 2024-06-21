@@ -1,6 +1,7 @@
 const Mongoose = require("mongoose");
+require('dotenv').config();
 
-const dburi = process.env.DBURI
+const dburi = process.env.DBURI;
 
 // Connect to database method
 

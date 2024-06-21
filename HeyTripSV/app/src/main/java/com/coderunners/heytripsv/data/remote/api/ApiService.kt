@@ -7,6 +7,7 @@ import com.coderunners.heytripsv.data.remote.model.LogInBody
 import com.coderunners.heytripsv.data.remote.model.LogInResponse
 import com.coderunners.heytripsv.data.remote.model.PostListResponse
 import com.coderunners.heytripsv.data.remote.model.ReportApiModel
+import com.coderunners.heytripsv.data.remote.model.SendCodeBody
 import com.coderunners.heytripsv.data.remote.model.savedPosts
 import com.coderunners.heytripsv.utils.Constants
 import okhttp3.MultipartBody
@@ -83,6 +84,8 @@ interface ApiService {
     ):APIResponseSuccesful
 
     @Headers(value = ["Content-Type: application/json"])
+    @POST(value= Constants.API_PATH + Constants.POST_REGISTER_AGENCY)
+    suspend fun sendCode(@Body email : SendCodeBody): APIResponseSuccesful
     @GET(value = Constants.API_PATH + Constants.GET_REPORTED_POST)
     suspend fun getReportedPosts(@Header("Authorization") authHeader: String): APIResponseSuccesful
 
