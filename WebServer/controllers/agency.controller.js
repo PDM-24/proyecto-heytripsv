@@ -17,6 +17,25 @@ controller.findReported = async (req, res, next) => {
     }
 }
 
+//Eliminar reporte
+controller.undoReport = async (req, res, next) => {
+    try {
+        const {id} = req.params
+        const agency = await Agency.findOne({_id: id})
+        agency.reports = []
+        const newAgency = await agency.save()
+        if (!newAgency) {
+            return res.status(500).json({error: "Error removing the agency from reported"})
+        }
+
+        const agencies = await Agency.find({ reports: { $exists: true, $not: { $size: 0 } } }, '_id email name dui description image instagram facebook reports').sort({ createdAt: -1 }).populate("reports.user", "name");
+        return res.status(200).json(agencies)
+
+    } catch (error) {
+        next(error)
+    }
+}
+
 //Reportar agencia
 controller.reportAgency = async (req, res, next) => {
     try {
