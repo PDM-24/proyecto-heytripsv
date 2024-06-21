@@ -1,5 +1,6 @@
 package com.coderunners.heytripsv
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,6 +20,7 @@ import com.coderunners.heytripsv.ui.navigation.NavBarGraph
 import com.coderunners.heytripsv.ui.theme.HeyTripSVTheme
 
 class MainActivity : ComponentActivity() {
+    @SuppressLint("SuspiciousIndentation")
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
