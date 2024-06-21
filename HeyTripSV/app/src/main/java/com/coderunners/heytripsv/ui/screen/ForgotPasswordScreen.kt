@@ -15,6 +15,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -27,14 +28,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.R
+import com.coderunners.heytripsv.data.remote.model.SendCodeBody
+import com.coderunners.heytripsv.model.EmailAccount
 import com.coderunners.heytripsv.ui.navigation.ScreenRoute
 import com.coderunners.heytripsv.ui.theme.MainGreen
 import com.coderunners.heytripsv.ui.theme.TextGray
 
 @Composable
-fun ForgotPassword(innerPadding: PaddingValues, navController: NavController){
+fun ForgotPassword(
+    innerPadding: PaddingValues, navController: NavController, mainViewModel: MainViewModel
+){
 
     val recoveremail = remember { mutableStateOf("") }
 
@@ -82,6 +89,11 @@ fun ForgotPassword(innerPadding: PaddingValues, navController: NavController){
         )
         Spacer(modifier = Modifier.height(40.dp))
         Button(onClick = {
+            mainViewModel.SendCode(
+                EmailAccount(
+                    email = recoveremail.value
+                )
+            )
             navController.navigate(ScreenRoute.ConfirmationCode.route)
         },
             modifier = Modifier

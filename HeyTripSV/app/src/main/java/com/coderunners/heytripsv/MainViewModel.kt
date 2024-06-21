@@ -11,7 +11,9 @@ import com.coderunners.heytripsv.data.remote.model.ItineraryApi
 import com.coderunners.heytripsv.data.remote.model.LogInBody
 import com.coderunners.heytripsv.data.remote.model.PostListResponse
 import com.coderunners.heytripsv.data.remote.model.ReportApiModel
+import com.coderunners.heytripsv.data.remote.model.SendCodeBody
 import com.coderunners.heytripsv.model.AgencyDataModel
+import com.coderunners.heytripsv.model.EmailAccount
 import com.coderunners.heytripsv.model.Itinerary
 import com.coderunners.heytripsv.model.LogInData
 import com.coderunners.heytripsv.model.Position
@@ -342,6 +344,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 datastore.saveToken(response.token)
                 _userRole.value = response.role
                 _userToken.value = response.token
+                _uiState.value = UiState.Success("Logged in correctly")
+            }catch (e: Exception){
+                Log.i("ViewModel", e.toString())
+                _uiState.value = UiState.Error("Error Logging in")
+            }
+        }
+    }
+
+    fun SendCode(email : EmailAccount){
+        viewModelScope.launch(Dispatchers.IO) {
+            try{
+                _uiState.value = UiState.Loading
+                val response = api.sendCode(SendCodeBody(
+                    email = email.email
+                ))
+                Log.i("MainViewModel", response.toString())
                 _uiState.value = UiState.Success("Logged in correctly")
             }catch (e: Exception){
                 Log.i("ViewModel", e.toString())
