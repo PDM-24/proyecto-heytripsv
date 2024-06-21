@@ -80,4 +80,12 @@ interface ApiService {
         @Path("postId") postId: String,
         @Body reportApiModel: ReportApiModel
     ):APIResponseSuccesful
+
+    @Headers(value = ["Content-Type: application/json"])
+    @PATCH(value = Constants.API_PATH + Constants.PATCH_REPORTED_AGENCY + "{agencyId}")
+    suspend fun reportAgency(
+        @Header("Authorization") authHeader: String,
+        @Path("agencyId") agencyId: String,
+        @Body reportApiModel: ReportApiModel
+    ):APIResponseSuccesful
 }

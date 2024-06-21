@@ -68,6 +68,7 @@ import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.R
 import com.coderunners.heytripsv.ui.components.PostCardHorizontal
 import com.coderunners.heytripsv.ui.components.ReportDialog
+import com.coderunners.heytripsv.ui.navigation.ScreenRoute
 import com.coderunners.heytripsv.ui.theme.MainGreen
 import com.coderunners.heytripsv.ui.theme.NavGray
 import com.coderunners.heytripsv.ui.theme.White
@@ -95,10 +96,56 @@ fun AgencyScreen(mainViewModel: MainViewModel, innerPadding: PaddingValues, onCl
     when(reportDialog.value){
         true -> {
             ReportDialog(radioOptions = radioOptions, onDismissRequest = {reportDialog.value = false}, onConfirm = {
-                //TODO: Enviar el reporte
+                var content = ""
+
+                content = when(it){
+                    radioOptions[0] -> "Cuenta falsa"
+                    radioOptions[1] -> "Publica contenido inadecuado"
+                    radioOptions[2] -> "Descripción inapropiada"
+                    radioOptions[3] -> "Spam"
+                    else -> it
+                }
+                mainViewModel.reportContent(agency.value.id, content, false)
             })
         }
         false -> { reportDialog.value = false }
+    }
+
+    // Estado para controlar el estado de la interfaz desde viewModel
+    val agencyState = mainViewModel.uiState.collectAsState()
+
+    when(agencyState.value){
+        is UiState.Error -> {
+            reportDialog.value = false
+            val message = (agencyState.value as UiState.Error).msg
+            Toast.makeText(LocalContext.current, message, Toast.LENGTH_SHORT).show()
+            mainViewModel.setStateToReady()
+        }
+        UiState.Loading -> {
+            Dialog(
+                onDismissRequest = { },
+                DialogProperties(
+                    dismissOnBackPress = false,
+                    dismissOnClickOutside = false
+                )
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .background(Color.Transparent)
+                ){
+                    CircularProgressIndicator()
+                }
+            }
+        }
+        UiState.Ready -> {}
+        is UiState.Success -> {
+
+            mainViewModel.setStateToReady()
+                reportDialog.value = false
+                Toast.makeText(LocalContext.current, stringResource(id = R.string.agency_reported), Toast.LENGTH_SHORT).show()
+        }
     }
 
     LazyColumn(

@@ -249,13 +249,13 @@ fun MainScreen(innerPadding: PaddingValues, mainViewModel: MainViewModel, navCon
                     }
                     LazyRow {
                         items(recentList.value) { postItem ->
-                                PostCard(post = postItem, isAdmin = (userRole.value == "admin"), onClick =  {
-                                    mainViewModel.saveSelectedPost(postItem)
-                                    navController.navigate(ScreenRoute.PostView.route)
+                            PostCard(post = postItem, isAdmin = (userRole.value == "admin"), onClick =  {
+                                mainViewModel.saveSelectedPost(postItem)
+                                navController.navigate(ScreenRoute.PostView.route)
                                 }, onDelete = {
                                     mainViewModel.deletePost(it)
-                                })
-                            }
+                                }
+                            )
                         }
                     }
                 }

@@ -141,6 +141,11 @@ controller.savePost = async (req, res, next) => {
             includes, category, lat, long, price } = req.body;
 
         let post = await Post.findById(id);
+        const agency = await Agency.findOne()
+
+        if (!agency) {
+            return res.status(403).json({error: "Forbidden"})
+        }
 
         if (!post) {
             post = new Post();

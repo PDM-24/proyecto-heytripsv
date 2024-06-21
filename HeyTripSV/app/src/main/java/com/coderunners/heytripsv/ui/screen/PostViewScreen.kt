@@ -111,14 +111,14 @@ fun PostViewScreen(
             ReportDialog(radioOptions = radioOptions, onDismissRequest = { reportDialog.value = false }, onConfirm = {
                 var content = ""
 
-                when(it){
-                    radioOptions[0] -> content = "La publicación no contiene un tour"
-                    radioOptions[1] -> content = "Imagen inapropiada"
-                    radioOptions[2] -> content = "Descripción inapropiada"
-                    radioOptions[3] -> content = "Spam"
-                    else -> content = it
+                content = when(it){
+                    radioOptions[0] -> "La publicación no contiene un tour"
+                    radioOptions[1] -> "Imagen inapropiada"
+                    radioOptions[2] -> "Descripción inapropiada"
+                    radioOptions[3] -> "Spam"
+                    else -> it
                 }
-                viewModel.reportPost(post.value.id, content)
+                viewModel.reportContent(post.value.id, content)
             })
         }
         false -> { reportDialog.value = false }
