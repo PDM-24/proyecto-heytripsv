@@ -13,6 +13,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -26,14 +27,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.R
 import com.coderunners.heytripsv.ui.components.PostCardHorizontal
+import com.coderunners.heytripsv.ui.navigation.BottomNavigationBar
+import com.coderunners.heytripsv.ui.navigation.navBarItemList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryScreen(
-    innerPadding: PaddingValues,
+    navController: NavController,
+    currentRoute: String?,
     mainViewModel: MainViewModel,
     onClick : () -> Unit
 ) {
@@ -44,61 +49,87 @@ fun CategoryScreen(
     }
     var filtros = arrayOf(stringResource(id = R.string.closest), stringResource(id = R.string.recent))
     var selectedText by remember { mutableStateOf(filtros[0]) }
-    LazyColumn(
-        modifier = Modifier
-            .padding(innerPadding)
-            .fillMaxWidth()
-    ) {
-        item {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(text = selectedCategory.value,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp),
-                    textAlign = TextAlign.Center,
-                    fontSize = 20.sp)
-                Row(modifier = Modifier.padding(10.dp, 10.dp, 10.dp, 20.dp)) {
-                    Text(text = stringResource(id = R.string.sort_by) + ":",
-                        modifier = Modifier.wrapContentHeight().padding(10.dp))
-                    ExposedDropdownMenuBox(
-                        expanded = expanded,
-                        onExpandedChange = {
-                            expanded = !expanded
+
+    Scaffold(
+        bottomBar = {
+            BottomNavigationBar(itemsList = navBarItemList(), currentRoute = currentRoute) {
+                    currentNavigationItem ->
+                navController.navigate(currentNavigationItem.route){
+                    navController.graph.startDestinationRoute?.let{startDestinationRoute ->
+                        popUpTo(startDestinationRoute){
+                            saveState = false
                         }
-                    ) {
-                        TextField(
-                            value = selectedText,
-                            onValueChange = {},
-                            readOnly = true,
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                            modifier = Modifier.menuAnchor()
+                    }
+                    launchSingleTop=true
+                    restoreState = true
+                }
+            }
+        }
+    ) { innerPadding ->
+
+        LazyColumn(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxWidth()
+        ) {
+            item {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = selectedCategory.value,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        textAlign = TextAlign.Center,
+                        fontSize = 20.sp
+                    )
+                    Row(modifier = Modifier.padding(10.dp, 10.dp, 10.dp, 20.dp)) {
+                        Text(
+                            text = stringResource(id = R.string.sort_by) + ":",
+                            modifier = Modifier
+                                .wrapContentHeight()
+                                .padding(10.dp)
                         )
-                        ExposedDropdownMenu(
+                        ExposedDropdownMenuBox(
                             expanded = expanded,
-                            onDismissRequest = { expanded = false }
+                            onExpandedChange = {
+                                expanded = !expanded
+                            }
                         ) {
-                            filtros.forEach { item ->
-                                DropdownMenuItem(
-                                    text = { Text(text = item) },
-                                    onClick = {
-                                        selectedText = item
-                                        expanded = false
-                                    }
-                                )
+                            TextField(
+                                value = selectedText,
+                                onValueChange = {},
+                                readOnly = true,
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                                modifier = Modifier.menuAnchor()
+                            )
+                            ExposedDropdownMenu(
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false }
+                            ) {
+                                filtros.forEach { item ->
+                                    DropdownMenuItem(
+                                        text = { Text(text = item) },
+                                        onClick = {
+                                            selectedText = item
+                                            expanded = false
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-        items(categoryList.value){
-            PostCardHorizontal(post = it, onClick = {
-                mainViewModel.saveSelectedPost(it)
-                onClick() })
-        }
+            items(categoryList.value) {
+                PostCardHorizontal(post = it, onClick = {
+                    mainViewModel.saveSelectedPost(it)
+                    onClick()
+                })
+            }
 
+        }
     }
 }

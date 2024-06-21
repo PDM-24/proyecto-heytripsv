@@ -104,4 +104,12 @@ interface ApiService {
         @Header("Authorization") authHeader: String,
         @Path("agencyId") agencyId: String
     ): APIResponseSuccesful
+  
+    @PATCH(value = Constants.API_PATH + Constants.PATCH_REPORTED_AGENCY + "{agencyId}")
+    suspend fun reportAgency(
+        @Header("Authorization") authHeader: String,
+        @Path("agencyId") agencyId: String,
+        @Body reportApiModel: ReportApiModel
+    ):APIResponseSuccesful
+  
 }

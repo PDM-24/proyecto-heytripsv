@@ -6,6 +6,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.coderunners.heytripsv.data.remote.api.APIResponseSuccesful
 import com.coderunners.heytripsv.data.remote.api.ApiClient
 import com.coderunners.heytripsv.data.remote.model.ItineraryApi
 import com.coderunners.heytripsv.data.remote.model.LogInBody
@@ -276,33 +277,42 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun getSavedPosts(){
         viewModelScope.launch(Dispatchers.IO){
             try {
-                _uiState.value = UiState.Loading
-                //TODO: obtener el token del datastore (login)
-                val apiList = api.getSaved("Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI2NjZkZjg2YzdhOWMyN2NmM2M4ODBkMjMiLCJleHAiOjE3MTk4MDE5MTYsImlhdCI6MTcxODUwNTkxNn0.Lb45PXk_UXFoFPDVcA-yROLNr4Ljm-7plqkqIFbAiLA")
-                _savedPostList.value = mutableListOf()
-                for (post in apiList.posts){
-                    _savedPostList.value.add(
-                        PostDataModel(
-                            id = post.id,
-                            title = post.title,
-                            image = post.image,
-                            date = isoDateFormat(post.date),
-                            price = post.price,
-                            agencyId = post.agency.id,
-                            agency = post.agency.name,
-                            phone = post.agency.number,
-                            description = post.description,
-                            meeting = post.meeting,
-                            itinerary = post.itinerary.map { it -> Itinerary(isoDateFormat(it.time, true), it.event) }
-                                .toMutableList(),
-                            includes = post.includes,
-                            category = post.category,
-                            position = Position(post.lat, post.long)
+                datastore.getToken().collect() { token ->
+                    _uiState.value = UiState.Loading
+                    val apiList =
+                        api.getSaved("Bearer $token")
+                    _savedPostList.value = mutableListOf()
+                    for (post in apiList.posts) {
+                        _savedPostList.value.add(
+                            PostDataModel(
+                                id = post.id,
+                                title = post.title,
+                                image = post.image,
+                                date = isoDateFormat(post.date),
+                                price = post.price,
+                                agencyId = post.agency.id,
+                                agency = post.agency.name,
+                                phone = post.agency.number,
+                                description = post.description,
+                                meeting = post.meeting,
+                                itinerary = post.itinerary.map { it ->
+                                    Itinerary(
+                                        isoDateFormat(
+                                            it.time,
+                                            true
+                                        ), it.event
+                                    )
+                                }
+                                    .toMutableList(),
+                                includes = post.includes,
+                                category = post.category,
+                                position = Position(post.lat, post.long)
+                            )
                         )
-                    )
+                    }
+                    Log.i("MainVewModel", "Posts retrieved correctly")
+                    _uiState.value = UiState.Success("Posts retrieved correctly")
                 }
-                Log.i("MainVewModel", "Posts retrieved correctly")
-                _uiState.value = UiState.Success("Posts retrieved correctly")
             }catch (e: Exception){
                 Log.i("MainVewModel", e.toString())
                 _uiState.value = UiState.Error(e.toString())
@@ -316,23 +326,36 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         image: Uri? = Uri.parse("https://res.cloudinary.com/dlmtei8cc/image/upload/v1718430757/zjyr4khxybczk6hjibw9.jpg")){
         viewModelScope.launch(Dispatchers.IO){
             try {
-                _uiState.value = UiState.Loading
-                val response = api.addPost(
-                    authHeader = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI2NjZlMDM5OGNjYWYxYTFlNGEwMGIzZTAiLCJleHAiOjE3MTk3OTg5OTMsImlhdCI6MTcxODUwMjk5M30.MVkhyzGELqiQIhrIQoWJCVgXzXJKVvZVj30yYaCmwt0",
-                    title = createPartFromString(postDataModel.title),
-                    description = createPartFromString(postDataModel.description),
-                    date = createPartFromString(postDataModel.date),
-                    meeting = createPartFromString(postDataModel.meeting),
-                    category = createPartFromString(postDataModel.category),
-                    lat = createPartFromString(postDataModel.position.lat.toString()),
-                    long = createPartFromString(postDataModel.position.long.toString()),
-                    price = createPartFromString(postDataModel.price.toString()),
-                    includes = createPartFromList("includes",postDataModel.includes),
-                    image= image?.let { createFilePart("image", it, contentResolver = context.contentResolver) },
-                    itinerary = createItineraryParts(postDataModel.itinerary.map{ it -> ItineraryApi(it.time, it.event)})
-                )
+                datastore.getToken().collect() { token ->
+                    _uiState.value = UiState.Loading
+                    val response = api.addPost(
+                        authHeader = "Bearer $token",
+                        title = createPartFromString(postDataModel.title),
+                        description = createPartFromString(postDataModel.description),
+                        date = createPartFromString(postDataModel.date),
+                        meeting = createPartFromString(postDataModel.meeting),
+                        category = createPartFromString(postDataModel.category),
+                        lat = createPartFromString(postDataModel.position.lat.toString()),
+                        long = createPartFromString(postDataModel.position.long.toString()),
+                        price = createPartFromString(postDataModel.price.toString()),
+                        includes = createPartFromList("includes", postDataModel.includes),
+                        image = image?.let {
+                            createFilePart(
+                                "image",
+                                it,
+                                contentResolver = context.contentResolver
+                            )
+                        },
+                        itinerary = createItineraryParts(postDataModel.itinerary.map { it ->
+                            ItineraryApi(
+                                it.time,
+                                it.event
+                            )
+                        })
+                    )
 
-                _uiState.value = UiState.Success(response.result)
+                    _uiState.value = UiState.Success(response.result)
+                }
             }catch (e: Exception){
                 Log.i("ViewModel", e.toString())
                 _uiState.value = UiState.Error("Error saving the post")
@@ -360,15 +383,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    //Función para reportar posts
-    fun reportPost(id: String, content: String){
+    //Función para reportar posts o agencias
+    fun reportContent(id: String, content: String, post: Boolean = true){
         viewModelScope.launch(Dispatchers.IO){
             try {
                 datastore.getToken().collect(){
                         token->
                     _uiState.value = UiState.Loading
                     val authHeader = "Bearer $token"
-                    val response = api.reportPost(authHeader, id, ReportApiModel(content))
+                    val response = if (post){
+                        api.reportPost(authHeader, id, ReportApiModel(content))
+                    }else{
+                        api.reportAgency(authHeader, id, ReportApiModel(content))
+                    }
+
                     _uiState.value = UiState.Success(response.result)
                 }
             }catch (e: Exception){
@@ -377,6 +405,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
 
+    }
+
+    //Función para cerrar sesión (Resetea el DataStore)
+    fun logOut(){
+        viewModelScope.launch (Dispatchers.IO){
+            try {
+                datastore.saveRole("")
+                datastore.saveToken("")
+            }catch (e: Exception){
+                Log.i("ViewModel", e.toString())
+                _uiState.value = UiState.Error("Error reporting the post")
+            }
+        }
     }
 
     fun setStateToReady() {

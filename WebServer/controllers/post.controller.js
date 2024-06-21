@@ -38,6 +38,25 @@ controller.findRecent = async (req, res, next) => {
     }
 }
 
+//Declarar publicación como buena (eliminar reporte)
+controller.undoReport = async (req, res, next) => {
+    try {
+        const {id} = req.params
+        const post = await Post.findOne({_id: id})
+        post.reports = []
+        const newPost = await post.save()
+        if (!newPost) {
+            return res.status(500).json({error: "Error removing the post from reported"})
+        }
+
+        const newList = await Post.find({ reports: { $exists: true, $not: { $size: 0 } } }).sort({ createdAt: -1 }).populate("agency", "name email").populate("reports.user", "name");
+        return res.status(200).json(newList)
+
+    } catch (error) {
+        next(error)
+    }
+}
+
 //Obtener las publicaciones reportadas
 controller.findReported = async (req, res, next) => {
     try {
@@ -122,6 +141,11 @@ controller.savePost = async (req, res, next) => {
             includes, category, lat, long, price } = req.body;
 
         let post = await Post.findById(id);
+        const agency = await Agency.findOne()
+
+        if (!agency) {
+            return res.status(403).json({error: "Forbidden"})
+        }
 
         if (!post) {
             post = new Post();
