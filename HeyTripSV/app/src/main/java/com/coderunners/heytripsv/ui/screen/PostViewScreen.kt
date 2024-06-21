@@ -32,6 +32,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -70,7 +71,9 @@ import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.R
 import com.coderunners.heytripsv.model.PostDataModel
 import com.coderunners.heytripsv.ui.components.ReportDialog
+import com.coderunners.heytripsv.ui.navigation.BottomNavigationBar
 import com.coderunners.heytripsv.ui.navigation.ScreenRoute
+import com.coderunners.heytripsv.ui.navigation.navBarItemList
 import com.coderunners.heytripsv.ui.theme.AddGreen
 import com.coderunners.heytripsv.ui.theme.MainGreen
 import com.coderunners.heytripsv.ui.theme.NavGray
@@ -87,7 +90,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun PostViewScreen(
-    innerPadding: PaddingValues,
+    currentRoute: String?,
     viewModel: MainViewModel,
     navController: NavHostController
 ){
@@ -173,84 +176,165 @@ fun PostViewScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .padding(innerPadding)
-            .verticalScroll(rememberScrollState(), columnScrollingEnabled.value),
-    ) {
-
-        AsyncImage(model = post.value.image, contentDescription = post.value.title, modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(1f)
-            .clip(RoundedCornerShape(12.dp)),
-            contentScale = ContentScale.Crop)
-        Row(verticalAlignment = Alignment.CenterVertically){
-            Text(text = post.value.title, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp), fontSize = 18.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Icon(painter = painterResource(R.drawable.flag), contentDescription = "Flag", modifier = Modifier
-                .size(32.dp)
-                .clickable {
-                    reportDialog.value = true
-                })
-        }
-        Text(text = (post.value.date + " - $" + "%.2f".format(post.value.price)), modifier = Modifier.padding(10.dp, 0.dp), color = NavGray)
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(10.dp)
-        ) {
-            Text(text = (stringResource(R.string.provided_by) + " " ), modifier = Modifier.wrapContentHeight(), color = NavGray)
-            ClickableText(text = AnnotatedString(post.value.agency), modifier = Modifier.wrapContentHeight(), style = TextStyle(color = Color(0xFF3366BB))) {
-                viewModel.getAgencyData(post.value.agencyId)
+    Scaffold(
+        bottomBar = {
+            BottomNavigationBar(itemsList = navBarItemList(), currentRoute = currentRoute) {
+                    currentNavigationItem ->
+                navController.navigate(currentNavigationItem.route){
+                    navController.graph.startDestinationRoute?.let{startDestinationRoute ->
+                        popUpTo(startDestinationRoute){
+                            saveState = false
+                        }
+                    }
+                    launchSingleTop=true
+                    restoreState = true
+                }
             }
         }
-        Button(onClick = { /*TODO*/ },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = AddGreen
-            ),
-            modifier = Modifier.padding(10.dp)) {
-            Text(text = stringResource(R.string.contact_wha), color = White)
-        }
-        Spacer(modifier = Modifier.padding(10.dp))
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState(), columnScrollingEnabled.value),
+        ) {
 
-        Text(text = stringResource(R.string.description) + ":", fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp, 0.dp))
-        Text(text = post.value.description, fontWeight = FontWeight.Normal, modifier = Modifier.padding(10.dp))
-        Spacer(modifier = Modifier.padding(10.dp))
-        Text(text = stringResource(R.string.meeting) + ":", fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp, 0.dp))
-        Text(text = post.value.meeting, fontWeight = FontWeight.Normal, modifier = Modifier.padding(10.dp))
-        Spacer(modifier = Modifier.padding(10.dp))
-        Text(text = stringResource(R.string.itinerary) + ":", fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp, 0.dp))
-        Text(text = makeBulletedList(items = (post.value.itinerary.map { it.time + ": " + it.event })), modifier = Modifier.padding(10.dp))
-        Spacer(modifier = Modifier.padding(10.dp))
-        Text(text = stringResource(R.string.includes) + ":", fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp, 0.dp))
-        Text(text = makeBulletedList(items = post.value.includes), modifier = Modifier.padding(10.dp))
-        Spacer(modifier = Modifier.padding(10.dp))
-        Text(text = stringResource(R.string.destination) + ":", fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp))
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()
-        ){
-            GoogleMap(
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .aspectRatio(1.25f)
-                    .pointerInteropFilter(
-                        onTouchEvent = {
-                            when (it.action) {
-                                MotionEvent.ACTION_DOWN -> {
-                                    columnScrollingEnabled.value = false
-                                    false
-                                }
-
-                                else -> {
-                                    true
-                                }
-                            }
-                        }),
-                cameraPositionState = cameraPositionState
-            ) {
-                Marker(
-                    state = MarkerState(position = LatLng(post.value.position.lat, post.value.position.long)),
-                    title = post.value.title
+            AsyncImage(
+                model = post.value.image, contentDescription = post.value.title, modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
+                    .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Crop
+            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = post.value.title,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(10.dp),
+                    fontSize = 18.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
+                Icon(painter = painterResource(R.drawable.flag),
+                    contentDescription = "Flag",
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clickable {
+                            reportDialog.value = true
+                        })
+            }
+            Text(
+                text = (post.value.date + " - $" + "%.2f".format(post.value.price)),
+                modifier = Modifier.padding(10.dp, 0.dp),
+                color = NavGray
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(10.dp)
+            ) {
+                Text(
+                    text = (stringResource(R.string.provided_by) + " "),
+                    modifier = Modifier.wrapContentHeight(),
+                    color = NavGray
+                )
+                ClickableText(
+                    text = AnnotatedString(post.value.agency),
+                    modifier = Modifier.wrapContentHeight(),
+                    style = TextStyle(color = Color(0xFF3366BB))
+                ) {
+                    viewModel.getAgencyData(post.value.agencyId)
+                }
+            }
+            Button(
+                onClick = { /*TODO*/ },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = AddGreen
+                ),
+                modifier = Modifier.padding(10.dp)
+            ) {
+                Text(text = stringResource(R.string.contact_wha), color = White)
+            }
+            Spacer(modifier = Modifier.padding(10.dp))
+
+            Text(
+                text = stringResource(R.string.description) + ":",
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(10.dp, 0.dp)
+            )
+            Text(
+                text = post.value.description,
+                fontWeight = FontWeight.Normal,
+                modifier = Modifier.padding(10.dp)
+            )
+            Spacer(modifier = Modifier.padding(10.dp))
+            Text(
+                text = stringResource(R.string.meeting) + ":",
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(10.dp, 0.dp)
+            )
+            Text(
+                text = post.value.meeting,
+                fontWeight = FontWeight.Normal,
+                modifier = Modifier.padding(10.dp)
+            )
+            Spacer(modifier = Modifier.padding(10.dp))
+            Text(
+                text = stringResource(R.string.itinerary) + ":",
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(10.dp, 0.dp)
+            )
+            Text(
+                text = makeBulletedList(items = (post.value.itinerary.map { it.time + ": " + it.event })),
+                modifier = Modifier.padding(10.dp)
+            )
+            Spacer(modifier = Modifier.padding(10.dp))
+            Text(
+                text = stringResource(R.string.includes) + ":",
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(10.dp, 0.dp)
+            )
+            Text(
+                text = makeBulletedList(items = post.value.includes),
+                modifier = Modifier.padding(10.dp)
+            )
+            Spacer(modifier = Modifier.padding(10.dp))
+            Text(
+                text = stringResource(R.string.destination) + ":",
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(10.dp)
+            )
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                GoogleMap(
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .aspectRatio(1.25f)
+                        .pointerInteropFilter(
+                            onTouchEvent = {
+                                when (it.action) {
+                                    MotionEvent.ACTION_DOWN -> {
+                                        columnScrollingEnabled.value = false
+                                        false
+                                    }
+
+                                    else -> {
+                                        true
+                                    }
+                                }
+                            }),
+                    cameraPositionState = cameraPositionState
+                ) {
+                    Marker(
+                        state = MarkerState(
+                            position = LatLng(
+                                post.value.position.lat,
+                                post.value.position.long
+                            )
+                        ),
+                        title = post.value.title
+                    )
+                }
             }
         }
     }
