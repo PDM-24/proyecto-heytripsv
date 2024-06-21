@@ -438,30 +438,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    //Función para reportar posts
-    fun reportPost(id: String, content: String) {
-        //Función para reportar posts o agencias
-        fun reportContent(id: String, content: String, post: Boolean = true) {
-
-            viewModelScope.launch(Dispatchers.IO) {
-                try {
-                    datastore.getToken().collect() { token ->
-                        _uiState.value = UiState.Loading
-                        val authHeader = "Bearer $token"
-                        val response = if (post) {
-                            api.reportPost(authHeader, id, ReportApiModel(content))
-                        } else {
-                            api.reportAgency(authHeader, id, ReportApiModel(content))
-                        }
-
-                        _uiState.value = UiState.Success(response.result)
+    fun reportContent(id: String, content: String, post: Boolean = true){
+        viewModelScope.launch(Dispatchers.IO){
+            try {
+                datastore.getToken().collect(){
+                        token->
+                    _uiState.value = UiState.Loading
+                    val authHeader = "Bearer $token"
+                    val response = if (post){
+                        api.reportPost(authHeader, id, ReportApiModel(content))
+                    }else{
+                        api.reportAgency(authHeader, id, ReportApiModel(content))
                     }
-                } catch (e: Exception) {
-                    Log.i("ViewModel", e.toString())
-                    _uiState.value = UiState.Error("Error reporting the post")
+                    _uiState.value = UiState.Success(response.result)
                 }
+            }catch (e: Exception){
+                Log.i("ViewModel", e.toString())
+                _uiState.value = UiState.Error("Error reporting the post")
             }
-
         }
     }
 
