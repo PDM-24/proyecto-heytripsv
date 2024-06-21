@@ -71,19 +71,12 @@ controller.reportAgency = async (req, res, next) => {
         agency["reports"] = _reports;
         const newAgency = await agency.save();
 
-        //Retorna la agencia actualizada
-        return res.status(200).json({
-            _id: newAgency._id, 
-            email: newAgency.email, 
-            name: newAgency.name, 
-            phone: newAgency.phone, 
-            dui: newAgency.dui,
-            description: newAgency.description,
-            image: newAgency.image,
-            instagram: newAgency.instagram,
-            facebook: newAgency.facebook,
-            reports: newAgency.reports });
-
+        //Retornamos el post actualizado
+        if (newAgency) {
+            return res.status(200).json({ result: "Agency reported" });
+        }else{
+            return res.status(500).json({error: "There was an error reporting the agency"})
+        }
     } catch (error) {
         next(error);
     }

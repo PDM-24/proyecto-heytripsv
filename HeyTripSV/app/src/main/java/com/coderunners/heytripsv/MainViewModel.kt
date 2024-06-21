@@ -6,6 +6,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.coderunners.heytripsv.data.remote.api.APIResponseSuccesful
 import com.coderunners.heytripsv.data.remote.api.ApiClient
 import com.coderunners.heytripsv.data.remote.model.ItineraryApi
 import com.coderunners.heytripsv.data.remote.model.LogInBody
@@ -350,15 +351,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    //Función para reportar posts
-    fun reportPost(id: String, content: String){
+    //Función para reportar posts o agencias
+    fun reportContent(id: String, content: String, post: Boolean = true){
         viewModelScope.launch(Dispatchers.IO){
             try {
                 datastore.getToken().collect(){
                         token->
                     _uiState.value = UiState.Loading
                     val authHeader = "Bearer $token"
-                    val response = api.reportPost(authHeader, id, ReportApiModel(content))
+                    val response = if (post){
+                        api.reportPost(authHeader, id, ReportApiModel(content))
+                    }else{
+                        api.reportAgency(authHeader, id, ReportApiModel(content))
+                    }
+
                     _uiState.value = UiState.Success(response.result)
                 }
             }catch (e: Exception){

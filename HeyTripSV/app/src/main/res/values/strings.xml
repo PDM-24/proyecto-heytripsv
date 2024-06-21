@@ -95,5 +95,6 @@
     <string name="save_changes">Save Changes</string>
     <string name="no_posts">There are no posts to show</string>
     <string name="post_reported">Post reported</string>
+    <string name="agency_reported">Agency Reported</string>
 
 </resources>
