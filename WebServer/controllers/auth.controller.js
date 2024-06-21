@@ -296,6 +296,94 @@ controller.sendCode = async (req, res, next) => {
     }
 }
 
+// Controlador para verificar el código
+controller.compareCode = async (req, res, next) => {
+    try {
+        const { email, code } = req.body;
+
+        let user = await User.findOne({ email: email });
+        let agency;
+
+        if (!user) {
+            agency = await Agency.findOne({ email: email });
+            if (!agency) {
+                return res.status(404).json({ error: "User not found" });
+            }
+
+            if (!agency.compareCode(code) || !checkCodeDate(new Date(), agency.codeDate)) {
+                return res.status(401).json({ error: "Invalid code" });
+            }
+
+            return res.status(200).json({ message: "Correct code" });
+        }
+
+        if (!user.compareCode(code) || !checkCodeDate(new Date(), user.codeDate)) {
+            return res.status(401).json({ error: "Invalid code" });
+        }
+
+        return res.status(200).json({ message: "Correct code" });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// Controlador para cambiar la contraseña
+controller.changePassword = async (req, res, next) => {
+    try {
+        const { email, pass } = req.body;
+
+        let user = await User.findOne({ email: email });
+        let agency;
+
+        if (!user) {
+            agency = await Agency.findOne({ email: email });
+            if (!agency) {
+                return res.status(404).json({ error: "User not found" });
+            }
+
+            if (pass) {
+                agency.password = pass;
+                const updatedAgency = await agency.save();
+
+                if (!updatedAgency) {
+                    return res.status(500).json({ error: "There was an error updating the password" });
+                }
+
+                return res.status(200).json({ message: "Password updated correctly" });
+            }
+
+            return res.status(200).json({ message: "Correct code" });
+        }
+
+
+        if (pass) {
+            user.password = pass;
+            const updatedUser = await user.save();
+
+            if (!updatedUser) {
+                return res.status(500).json({ error: "There was an error updating the password" });
+            }
+
+            return res.status(200).json({ message: "Password updated correctly" });
+        }
+
+        return res.status(200).json({ message: "Correct code" });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// Función para generar un código aleatorio
+function generateRandomCode() {
+    let _code = '';
+    while (_code.length < 5) {
+        _code += Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(36);
+    }
+    return _code.substring(0, 5).toUpperCase();
+}
+
+
+/*
 //Compara el código escrito por el usuario al que está ingresado en la base de datos
 controller.compareCode = async (req, res, next) => {
     try {
@@ -372,6 +460,7 @@ controller.compareCode = async (req, res, next) => {
         next(error);
     }
 }
+*/
 
 //Verificar el tiempo de vencimiento del código de recuperación
 function checkCodeDate(date1, date2) {

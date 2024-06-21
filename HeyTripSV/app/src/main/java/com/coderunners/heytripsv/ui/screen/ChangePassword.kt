@@ -1,8 +1,11 @@
 package com.coderunners.heytripsv.ui.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -18,18 +21,21 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -37,20 +43,60 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
+import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.R
 import com.coderunners.heytripsv.ui.navigation.ScreenRoute
 import com.coderunners.heytripsv.ui.theme.MainGreen
 import com.coderunners.heytripsv.ui.theme.NavGray
 import com.coderunners.heytripsv.ui.theme.TextGray
+import com.coderunners.heytripsv.utils.UiState
 
 @Composable
-fun ChangePass(navController: NavController){
+fun ChangePass(navController: NavController, mainViewModel : MainViewModel){
 
     val newPassword = remember { mutableStateOf("") }
     val newPasswordConf = remember { mutableStateOf("") }
     val similarityStatus: MutableState<Boolean> = remember { mutableStateOf(false) }
     val dialogStatus: MutableState<Boolean> = remember { mutableStateOf(false) }
+    val screenviewState = mainViewModel.uiState.collectAsState()
+    val email = mainViewModel.email.collectAsState()
+
+    when(screenviewState.value) {
+        is UiState.Error -> {
+            val message = (screenviewState.value as UiState.Error).msg
+            Toast.makeText(LocalContext.current, message, Toast.LENGTH_SHORT).show()
+            mainViewModel.setStateToReady()
+        }
+
+        UiState.Loading -> {
+            Dialog(
+                onDismissRequest = { },
+                DialogProperties(
+                    dismissOnBackPress = false,
+                    dismissOnClickOutside = false
+                )
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .background(Color.Transparent)
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+        }
+
+        UiState.Ready -> {}
+        is UiState.Success -> {
+            mainViewModel.setStateToReady()
+            navController.navigate(ScreenRoute.Profile.route)
+        }
+
+    }
 
     Scaffold(
         topBar = {
@@ -122,7 +168,7 @@ fun ChangePass(navController: NavController){
                         similarityStatus.value = true
                         dialogStatus.value = true
                     } else {
-                        navController.navigate(ScreenRoute.RegisterAgency.route)
+                        mainViewModel.changePassword(newPassword.value)
                     }
                 },
                 modifier = Modifier

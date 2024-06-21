@@ -101,5 +101,6 @@
     <string name="back">Back</string>
     <string name="report_logged">To report a post you have to log into your account</string>
     <string name="report_agn_logged">To report an agency you have to log into your account</string>
+    <string name="confirmation_code">Confirmation code</string>
 
 </resources>

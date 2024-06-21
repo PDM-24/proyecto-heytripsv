@@ -6,8 +6,9 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.coderunners.heytripsv.data.remote.api.APIResponseSuccesful
 import com.coderunners.heytripsv.data.remote.api.ApiClient
+import com.coderunners.heytripsv.data.remote.model.ChangePassBody
+import com.coderunners.heytripsv.data.remote.model.CompareCodeBody
 import com.coderunners.heytripsv.data.remote.model.ItineraryApi
 import com.coderunners.heytripsv.data.remote.model.LogInBody
 import com.coderunners.heytripsv.data.remote.model.PostListResponse
@@ -20,7 +21,6 @@ import com.coderunners.heytripsv.model.LogInData
 import com.coderunners.heytripsv.model.Position
 import com.coderunners.heytripsv.model.PostDataModel
 import com.coderunners.heytripsv.model.PostList
-import com.coderunners.heytripsv.model.agencyData
 import com.coderunners.heytripsv.repository.DataStore
 import com.coderunners.heytripsv.utils.UiState
 import com.coderunners.heytripsv.utils.createFilePart
@@ -35,7 +35,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //ESTADO DE APP (LOADING)
@@ -68,6 +67,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _ownAgency = MutableStateFlow(AgencyDataModel())
     val ownAgency = _ownAgency.asStateFlow()
+
+    private val _email = MutableStateFlow("")
+    val email = _email.asStateFlow()
 
     private val _savedIDs = MutableStateFlow(mutableListOf(""))
     val savedIDs = _savedIDs.asStateFlow()
@@ -430,10 +432,51 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     )
                 )
                 Log.i("MainViewModel", response.toString())
-                _uiState.value = UiState.Success("Logged in correctly")
+                _uiState.value = UiState.Success("Succesful")
+                _email.value = email.email
             } catch (e: Exception) {
                 Log.i("ViewModel", e.toString())
-                _uiState.value = UiState.Error("Error Logging in")
+                _uiState.value = UiState.Error("Code Not Sent")
+            }
+        }
+    }
+
+    fun compareCode(code : String){
+        viewModelScope.launch(Dispatchers.IO) {
+            try{
+                _uiState.value = UiState.Loading
+                val response = api.compareCode(
+                    CompareCodeBody(
+                        email = _email.value,
+                        code = code
+                    )
+                )
+                Log.i("MainViewModel", response.toString())
+                _uiState.value = UiState.Success("Code verified")
+            }catch(e : Exception){
+                Log.i("ViewModel", e.toString())
+                _uiState.value = UiState.Error("Code couldn't be compared")
+            }
+        }
+    }
+
+    fun changePassword(password : String){
+        viewModelScope.launch(Dispatchers.IO) {
+            try{
+                _uiState.value = UiState.Loading
+                Log.d("ViewModel",_email.value)
+                val response = api.changePassword(
+                    ChangePassBody(
+                        email = _email.value,
+                        password = password
+                    )
+                )
+                Log.i("MainViewModel", response.toString())
+                _uiState.value = UiState.Success("Password Changed Succesfully")
+            }catch(e : Exception){
+                Log.i("ViewModel", e.toString())
+                Log.d("ViewModel",_email.value)
+                _uiState.value = UiState.Error("Password couldn't be changed")
             }
         }
     }
@@ -600,3 +643,4 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 }
+

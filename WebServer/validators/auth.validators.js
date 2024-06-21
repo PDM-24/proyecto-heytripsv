@@ -12,10 +12,15 @@ validators.codeValidator = [
     body("email")
         .notEmpty().withMessage("An email is required"),
     body("code")
-        .notEmpty().withMessage("A code is required"),
+        .notEmpty().withMessage("A code is required")
+]
+
+validators.newPassValidator = [
+    body("email")
+        .notEmpty().withMessage("An email is required"),
     body("pass")
-        .optional()
-        .matches(passwordRegex).withMessage("Invalid password format")
+        .notEmpty().withMessage("A password is required")
+        .matches(passwordRegex).withMessage("Invalid password format")   
 ]
 
 validators.registerAgencyValidator = [
