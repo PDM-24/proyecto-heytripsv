@@ -3,6 +3,8 @@ package com.coderunners.heytripsv.data.remote.api
 import android.net.Uri
 import com.coderunners.heytripsv.data.remote.model.ItineraryApi
 import com.coderunners.heytripsv.data.remote.model.AgencyResponse
+import com.coderunners.heytripsv.data.remote.model.ChangePassBody
+import com.coderunners.heytripsv.data.remote.model.CompareCodeBody
 import com.coderunners.heytripsv.data.remote.model.LogInBody
 import com.coderunners.heytripsv.data.remote.model.LogInResponse
 import com.coderunners.heytripsv.data.remote.model.PostListResponse
@@ -84,7 +86,7 @@ interface ApiService {
     ):APIResponseSuccesful
 
     @Headers(value = ["Content-Type: application/json"])
-    @POST(value= Constants.API_PATH + Constants.POST_REGISTER_AGENCY)
+    @POST(value= Constants.API_PATH + Constants.POST_RECOVER_PASSWORD)
     suspend fun sendCode(@Body email : SendCodeBody): APIResponseSuccesful
     @GET(value = Constants.API_PATH + Constants.GET_REPORTED_POST)
     suspend fun getReportedPosts(@Header("Authorization") authHeader: String): APIResponseSuccesful
@@ -122,4 +124,12 @@ interface ApiService {
         @Header("Authorization") authHeader: String,
         @Path("id") id: String
     ):savedPosts
+
+    @Headers(value = ["Content-Type: application/json"])
+    @POST(value= Constants.API_PATH + Constants.POST_CONFIRM_CODE)
+    suspend fun compareCode(@Body compareCode : CompareCodeBody): APIResponseSuccesful
+
+    @Headers(value = ["Content-Type: application/json"])
+    @POST(value= Constants.API_PATH + Constants.POST_CHANGE_PASSWORD)
+    suspend fun changePassword(@Body changePass : ChangePassBody): APIResponseSuccesful
 }

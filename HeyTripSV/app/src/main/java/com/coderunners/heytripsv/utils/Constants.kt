@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 object Constants {
     //api service
-    const val BASE_URL = "http://192.168.1.12:3000"
+    const val BASE_URL = "http://192.168.1.6:3000"
     const val API_PATH ="/api"
 
     //Obtener post Home
@@ -53,6 +53,7 @@ object Constants {
     //Recuperar cuenta
     const val POST_RECOVER_PASSWORD = "/auth/recovery-code/"
     const val POST_CONFIRM_CODE = "/auth/confirm-code/"
+    const val POST_CHANGE_PASSWORD = "/auth/change-password/"
 
     //Iniciar Sesion
     const val POST_LOGIN = "/auth/login/"
