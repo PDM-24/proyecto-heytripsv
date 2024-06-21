@@ -3,6 +3,7 @@ package com.coderunners.heytripsv.ui.screen
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,17 +11,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.coderunners.heytripsv.MainViewModel
@@ -35,7 +33,6 @@ fun ReportedScreen(
     navController: NavController
 ) {
     val (isPublicationsSelected, setIsPublicationsSelected) = remember { mutableStateOf(true) }
-
 
     SideEffect {
         mainViewModel.getReportedAgency()
@@ -71,14 +68,20 @@ fun ReportedScreen(
                     ToggleButton("Cuentas", !isPublicationsSelected) { setIsPublicationsSelected(false) }
                 }
 
-                // Sorting option
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.Start
                 ) {
-                    Text("Ordenar por: A-Z", color = Color.Gray)
+                    Text(
+                        "Ordenar por: A-Z",
+                        color = Color.Gray,
+                        textDecoration = TextDecoration.Underline,
+                        modifier = Modifier.clickable {
+                            mainViewModel.sortReportedPostsAlphabetically()
+                        }
+                    )
                 }
 
                 LazyColumn(
@@ -100,23 +103,21 @@ fun ReportedScreen(
                         }
                     } else {
                         items(mainViewModel.reportedAgency.value) { apiModel ->
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp)
-                            ) {
-                                Text(text = "Agencia: ${apiModel.agency.firstOrNull()?.name ?: "Sin agencia"}")
-                                Text(text = "Razón del reporte: ${apiModel.content}")
-                                IconButton(
-                                    onClick = { mainViewModel.deleteReportedAgency(apiModel.id) },
-                                    modifier = Modifier.align(Alignment.End)
-                                ) {
-                                    Icon(Icons.Default.Delete, contentDescription = "Eliminar")
-                                }
+                            val agency = apiModel.agency.firstOrNull()
+                            if (agency != null) {
+                                ReportedAgency(
+                                    account = ReportedAgencyData(
+                                        imageRes = R.drawable.default_image,
+                                        username = agency.name,
+                                        reason = apiModel.content
+                                    ),
+                                    onDelete = { mainViewModel.deleteReportedAgency(apiModel.id) },
+                                    apiModel = apiModel,
+                                    mainViewModel = mainViewModel
+                                )
                             }
                         }
                     }
-
                 }
             }
         }
@@ -150,6 +151,33 @@ fun ReportedPost(
     mainViewModel: MainViewModel,
     apiModel: ReportApiModel
 ) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Eliminar publicación") },
+            text = { Text("¿Estás seguro de que deseas eliminar esta publicación?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onDelete()
+                        showDialog = false
+                    }
+                ) {
+                    Text("Sí")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { showDialog = false }
+                ) {
+                    Text("No")
+                }
+            }
+        )
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -178,7 +206,7 @@ fun ReportedPost(
                         horizontalArrangement = Arrangement.End
                     ) {
                         IconButton(
-                            onClick = onDelete,
+                            onClick = { showDialog = true },
                             modifier = Modifier
                                 .background(MainGreen, shape = RoundedCornerShape(4.dp))
                                 .size(32.dp)
@@ -187,7 +215,7 @@ fun ReportedPost(
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                         IconButton(
-                            onClick = { mainViewModel.deleteReportedPost(apiModel.id ?: "") },
+                            onClick = { showDialog = true },
                             modifier = Modifier
                                 .background(Color(0xFFCC0000), shape = RoundedCornerShape(4.dp))
                                 .size(32.dp)
@@ -203,10 +231,38 @@ fun ReportedPost(
 
 @Composable
 fun ReportedAgency(
-    account: ReportedAgency,
+    account: ReportedAgencyData,
     onDelete: () -> Unit,
-    apiModel: ReportApiModel
+    apiModel: ReportApiModel,
+    mainViewModel: MainViewModel
 ) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Eliminar agencia") },
+            text = { Text("¿Estás seguro de que deseas eliminar esta agencia?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onDelete()
+                        showDialog = false
+                    }
+                ) {
+                    Text("Sí")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { showDialog = false }
+                ) {
+                    Text("No")
+                }
+            }
+        )
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -235,7 +291,7 @@ fun ReportedAgency(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 IconButton(
-                    onClick = { /* Handle approve */ },
+                    onClick = { showDialog = true },
                     modifier = Modifier
                         .background(MainGreen, shape = RoundedCornerShape(4.dp))
                         .size(32.dp)
@@ -243,7 +299,7 @@ fun ReportedAgency(
                     Icon(Icons.Filled.Check, contentDescription = "Approve", tint = Color.White)
                 }
                 IconButton(
-                    onClick = onDelete,
+                    onClick = { showDialog = true },
                     modifier = Modifier
                         .background(Color(0xFFCC0000), shape = RoundedCornerShape(4.dp))
                         .size(32.dp)
@@ -256,4 +312,4 @@ fun ReportedAgency(
 }
 
 data class ReportedPost(val imageRes: Int, val title: String, val description: String)
-data class ReportedAgency(val imageRes: Int, val username: String, val reason: String)
+data class ReportedAgencyData(val imageRes: Int, val username: String, val reason: String)
