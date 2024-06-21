@@ -424,6 +424,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.value = UiState.Ready
     }
 
+    //Funcion para ordenar de forma alfabetica la lista de post reportados
+    fun sortReportedPostsAlphabetically() {
+        val sortedList = _reportedPosts.value.sortedBy { it.title }
+        _reportedPosts.value = sortedList
+    }
+
+
     //Funcion para eliminar post
     fun deletePost(postId: String) {
         viewModelScope.launch(Dispatchers.IO) {
