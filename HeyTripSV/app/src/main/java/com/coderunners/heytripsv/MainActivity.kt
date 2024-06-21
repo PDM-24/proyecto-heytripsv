@@ -31,33 +31,10 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    val navBackStackEntry by navController.currentBackStackEntryAsState()
-                    val currentRoute: String? =navBackStackEntry?.destination?.route
-                    val navItems =  navBarItemList()
-
-                    Scaffold(
-                        bottomBar = {
-                            BottomNavigationBar(itemsList = navItems, currentRoute = currentRoute) {
-                                currentNavigationItem ->
-                                navController.navigate(currentNavigationItem.route){
-                                    navController.graph.startDestinationRoute?.let{startDestinationRoute ->
-                                        popUpTo(startDestinationRoute){
-                                            saveState = false
-                                        }
-                                    }
-                                    launchSingleTop=true
-                                    restoreState = true
-                                }
-                            }
-                        }
-                    ) {
-                            innerPadding ->
                         NavBarGraph(
                             navController = navController,
-                            innerPadding = innerPadding,
                             mainViewModel = mainViewModel
                         )
-                    }
                 }
             }
         }

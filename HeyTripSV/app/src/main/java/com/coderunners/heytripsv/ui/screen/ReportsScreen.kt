@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -22,31 +23,36 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.R
+import com.coderunners.heytripsv.data.remote.model.ReportApiModel
 import com.coderunners.heytripsv.ui.theme.MainGreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportedScreen(
-    reportedItems: List<ReportedItem>,
-    reportedAccounts: List<ReportedAccount>,
-    innerPadding : PaddingValues,
-    navController : NavController
+    mainViewModel: MainViewModel,
+    navController: NavController
 ) {
     val (isPublicationsSelected, setIsPublicationsSelected) = remember { mutableStateOf(true) }
+
+
+    SideEffect {
+        mainViewModel.getReportedAgency()
+        mainViewModel.getReportedPosts()
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Reportados") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Regresar")
                     }
                 }
             )
-        }
-        ,
+        },
         content = { innerPadding ->
             Column(
                 modifier = Modifier
@@ -79,14 +85,38 @@ fun ReportedScreen(
                     modifier = Modifier.padding(16.dp)
                 ) {
                     if (isPublicationsSelected) {
-                        items(reportedItems) { item ->
-                            ReportedItem(item)
+                        items(mainViewModel.reportedPosts.value) { apiModel ->
+                            val reportedItem = ReportedPost(
+                                title = apiModel.title ?: "",
+                                description = apiModel.description ?: "",
+                                imageRes = R.drawable.default_image
+                            )
+                            ReportedPost(
+                                item = reportedItem,
+                                onDelete = { mainViewModel.deleteReportedPost(apiModel.id ?: "") },
+                                mainViewModel = mainViewModel,
+                                apiModel = apiModel
+                            )
                         }
                     } else {
-                        items(reportedAccounts) { account ->
-                            ReportedAccount(account)
+                        items(mainViewModel.reportedAgency.value) { apiModel ->
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                            ) {
+                                Text(text = "Agencia: ${apiModel.agency.firstOrNull()?.name ?: "Sin agencia"}")
+                                Text(text = "Razón del reporte: ${apiModel.content}")
+                                IconButton(
+                                    onClick = { mainViewModel.deleteReportedAgency(apiModel.id) },
+                                    modifier = Modifier.align(Alignment.End)
+                                ) {
+                                    Icon(Icons.Default.Delete, contentDescription = "Eliminar")
+                                }
+                            }
                         }
                     }
+
                 }
             }
         }
@@ -114,7 +144,12 @@ fun ToggleButton(
 }
 
 @Composable
-fun ReportedItem(item: ReportedItem) {
+fun ReportedPost(
+    item: ReportedPost,
+    onDelete: () -> Unit,
+    mainViewModel: MainViewModel,
+    apiModel: ReportApiModel
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -143,7 +178,7 @@ fun ReportedItem(item: ReportedItem) {
                         horizontalArrangement = Arrangement.End
                     ) {
                         IconButton(
-                            onClick = { /* Handle approve */ },
+                            onClick = onDelete,
                             modifier = Modifier
                                 .background(MainGreen, shape = RoundedCornerShape(4.dp))
                                 .size(32.dp)
@@ -152,7 +187,7 @@ fun ReportedItem(item: ReportedItem) {
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                         IconButton(
-                            onClick = { /* Handle delete */ },
+                            onClick = { mainViewModel.deleteReportedPost(apiModel.id ?: "") },
                             modifier = Modifier
                                 .background(Color(0xFFCC0000), shape = RoundedCornerShape(4.dp))
                                 .size(32.dp)
@@ -167,7 +202,11 @@ fun ReportedItem(item: ReportedItem) {
 }
 
 @Composable
-fun ReportedAccount(account: ReportedAccount) {
+fun ReportedAgency(
+    account: ReportedAgency,
+    onDelete: () -> Unit,
+    apiModel: ReportApiModel
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -191,7 +230,6 @@ fun ReportedAccount(account: ReportedAccount) {
                 Text(account.username, fontWeight = FontWeight.Bold)
                 Text(account.reason, color = Color.Gray)
             }
-            Spacer(modifier = Modifier.weight(1f))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -205,7 +243,7 @@ fun ReportedAccount(account: ReportedAccount) {
                     Icon(Icons.Filled.Check, contentDescription = "Approve", tint = Color.White)
                 }
                 IconButton(
-                    onClick = { /* Handle delete */ },
+                    onClick = onDelete,
                     modifier = Modifier
                         .background(Color(0xFFCC0000), shape = RoundedCornerShape(4.dp))
                         .size(32.dp)
@@ -217,5 +255,5 @@ fun ReportedAccount(account: ReportedAccount) {
     }
 }
 
-data class ReportedItem(val imageRes: Int, val title: String, val description: String)
-data class ReportedAccount(val imageRes: Int, val username: String, val reason: String)
+data class ReportedPost(val imageRes: Int, val title: String, val description: String)
+data class ReportedAgency(val imageRes: Int, val username: String, val reason: String)

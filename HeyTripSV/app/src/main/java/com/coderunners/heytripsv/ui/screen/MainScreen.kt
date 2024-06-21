@@ -23,6 +23,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,17 +47,21 @@ import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.R
 import com.coderunners.heytripsv.model.PostList
 import com.coderunners.heytripsv.ui.components.PostCard
+import com.coderunners.heytripsv.ui.navigation.BottomNavigationBar
 import com.coderunners.heytripsv.ui.navigation.ScreenRoute
+import com.coderunners.heytripsv.ui.navigation.navBarItemList
 import com.coderunners.heytripsv.ui.theme.MainGreen
 import com.coderunners.heytripsv.ui.theme.TextGray
 import com.coderunners.heytripsv.ui.theme.White
 import com.coderunners.heytripsv.utils.UiState
 
 @Composable
-fun MainScreen(innerPadding: PaddingValues, mainViewModel: MainViewModel, navController: NavHostController) {
+fun MainScreen(currentRoute: String?, mainViewModel: MainViewModel, navController: NavHostController) {
     val context = LocalContext.current
     val userRole = mainViewModel.userRole.collectAsState()
     val updateScreenState = mainViewModel.uiState.collectAsState()
+    //TODO: ESTA LISTA CAMBIA A LA LISTA DE NAVBAR ITEM SI EL USUARIO ESTA LOGGEADO COMO ADMIN
+    val navItems = navBarItemList()
     val loading = remember {
         mutableStateOf(false)
     }
@@ -85,176 +90,215 @@ fun MainScreen(innerPadding: PaddingValues, mainViewModel: MainViewModel, navCon
         mainViewModel.getHomePostList()
     }
 
-    Column(
-        modifier = Modifier
-            .padding(innerPadding)
-            .fillMaxWidth()
-            .verticalScroll(rememberScrollState())
-    ) {
-        //Categories
-        Row(
-            modifier = Modifier
-                .background(MainGreen)
-                .fillMaxWidth()
-                .padding(15.dp)
-        ) {
-            Column {
-                Text(
-                    text = stringResource(R.string.categories),
-                    color = TextGray,
-                    modifier = Modifier.padding(5.dp, 0.dp, 5.dp, 0.dp),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                )
-                Text(
-                    text = stringResource(R.string.categories_desc),
-                    color = White,
-                    modifier = Modifier.padding(5.dp)
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth(0.5f)
-                            .padding(5.dp)
-                    ) {
-                        Button(onClick = {
-                            mainViewModel.saveSelectedCategory(context.resources.getString(R.string.beaches))
-                            navController.navigate(ScreenRoute.Category.route)
-                        },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = White
-                            )) {
-                            Text(text = stringResource(R.string.beaches), color = TextGray)
-                        }
-                        Button(onClick = {
-                            mainViewModel.saveSelectedCategory(context.resources.getString(R.string.towns))
-                            navController.navigate(ScreenRoute.Category.route)
-                        },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = White
-                            )) {
-                            Text(text = stringResource(R.string.towns), color = TextGray)
-                        }
-                        Button(onClick = {
-                            mainViewModel.saveSelectedCategory(context.resources.getString(R.string.others))
-                            navController.navigate(ScreenRoute.Category.route)
-                        },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = White
-                            )) {
-                            Text(text = stringResource(R.string.others), color = TextGray)
+    Scaffold(
+        bottomBar = {
+            BottomNavigationBar(itemsList = navItems, currentRoute = currentRoute) {
+                    currentNavigationItem ->
+                navController.navigate(currentNavigationItem.route){
+                    navController.graph.startDestinationRoute?.let{startDestinationRoute ->
+                        popUpTo(startDestinationRoute){
+                            saveState = false
                         }
                     }
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth(1f)
-                            .padding(5.dp)
-                    ) {
-                        Button(onClick = {
-                            mainViewModel.saveSelectedCategory(context.resources.getString(R.string.mountains))
-                            navController.navigate(ScreenRoute.Category.route)
-                        },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = White
-                            )) {
-                            Text(text = stringResource(R.string.mountains), color = TextGray)
-                        }
-                        Button(onClick = {
-                            mainViewModel.saveSelectedCategory(context.resources.getString(R.string.routes))
-                            navController.navigate(ScreenRoute.Category.route)
-                        },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = White
-                            )) {
-                            Text(text = stringResource(R.string.routes), color = TextGray)
-                        }
-                    }
+                    launchSingleTop=true
+                    restoreState = true
                 }
             }
         }
+    ) { innerPadding ->
 
-        Spacer(modifier = Modifier.padding(5.dp))
-        //PostCards
-        Row(
-            modifier = Modifier.padding(10.dp)
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
         ) {
-            Column {
-                Text(
-                    text = stringResource(id = R.string.upcoming),
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(0.dp, 10.dp)
-                )
-                if (loading.value) {
+            //Categories
+            Row(
+                modifier = Modifier
+                    .background(MainGreen)
+                    .fillMaxWidth()
+                    .padding(15.dp)
+            ) {
+                Column {
+                    Text(
+                        text = stringResource(R.string.categories),
+                        color = TextGray,
+                        modifier = Modifier.padding(5.dp, 0.dp, 5.dp, 0.dp),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
+                    Text(
+                        text = stringResource(R.string.categories_desc),
+                        color = White,
+                        modifier = Modifier.padding(5.dp)
+                    )
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        CircularProgressIndicator(modifier = Modifier.size(30.dp, 30.dp))
-                    }
-                } else {
-                    if (upcomingList.value.size == 0) {
-                        Text(
-                            text = stringResource(id = R.string.no_posts),
+                        Column(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(15.dp),
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                    LazyRow {
-                        items(upcomingList.value) { postItem ->
-                            PostCard(post = postItem, isAdmin = (userRole.value == "admin"), onClick =  {
-                                mainViewModel.saveSelectedPost(postItem)
-                                navController.navigate(ScreenRoute.PostView.route)
-                            }, onDelete = {
-                                mainViewModel.deletePost(it)
-                            })
+                                .fillMaxWidth(0.5f)
+                                .padding(5.dp)
+                        ) {
+                            Button(
+                                onClick = {
+                                    mainViewModel.saveSelectedCategory(context.resources.getString(R.string.beaches))
+                                    navController.navigate(ScreenRoute.Category.route)
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = White
+                                )
+                            ) {
+                                Text(text = stringResource(R.string.beaches), color = TextGray)
+                            }
+                            Button(
+                                onClick = {
+                                    mainViewModel.saveSelectedCategory(context.resources.getString(R.string.towns))
+                                    navController.navigate(ScreenRoute.Category.route)
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = White
+                                )
+                            ) {
+                                Text(text = stringResource(R.string.towns), color = TextGray)
+                            }
+                            Button(
+                                onClick = {
+                                    mainViewModel.saveSelectedCategory(context.resources.getString(R.string.others))
+                                    navController.navigate(ScreenRoute.Category.route)
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = White
+                                )
+                            ) {
+                                Text(text = stringResource(R.string.others), color = TextGray)
+                            }
+                        }
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth(1f)
+                                .padding(5.dp)
+                        ) {
+                            Button(
+                                onClick = {
+                                    mainViewModel.saveSelectedCategory(context.resources.getString(R.string.mountains))
+                                    navController.navigate(ScreenRoute.Category.route)
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = White
+                                )
+                            ) {
+                                Text(text = stringResource(R.string.mountains), color = TextGray)
+                            }
+                            Button(
+                                onClick = {
+                                    mainViewModel.saveSelectedCategory(context.resources.getString(R.string.routes))
+                                    navController.navigate(ScreenRoute.Category.route)
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = White
+                                )
+                            ) {
+                                Text(text = stringResource(R.string.routes), color = TextGray)
+                            }
                         }
                     }
                 }
             }
-        }
-        Spacer(modifier = Modifier.padding(5.dp))
-        Row(
-            modifier = Modifier.padding(10.dp)
-        ) {
-            Column {
-                Text(
-                    text = stringResource(id = R.string.recent),
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(0.dp, 10.dp)
-                )
-                if (loading.value) {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                        CircularProgressIndicator(modifier = Modifier.size(30.dp, 30.dp))
+
+            Spacer(modifier = Modifier.padding(5.dp))
+            //PostCards
+            Row(
+                modifier = Modifier.padding(10.dp)
+            ) {
+                Column {
+                    Text(
+                        text = stringResource(id = R.string.upcoming),
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(0.dp, 10.dp)
+                    )
+                    if (loading.value) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            CircularProgressIndicator(modifier = Modifier.size(30.dp, 30.dp))
+                        }
+                    } else {
+                        if (upcomingList.value.size == 0) {
+                            Text(
+                                text = stringResource(id = R.string.no_posts),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(15.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                        LazyRow {
+                            items(upcomingList.value) { postItem ->
+                                PostCard(
+                                    post = postItem,
+                                    isAdmin = (userRole.value == "admin"),
+                                    onClick = {
+                                        mainViewModel.saveSelectedPost(postItem)
+                                        navController.navigate(ScreenRoute.PostView.route)
+                                    },
+                                    onDelete = {
+                                        mainViewModel.deletePost(it)
+                                    })
+                            }
+                        }
                     }
-                } else {
-                    if (recentList.value.size == 0) {
-                        Text(
-                            text = stringResource(id = R.string.no_posts),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(15.dp),
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                    LazyRow {
-                        items(recentList.value) { postItem ->
-                                PostCard(post = postItem, isAdmin = (userRole.value == "admin"), onClick =  {
-                                    mainViewModel.saveSelectedPost(postItem)
-                                    navController.navigate(ScreenRoute.PostView.route)
-                                }, onDelete = {
-                                    mainViewModel.deletePost(it)
-                                })
+                }
+            }
+            Spacer(modifier = Modifier.padding(5.dp))
+            Row(
+                modifier = Modifier.padding(10.dp)
+            ) {
+                Column {
+                    Text(
+                        text = stringResource(id = R.string.recent),
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(0.dp, 10.dp)
+                    )
+                    if (loading.value) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            CircularProgressIndicator(modifier = Modifier.size(30.dp, 30.dp))
+                        }
+                    } else {
+                        if (recentList.value.size == 0) {
+                            Text(
+                                text = stringResource(id = R.string.no_posts),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(15.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                        LazyRow {
+                            items(recentList.value) { postItem ->
+                                PostCard(
+                                    post = postItem,
+                                    isAdmin = (userRole.value == "admin"),
+                                    onClick = {
+                                        mainViewModel.saveSelectedPost(postItem)
+                                        navController.navigate(ScreenRoute.PostView.route)
+                                    },
+                                    onDelete = {
+                                        mainViewModel.deletePost(it)
+                                    }
+                                )
                             }
                         }
                     }

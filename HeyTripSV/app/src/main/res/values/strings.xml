@@ -35,7 +35,7 @@
     <string name="password">Password</string>
     <string name="fg_password">Forgot Password</string>
     <string name="register">Sign In</string>
-    <string name="dont_re">Don´t you have an account?</string>
+    <string name="dont_re">You don\'t have an account?</string>
     <string name="sign_up">Sign Up</string>
     <string name="create_ac">Create Account</string>
     <string name="name">Name</string>
@@ -95,5 +95,11 @@
     <string name="save_changes">Save Changes</string>
     <string name="no_posts">There are no posts to show</string>
     <string name="post_reported">Post reported</string>
+    <string name="agency_reported">Agency Reported</string>
+    <string name="logout">Log out</string>
+    <string name="login_to_save">To save a post log into your account</string>
+    <string name="back">Back</string>
+    <string name="report_logged">To report a post you have to log into your account</string>
+    <string name="report_agn_logged">To report an agency you have to log into your account</string>
 
 </resources>

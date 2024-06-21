@@ -168,8 +168,15 @@ controller.login = async (req, res, next) => {
         _tokens = [token, ..._tokens];
         user.tokens = _tokens;
         await user.save();
-        let role = user.admin ? "admin" : "user";
-        return res.status(200).json({ token: token, role: role })
+        let role = "";
+        let saved = []
+        if (user.admin) {
+            role = "admin"
+        }else {
+            role = "user"
+            saved = user.saved
+        }
+        return res.status(200).json({ token: token, role: role, saved: saved })
 
     } catch (error) {
         next(error)

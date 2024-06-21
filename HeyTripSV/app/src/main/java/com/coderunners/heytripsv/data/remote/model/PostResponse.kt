@@ -55,3 +55,8 @@ data class AgencyPostApi(
     @SerializedName(value = "number")
     val number: String = "",
 )
+
+data class savedPosts(
+    @SerializedName(value = "saved")
+    val saved: MutableList<String> = mutableListOf()
+)

@@ -6,6 +6,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.coderunners.heytripsv.data.remote.api.APIResponseSuccesful
 import com.coderunners.heytripsv.data.remote.api.ApiClient
 import com.coderunners.heytripsv.data.remote.model.ItineraryApi
 import com.coderunners.heytripsv.data.remote.model.LogInBody
@@ -68,6 +69,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _ownAgency = MutableStateFlow(AgencyDataModel())
     val ownAgency = _ownAgency.asStateFlow()
 
+    private val _savedIDs = MutableStateFlow(mutableListOf(""))
+    val savedIDs = _savedIDs.asStateFlow()
+
     private val _savedPostList = MutableStateFlow(mutableListOf<PostDataModel>())
     val savedPostList = _savedPostList.asStateFlow()
 
@@ -87,6 +91,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     // Variable para el rol de administrador
     private val _isAdmin = MutableStateFlow(false)
     val isAdmin = _isAdmin.asStateFlow()
+
+    //Variable para obtener post reportados
+    private val _reportedPosts = MutableStateFlow<List<ReportApiModel>>(emptyList())
+    val reportedPosts: StateFlow<List<ReportApiModel>> = _reportedPosts.asStateFlow()
+    private val _reportedPostsState = MutableStateFlow<UiState>(UiState.Ready)
+
+    //Variable para obtener agencias reportadas
+    private val _reportedAgencies = MutableStateFlow<List<ReportApiModel>>(emptyList())
+    val reportedAgency: StateFlow<List<ReportApiModel>> = _reportedAgencies.asStateFlow()
+    private val _reportedAgenciesState = MutableStateFlow<UiState>(UiState.Ready)
 
     //Función para parsear el formato que devuelve la API a dd/MM/yyyy o HH:mm
     private fun isoDateFormat(dateToFormat: String, time: Boolean = false): String{
@@ -258,7 +272,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 _uiState.value = UiState.Success("Agency retrieved correctly")
             }catch (e: Exception){
                 Log.i("MainVewModel", e.toString())
-                _uiState.value = UiState.Error(e.toString())
+                _uiState.value = UiState.Error("There was an error retrieving the agency data")
             }
 
         }
@@ -268,36 +282,45 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun getSavedPosts(){
         viewModelScope.launch(Dispatchers.IO){
             try {
-                _uiState.value = UiState.Loading
-                //TODO: obtener el token del datastore (login)
-                val apiList = api.getSaved("Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI2NjZkZjg2YzdhOWMyN2NmM2M4ODBkMjMiLCJleHAiOjE3MTk4MDE5MTYsImlhdCI6MTcxODUwNTkxNn0.Lb45PXk_UXFoFPDVcA-yROLNr4Ljm-7plqkqIFbAiLA")
-                _savedPostList.value = mutableListOf()
-                for (post in apiList.posts){
-                    _savedPostList.value.add(
-                        PostDataModel(
-                            id = post.id,
-                            title = post.title,
-                            image = post.image,
-                            date = isoDateFormat(post.date),
-                            price = post.price,
-                            agencyId = post.agency.id,
-                            agency = post.agency.name,
-                            phone = post.agency.number,
-                            description = post.description,
-                            meeting = post.meeting,
-                            itinerary = post.itinerary.map { it -> Itinerary(isoDateFormat(it.time, true), it.event) }
-                                .toMutableList(),
-                            includes = post.includes,
-                            category = post.category,
-                            position = Position(post.lat, post.long)
+                datastore.getToken().collect() { token ->
+                    _uiState.value = UiState.Loading
+                    val apiList =
+                        api.getSaved("Bearer $token")
+                    _savedPostList.value = mutableListOf()
+                    for (post in apiList.posts) {
+                        _savedPostList.value.add(
+                            PostDataModel(
+                                id = post.id,
+                                title = post.title,
+                                image = post.image,
+                                date = isoDateFormat(post.date),
+                                price = post.price,
+                                agencyId = post.agency.id,
+                                agency = post.agency.name,
+                                phone = post.agency.number,
+                                description = post.description,
+                                meeting = post.meeting,
+                                itinerary = post.itinerary.map { it ->
+                                    Itinerary(
+                                        isoDateFormat(
+                                            it.time,
+                                            true
+                                        ), it.event
+                                    )
+                                }
+                                    .toMutableList(),
+                                includes = post.includes,
+                                category = post.category,
+                                position = Position(post.lat, post.long)
+                            )
                         )
-                    )
+                    }
+                    Log.i("MainVewModel", "Posts retrieved correctly")
+                    _uiState.value = UiState.Success("Posts retrieved correctly")
                 }
-                Log.i("MainVewModel", "Posts retrieved correctly")
-                _uiState.value = UiState.Success("Posts retrieved correctly")
             }catch (e: Exception){
                 Log.i("MainVewModel", e.toString())
-                _uiState.value = UiState.Error(e.toString())
+                _uiState.value = UiState.Error("Error getting the saved posts")
             }
         }
     }
@@ -308,23 +331,36 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         image: Uri? = Uri.parse("https://res.cloudinary.com/dlmtei8cc/image/upload/v1718430757/zjyr4khxybczk6hjibw9.jpg")){
         viewModelScope.launch(Dispatchers.IO){
             try {
-                _uiState.value = UiState.Loading
-                val response = api.addPost(
-                    authHeader = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI2NjZlMDM5OGNjYWYxYTFlNGEwMGIzZTAiLCJleHAiOjE3MTk3OTg5OTMsImlhdCI6MTcxODUwMjk5M30.MVkhyzGELqiQIhrIQoWJCVgXzXJKVvZVj30yYaCmwt0",
-                    title = createPartFromString(postDataModel.title),
-                    description = createPartFromString(postDataModel.description),
-                    date = createPartFromString(postDataModel.date),
-                    meeting = createPartFromString(postDataModel.meeting),
-                    category = createPartFromString(postDataModel.category),
-                    lat = createPartFromString(postDataModel.position.lat.toString()),
-                    long = createPartFromString(postDataModel.position.long.toString()),
-                    price = createPartFromString(postDataModel.price.toString()),
-                    includes = createPartFromList("includes",postDataModel.includes),
-                    image= image?.let { createFilePart("image", it, contentResolver = context.contentResolver) },
-                    itinerary = createItineraryParts(postDataModel.itinerary.map{ it -> ItineraryApi(it.time, it.event)})
-                )
+                datastore.getToken().collect() { token ->
+                    _uiState.value = UiState.Loading
+                    val response = api.addPost(
+                        authHeader = "Bearer $token",
+                        title = createPartFromString(postDataModel.title),
+                        description = createPartFromString(postDataModel.description),
+                        date = createPartFromString(postDataModel.date),
+                        meeting = createPartFromString(postDataModel.meeting),
+                        category = createPartFromString(postDataModel.category),
+                        lat = createPartFromString(postDataModel.position.lat.toString()),
+                        long = createPartFromString(postDataModel.position.long.toString()),
+                        price = createPartFromString(postDataModel.price.toString()),
+                        includes = createPartFromList("includes", postDataModel.includes),
+                        image = image?.let {
+                            createFilePart(
+                                "image",
+                                it,
+                                contentResolver = context.contentResolver
+                            )
+                        },
+                        itinerary = createItineraryParts(postDataModel.itinerary.map { it ->
+                            ItineraryApi(
+                                it.time,
+                                it.event
+                            )
+                        })
+                    )
 
-                _uiState.value = UiState.Success(response.result)
+                    _uiState.value = UiState.Success(response.result)
+                }
             }catch (e: Exception){
                 Log.i("ViewModel", e.toString())
                 _uiState.value = UiState.Error("Error saving the post")
@@ -344,6 +380,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 datastore.saveToken(response.token)
                 _userRole.value = response.role
                 _userToken.value = response.token
+
+                if (response.role == "user"){
+                    _savedIDs.value = response.saved
+                }
+
                 _uiState.value = UiState.Success("Logged in correctly")
             }catch (e: Exception){
                 Log.i("ViewModel", e.toString())
@@ -370,13 +411,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //Función para reportar posts
     fun reportPost(id: String, content: String){
+    //Función para reportar posts o agencias
+    fun reportContent(id: String, content: String, post: Boolean = true){
+
         viewModelScope.launch(Dispatchers.IO){
             try {
                 datastore.getToken().collect(){
                         token->
                     _uiState.value = UiState.Loading
                     val authHeader = "Bearer $token"
-                    val response = api.reportPost(authHeader, id, ReportApiModel(content))
+                    val response = if (post){
+                        api.reportPost(authHeader, id, ReportApiModel(content))
+                    }else{
+                        api.reportAgency(authHeader, id, ReportApiModel(content))
+                    }
+
                     _uiState.value = UiState.Success(response.result)
                 }
             }catch (e: Exception){
@@ -385,6 +434,42 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
 
+    }
+
+    //Función para cerrar sesión (Resetea el DataStore)
+    fun logOut(){
+        viewModelScope.launch (Dispatchers.IO){
+            try {
+                _uiState.value = UiState.Loading
+                datastore.saveRole("")
+                datastore.saveToken("")
+                _userToken.value = ""
+                _userRole.value = ""
+                _uiState.value = UiState.Success("Logged out correctly")
+            }catch (e: Exception){
+                Log.i("ViewModel", e.toString())
+                _uiState.value = UiState.Error("Error logging out")
+            }
+        }
+    }
+
+    //Función para guardar los posts
+    fun savePost(id: String){
+        viewModelScope.launch(Dispatchers.IO){
+            try {
+                datastore.getToken().collect(){
+                        token->
+                    _uiState.value = UiState.Loading
+                    val authHeader = "Bearer $token"
+                    val response = api.savePost(authHeader, id)
+                    _savedIDs.value = response.saved
+                    _uiState.value = UiState.Success("Post saved")
+                }
+            }catch (e: Exception){
+                Log.i("ViewModel", e.toString())
+                _uiState.value = UiState.Error("Error reporting the post")
+            }
+        }
     }
 
     fun setStateToReady() {
@@ -404,6 +489,85 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             } catch (e: Exception) {
                 Log.e("MainViewModel", "Error eliminando post: $e")
                 _uiState.value = UiState.Error("Error eliminando post")
+            }
+        }
+    }
+
+    //Funcion para obtener post reportados
+    fun getReportedPosts() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                _reportedPostsState.value = UiState.Loading
+                datastore.getToken().collect { token ->
+                    val authHeader = "Bearer $token"
+                    val response = api.getReportedPosts(authHeader)
+                    _reportedPosts.value = response.reportedPosts ?: emptyList()
+                    _reportedPostsState.value = UiState.Success("Posts reportados obtenidos correctamente")
+                }
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "Error obteniendo posts reportados: $e")
+                _reportedPostsState.value = UiState.Error("Error al obtener posts reportados: ${e.message ?: "Error desconocido"}")
+            }
+        }
+    }
+
+    //Funcion eliminar post de la lista de reportes
+    fun deleteReportedPost(postId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // Eliminar el post del backend
+                val response = api.deleteReportedPost("Bearer " + datastore.getToken(), postId)
+
+                // Eliminar el post de la lista de posts reportados
+                val updatedReportedPosts = _reportedPosts.value.filter { it.id != postId }
+                _reportedPosts.value = updatedReportedPosts
+
+                // Eliminar el post de la lista de posts
+                val updatedPosts = _upcomingPosts.value.filter { it.id != postId }
+                _upcomingPosts.value = updatedPosts.toMutableList()
+
+                _uiState.value = UiState.Success("El post ha sido eliminado exitosamente!")
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "Error eliminando post reportado: $e")
+                _uiState.value = UiState.Error("Error eliminando post reportado")
+            }
+        }
+    }
+
+    //Funcion para obtener agencias reportadas
+    fun getReportedAgency() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                _reportedAgenciesState.value = UiState.Loading
+                datastore.getToken().collect { token ->
+                    val authHeader = "Bearer $token"
+                    val response = api.getReportedAgencies(authHeader)
+                    _reportedAgencies.value = response.reportedAgencies ?: emptyList()
+                    _reportedAgenciesState.value = UiState.Success("Agencias reportadas obtenidas correctamente")
+                }
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "Error obteniendo agencias reportadas: $e")
+                _reportedAgenciesState.value = UiState.Error("Error al obtener agencias reportadas: ${e.message ?: "Error desconocido"}")
+            }
+        }
+    }
+
+    //Funcion para eliminar agencias reportadas
+    fun deleteReportedAgency(agencyId: String) {
+        viewModelScope.launch {
+            try {
+                val token = datastore.getToken()
+                val authHeader = "Bearer $token"
+                api.deleteReportedAgency(authHeader, agencyId)
+
+                // Eliminar la agencia reportada de la lista de agencias reportadas
+                val updatedReportedAgencies = _reportedAgencies.value.filter { it.id != agencyId }
+                _reportedAgencies.value = updatedReportedAgencies
+
+                _uiState.value = UiState.Success("Agencia reportada eliminada correctamente")
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "Error eliminando agencia reportada: $e")
+                _uiState.value = UiState.Error("Error eliminando la agencia reportada")
             }
         }
     }

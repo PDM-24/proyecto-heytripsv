@@ -8,6 +8,7 @@ import com.coderunners.heytripsv.data.remote.model.LogInResponse
 import com.coderunners.heytripsv.data.remote.model.PostListResponse
 import com.coderunners.heytripsv.data.remote.model.ReportApiModel
 import com.coderunners.heytripsv.data.remote.model.SendCodeBody
+import com.coderunners.heytripsv.data.remote.model.savedPosts
 import com.coderunners.heytripsv.utils.Constants
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -85,4 +86,40 @@ interface ApiService {
     @Headers(value = ["Content-Type: application/json"])
     @POST(value= Constants.API_PATH + Constants.POST_REGISTER_AGENCY)
     suspend fun sendCode(@Body email : SendCodeBody): APIResponseSuccesful
+    @GET(value = Constants.API_PATH + Constants.GET_REPORTED_POST)
+    suspend fun getReportedPosts(@Header("Authorization") authHeader: String): APIResponseSuccesful
+
+    @Headers(value = ["Content-Type: application/json"])
+    @DELETE(value = Constants.API_PATH + Constants.DELETE_REPORTED_POST + "{_id}")
+    suspend fun deleteReportedPost(
+        @Header("Authorization") authHeader: String,
+        @Path("postId") postId: String
+    ): APIResponseSuccesful
+
+    @Headers(value = ["Content-Type: application/json"])
+    @GET(Constants.API_PATH + Constants.GET_REPORTED_AGENCY)
+    suspend fun getReportedAgencies(
+        @Header("Authorization") authHeader: String
+    ): APIResponseSuccesful
+
+    @Headers(value = ["Content-Type: application/json"])
+    @DELETE(Constants.API_PATH + Constants.DELETE_REPORTED_AGENCY + "{_id}")
+    suspend fun deleteReportedAgency(
+        @Header("Authorization") authHeader: String,
+        @Path("agencyId") agencyId: String
+    ): APIResponseSuccesful
+  
+    @PATCH(value = Constants.API_PATH + Constants.PATCH_REPORTED_AGENCY + "{agencyId}")
+    suspend fun reportAgency(
+        @Header("Authorization") authHeader: String,
+        @Path("agencyId") agencyId: String,
+        @Body reportApiModel: ReportApiModel
+    ):APIResponseSuccesful
+
+    @Headers(value = ["Content-Type: application/json"])
+    @PATCH(value = Constants.API_PATH + Constants.SAVE_POST + "{id}")
+    suspend fun savePost(
+        @Header("Authorization") authHeader: String,
+        @Path("id") id: String
+    ):savedPosts
 }
