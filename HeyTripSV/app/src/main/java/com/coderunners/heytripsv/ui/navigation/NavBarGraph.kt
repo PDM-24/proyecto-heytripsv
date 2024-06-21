@@ -94,7 +94,7 @@ fun NavBarGraph(
             RegisterAgency(innerPadding = innerPadding, navController = navController)
         }
         composable(ScreenRoute.ReportedPost.route){
-            ReportedScreen(innerPadding = innerPadding, navController = navController, reportedAccounts = listOf(), reportedItems = listOf())
+            ReportedScreen(navController = navController, mainViewModel = mainViewModel)
         }
     }
 }
