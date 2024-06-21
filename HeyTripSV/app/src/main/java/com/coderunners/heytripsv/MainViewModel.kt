@@ -90,6 +90,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _isAdmin = MutableStateFlow(false)
     val isAdmin = _isAdmin.asStateFlow()
 
+    //Variable para obtener post reportados
+    private val _reportedPosts = MutableStateFlow<List<ReportApiModel>>(emptyList())
+    val reportedPosts: StateFlow<List<ReportApiModel>> = _reportedPosts.asStateFlow()
+    private val _reportedPostsState = MutableStateFlow<UiState>(UiState.Ready)
+
+    //Variable para obtener agencias reportadas
+    private val _reportedAgencies = MutableStateFlow<List<ReportApiModel>>(emptyList())
+    val reportedAgency: StateFlow<List<ReportApiModel>> = _reportedAgencies.asStateFlow()
+    private val _reportedAgenciesState = MutableStateFlow<UiState>(UiState.Ready)
+
     //Función para parsear el formato que devuelve la API a dd/MM/yyyy o HH:mm
     private fun isoDateFormat(dateToFormat: String, time: Boolean = false): String{
         try {
@@ -458,6 +468,85 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             } catch (e: Exception) {
                 Log.e("MainViewModel", "Error eliminando post: $e")
                 _uiState.value = UiState.Error("Error eliminando post")
+            }
+        }
+    }
+
+    //Funcion para obtener post reportados
+    fun getReportedPosts() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                _reportedPostsState.value = UiState.Loading
+                datastore.getToken().collect { token ->
+                    val authHeader = "Bearer $token"
+                    val response = api.getReportedPosts(authHeader)
+                    _reportedPosts.value = response.reportedPosts ?: emptyList()
+                    _reportedPostsState.value = UiState.Success("Posts reportados obtenidos correctamente")
+                }
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "Error obteniendo posts reportados: $e")
+                _reportedPostsState.value = UiState.Error("Error al obtener posts reportados: ${e.message ?: "Error desconocido"}")
+            }
+        }
+    }
+
+    //Funcion eliminar post de la lista de reportes
+    fun deleteReportedPost(postId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // Eliminar el post del backend
+                val response = api.deleteReportedPost("Bearer " + datastore.getToken(), postId)
+
+                // Eliminar el post de la lista de posts reportados
+                val updatedReportedPosts = _reportedPosts.value.filter { it.id != postId }
+                _reportedPosts.value = updatedReportedPosts
+
+                // Eliminar el post de la lista de posts
+                val updatedPosts = _upcomingPosts.value.filter { it.id != postId }
+                _upcomingPosts.value = updatedPosts.toMutableList()
+
+                _uiState.value = UiState.Success("El post ha sido eliminado exitosamente!")
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "Error eliminando post reportado: $e")
+                _uiState.value = UiState.Error("Error eliminando post reportado")
+            }
+        }
+    }
+
+    //Funcion para obtener agencias reportadas
+    fun getReportedAgency() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                _reportedAgenciesState.value = UiState.Loading
+                datastore.getToken().collect { token ->
+                    val authHeader = "Bearer $token"
+                    val response = api.getReportedAgencies(authHeader)
+                    _reportedAgencies.value = response.reportedAgencies ?: emptyList()
+                    _reportedAgenciesState.value = UiState.Success("Agencias reportadas obtenidas correctamente")
+                }
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "Error obteniendo agencias reportadas: $e")
+                _reportedAgenciesState.value = UiState.Error("Error al obtener agencias reportadas: ${e.message ?: "Error desconocido"}")
+            }
+        }
+    }
+
+    //Funcion para eliminar agencias reportadas
+    fun deleteReportedAgency(agencyId: String) {
+        viewModelScope.launch {
+            try {
+                val token = datastore.getToken()
+                val authHeader = "Bearer $token"
+                api.deleteReportedAgency(authHeader, agencyId)
+
+                // Eliminar la agencia reportada de la lista de agencias reportadas
+                val updatedReportedAgencies = _reportedAgencies.value.filter { it.id != agencyId }
+                _reportedAgencies.value = updatedReportedAgencies
+
+                _uiState.value = UiState.Success("Agencia reportada eliminada correctamente")
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "Error eliminando agencia reportada: $e")
+                _uiState.value = UiState.Error("Error eliminando la agencia reportada")
             }
         }
     }

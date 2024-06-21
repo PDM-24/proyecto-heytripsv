@@ -25,8 +25,11 @@ object Constants {
     const val PATCH_REPORT_POST = "/post/report/"
 
     //Eliminar post
-    const val  DELETE_POST = "/post/own/"
-    const val  DELETE_POST_ID= "/post/"
+    const val  DELETE_POST_AGENCY = "/post/own/"
+    const val  DELETE_POST= "/post/"
+
+    //Eliminar post reportado
+    const val DELETE_REPORTED_POST  ="/post/undo-report/"
 
     //Registrar agencia
     const val POST_REGISTER_AGENCY = "/auth/register/agency/"
@@ -63,6 +66,9 @@ object Constants {
 
     //Reportar agencia
     const val PATCH_REPORTED_AGENCY = "/agency/report/"
+
+    //Eliminar agencia reportada
+    const val DELETE_REPORTED_AGENCY = "/agency/undo-report"
 
     //Editar perfil
     const val  POST_EDIT_PROFILE = "/user/edit-profile/"
