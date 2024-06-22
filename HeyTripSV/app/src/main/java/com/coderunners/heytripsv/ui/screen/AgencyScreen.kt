@@ -372,7 +372,7 @@ fun AgencyScreen(mainViewModel: MainViewModel, currentRoute: String?, navControl
                 PostCardHorizontal(post = it, onClick = {
                     mainViewModel.saveSelectedPost(it)
                     onClick()
-                })
+                }, mainViewModel = mainViewModel)
             }
 
 
