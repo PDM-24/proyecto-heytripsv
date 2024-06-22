@@ -62,7 +62,7 @@ fun NavBarGraph(
             ForgotPassword(innerPadding, navController, mainViewModel)
         }
         composable(ScreenRoute.CreateAccount.route){
-            CreateAccount(navController)
+            CreateAccount(navController, mainViewModel)
         }
         composable(ScreenRoute.Category.route){
             CategoryScreen(navController = navController, currentRoute = currentRoute,  mainViewModel = mainViewModel) {

@@ -102,5 +102,6 @@
     <string name="report_logged">To report a post you have to log into your account</string>
     <string name="report_agn_logged">To report an agency you have to log into your account</string>
     <string name="confirmation_code">Confirmation code</string>
+    <string name="password_confirmation">Passwords don´t match </string>
 
 </resources>

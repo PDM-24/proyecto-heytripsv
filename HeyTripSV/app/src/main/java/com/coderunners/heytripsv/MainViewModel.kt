@@ -10,6 +10,7 @@ import com.coderunners.heytripsv.data.remote.api.ApiClient
 import com.coderunners.heytripsv.data.remote.model.ApiReportResponse
 import com.coderunners.heytripsv.data.remote.model.ChangePassBody
 import com.coderunners.heytripsv.data.remote.model.CompareCodeBody
+import com.coderunners.heytripsv.data.remote.model.CreateUserBody
 import com.coderunners.heytripsv.data.remote.model.ItineraryApi
 import com.coderunners.heytripsv.data.remote.model.LogInBody
 import com.coderunners.heytripsv.data.remote.model.PostListResponse
@@ -17,6 +18,7 @@ import com.coderunners.heytripsv.data.remote.model.ReportApiModel
 import com.coderunners.heytripsv.data.remote.model.ReportedAgency
 import com.coderunners.heytripsv.data.remote.model.SendCodeBody
 import com.coderunners.heytripsv.model.AgencyDataModel
+import com.coderunners.heytripsv.model.CreateUserData
 import com.coderunners.heytripsv.model.EmailAccount
 import com.coderunners.heytripsv.model.Itinerary
 import com.coderunners.heytripsv.model.LogInData
@@ -424,6 +426,27 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 Log.i("ViewModel", e.toString())
                 _uiState.value = UiState.Error("Error Logging in")
             }
+        }
+    }
+
+    fun CreateUser (createUserData: CreateUserData){
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                _uiState.value = UiState.Loading
+                val response = api.createUser(
+                    CreateUserBody(
+                        name = createUserData.name,
+                        email = createUserData.email,
+                        password = createUserData.password,
+                    )
+                )
+                _uiState.value = UiState.Success(response.result)
+            }
+            catch (e: Exception){
+                Log.i("ViewModel", e.toString())
+                _uiState.value = UiState.Error("Error creating User")
+            }
+
         }
     }
 

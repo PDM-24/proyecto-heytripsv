@@ -68,6 +68,7 @@ android {
 
 dependencies {
 
+    implementation(libs.androidx.compose.material)
     val lifecycle_version = "2.7.0"
 // Data store
     implementation("androidx.datastore:datastore-preferences:1.1.0")
