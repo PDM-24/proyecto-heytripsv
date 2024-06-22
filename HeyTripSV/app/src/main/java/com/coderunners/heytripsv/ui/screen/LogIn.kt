@@ -121,6 +121,9 @@ fun LogIn( navController: NavController, mainViewModel: MainViewModel) {
                 navController.navigate(ScreenRoute.Home.route)
             }
         }
+        else->{
+
+        }
     }
 
     val annotatedStringPass = AnnotatedString.Builder().apply {

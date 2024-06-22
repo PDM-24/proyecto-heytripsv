@@ -208,6 +208,9 @@ fun AgencyScreen(mainViewModel: MainViewModel, currentRoute: String?, navControl
                 reportDialog.value = false
                 Toast.makeText(LocalContext.current, stringResource(id = R.string.agency_reported), Toast.LENGTH_SHORT).show()
         }
+        else->{
+
+        }
     }
 
     Scaffold(

@@ -80,6 +80,9 @@ fun MainScreen(currentRoute: String?, mainViewModel: MainViewModel, navControlle
         is UiState.Success -> {
             mainViewModel.setStateToReady()
         }
+        else->{
+
+        }
     }
 
     val upcomingList = mainViewModel.upcomingPosts.collectAsState()

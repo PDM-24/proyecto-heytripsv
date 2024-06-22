@@ -87,13 +87,18 @@ fun ChangePass(navController: NavController, mainViewModel : MainViewModel){
                 ) {
                     CircularProgressIndicator()
                 }
+
             }
+
         }
 
         UiState.Ready -> {}
         is UiState.Success -> {
             mainViewModel.setStateToReady()
             navController.navigate(ScreenRoute.Profile.route)
+        }
+        else->{
+
         }
 
     }

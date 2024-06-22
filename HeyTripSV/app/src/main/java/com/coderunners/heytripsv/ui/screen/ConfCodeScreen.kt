@@ -99,6 +99,9 @@ fun ConfirmCode(navController: NavController, mainViewModel: MainViewModel) {
                 navController.navigate(ScreenRoute.ConfirmationCode.route)
             }
         }
+        else->{
+
+        }
 
     }
 

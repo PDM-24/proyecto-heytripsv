@@ -175,12 +175,14 @@ fun PostViewScreen(
                         }
                     }
                 }
+
             }
         }
 
         false -> {
             dialogOpen.value = false
         }
+
     }
 
     when(reportDialog.value){
@@ -307,6 +309,10 @@ fun PostViewScreen(
                     }
                 }
             }
+
+        }
+        else->{
+
         }
     }
 

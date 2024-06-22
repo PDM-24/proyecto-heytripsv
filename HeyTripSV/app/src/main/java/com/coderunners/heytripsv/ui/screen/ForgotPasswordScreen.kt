@@ -83,6 +83,9 @@ fun ForgotPassword(
             mainViewModel.setStateToReady()
             navController.navigate(ScreenRoute.ConfirmationCode.route)
         }
+        else->{
+
+        }
 
     }
 

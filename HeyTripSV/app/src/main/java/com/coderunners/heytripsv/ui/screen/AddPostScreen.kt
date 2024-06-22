@@ -119,13 +119,19 @@ fun AddPostScreen(
                 ){
                     CircularProgressIndicator()
                 }
+
             }
+
+
         }
         UiState.Ready -> {}
         is UiState.Success -> {
             val message = (addScreenState.value as UiState.Success).msg
             Toast.makeText(LocalContext.current, message, Toast.LENGTH_SHORT).show()
             mainViewModel.setStateToReady()
+
+        }
+        else->{
 
         }
     }

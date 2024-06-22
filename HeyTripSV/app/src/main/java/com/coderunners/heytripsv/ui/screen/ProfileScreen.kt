@@ -86,6 +86,9 @@ fun ProfileScreen(currentRoute: String?, navController: NavController, mainViewM
             mainViewModel.setStateToReady()
             navController.navigate(ScreenRoute.Home.route)
         }
+        else->{
+
+        }
     }
 
     Scaffold(
