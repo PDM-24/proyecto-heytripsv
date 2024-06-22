@@ -16,16 +16,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.R
 import com.coderunners.heytripsv.data.remote.model.ReportApiModel
 import com.coderunners.heytripsv.data.remote.model.ReportedAgency
 import com.coderunners.heytripsv.ui.theme.MainGreen
+import com.coderunners.heytripsv.utils.UiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,6 +38,9 @@ fun ReportedScreen(
 ) {
     val (isPublicationsSelected, setIsPublicationsSelected) = remember { mutableStateOf(true) }
     val reportedAgencies by mainViewModel.reportedAgencies.collectAsState()
+    val reportedPosts by mainViewModel.reportedPosts.collectAsState()
+    val reportedPostsState by mainViewModel.reportedPostsState.collectAsState()
+    val reportedAgenciesState by mainViewModel.reportedAgenciesState.collectAsState()
 
     LaunchedEffect(Unit) {
         mainViewModel.getReportedAgency()
@@ -91,42 +97,55 @@ fun ReportedScreen(
                     )
                 }
 
-                LazyColumn(
-
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    if (isPublicationsSelected) {
-                        items(mainViewModel.reportedPosts.value) { apiModel ->
-                            val reportedItem = ReportedPost(
-                                title = apiModel.title ?: "",
-                                content = apiModel.content ?: "",
-                                imageRes = R.drawable.default_image
-                            )
-                            ReportedPost(
-                                item = reportedItem,
-                                onDelete = { mainViewModel.deleteReportedPost(apiModel.id ?: "") },
-                                mainViewModel = mainViewModel,
-                                apiModel = apiModel
-                            )
-                        }
-                    } else {
-                        items(reportedAgencies) { reportedAgency: ReportedAgency ->
-                            val agency = reportedAgency.agency.firstOrNull()
-                            if (agency != null) {
-                                ReportedAgency(
-                                    account = ReportedAgencyData(
-                                        imageRes = R.drawable.default_image,
-                                        username = agency.name,
-                                        content = reportedAgency.report.firstOrNull()?.content ?: ""
-                                    ),
-                                    onDelete = {
-                                        // Usamos el ID de la primera agencia en la lista
-                                        agency.id?.let { id -> mainViewModel.deleteReportedAgency(id) }
-                                    },
-                                    apiModel = reportedAgency,
-                                    mainViewModel = mainViewModel
-                                )
+                when {
+                    isPublicationsSelected -> {
+                        when (reportedPostsState) {
+                            is UiState.Loading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                            is UiState.Error -> Text((reportedPostsState as UiState.Error).msg, color = Color.Red)
+                            is UiState.Success -> LazyColumn(
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                items(reportedPosts) { apiModel ->
+                                    val reportedItem = ReportedPost(
+                                        title = apiModel.title ?: "",
+                                        content = apiModel.content ?: "",
+                                        imageRes = apiModel.image
+                                    )
+                                    ReportedPost(
+                                        item = reportedItem,
+                                        onDelete = { mainViewModel.deleteReportedPost(apiModel.id ?: "") },
+                                        mainViewModel = mainViewModel,
+                                        apiModel = apiModel
+                                    )
+                                }
                             }
+                            else -> Unit
+                        }
+
+
+                        when (reportedAgenciesState) {
+                            is UiState.Loading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                            is UiState.Error -> Text((reportedAgenciesState as UiState.Error).msg, color = Color.Red)
+                            is UiState.Success -> LazyColumn(
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                items(reportedAgencies) { reportedAgency ->
+                                    val agency = reportedAgency.agency
+                                    ReportedAgency(
+                                        account = ReportedAgencyData(
+                                            imageRes = reportedAgency.agency.image,
+                                            username = reportedAgency.agency.name,
+                                            content = reportedAgency.report.firstOrNull()?.content ?: ""
+                                        ),
+                                        onDelete = {
+                                            agency.id?.let { id -> mainViewModel.deleteReportedAgency(id) }
+                                        },
+                                        apiModel = reportedAgency,
+                                        mainViewModel = mainViewModel
+                                    )
+                                }
+                            }
+                            else -> Unit
                         }
                     }
                 }
@@ -134,6 +153,8 @@ fun ReportedScreen(
         }
     )
 }
+
+
 
 @Composable
 fun ToggleButton(
@@ -198,12 +219,13 @@ fun ReportedPost(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = painterResource(id = item.imageRes),
+            AsyncImage(
+                model = item.imageRes,
                 contentDescription = null,
                 modifier = Modifier
                     .size(100.dp)
-                    .clip(RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(16.dp)),
+                contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(
@@ -283,12 +305,12 @@ fun ReportedAgency(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = painterResource(id = account.imageRes),
+            AsyncImage(
+                model = account.imageRes,
                 contentDescription = null,
                 modifier = Modifier
                     .size(100.dp)
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(16.dp))
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(
@@ -296,31 +318,41 @@ fun ReportedAgency(
             ) {
                 Text(account.username, fontWeight = FontWeight.Bold)
                 Text(account.content, color = Color.Gray)
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                IconButton(
-                    onClick = { showDialog = true },
-                    modifier = Modifier
-                        .background(MainGreen, shape = RoundedCornerShape(4.dp))
-                        .size(32.dp)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
                 ) {
-                    Icon(Icons.Filled.Check, contentDescription = "Approve", tint = Color.White)
-                }
-                IconButton(
-                    onClick = { showDialog = true },
-                    modifier = Modifier
-                        .background(Color(0xFFCC0000), shape = RoundedCornerShape(4.dp))
-                        .size(32.dp)
-                ) {
-                    Icon(Icons.Filled.Delete, contentDescription = "Delete", tint = Color.White)
+                    IconButton(
+                        onClick = { showDialog = true },
+                        modifier = Modifier
+                            .background(MainGreen, shape = RoundedCornerShape(4.dp))
+                            .size(32.dp)
+                    ) {
+                        Icon(Icons.Filled.Check, contentDescription = "Approve", tint = Color.White)
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    IconButton(
+                        onClick = { showDialog = true },
+                        modifier = Modifier
+                            .background(Color(0xFFCC0000), shape = RoundedCornerShape(4.dp))
+                            .size(32.dp)
+                    ) {
+                        Icon(Icons.Filled.Delete, contentDescription = "Delete", tint = Color.White)
+                    }
                 }
             }
         }
     }
 }
 
-data class ReportedPost(val imageRes: Int, val title: String, val content: String)
-data class ReportedAgencyData(val imageRes: Int, val username: String, val content: String)
+data class ReportedPost(
+    val title: String,
+    val content: String,
+    val imageRes: String
+)
+
+data class ReportedAgencyData(
+    val imageRes: String,
+    val username: String,
+    val content: String
+)
