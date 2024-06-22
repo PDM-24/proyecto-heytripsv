@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -46,12 +48,14 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.TextStyle
@@ -98,6 +102,8 @@ fun PostViewScreen(
         stringResource(R.string.report_post1), stringResource(R.string.report_post2), stringResource(R.string.report_post3), stringResource(R.string.report_post4), stringResource(R.string.report_other)
     )
 
+    val savedIds = viewModel.savedIDs.collectAsState()
+    val userRole = viewModel.userRole.collectAsState()
     val post = viewModel.selectedPost.collectAsState()
 
     val cameraPositionState = rememberCameraPositionState {
@@ -108,21 +114,147 @@ fun PostViewScreen(
     val reportDialog = remember {
         mutableStateOf(false)
     }
+    val dialogOpen = remember { mutableStateOf(false)}
+
+    when (dialogOpen.value) {
+        true -> {
+            Dialog(onDismissRequest = {}) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(250.dp)
+                        .padding(10.dp),
+                    shape = RoundedCornerShape(16.dp),
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(15.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    )
+                    {
+                        Text(text = stringResource(id = R.string.save_logged))
+                        Spacer(modifier = Modifier.padding(10.dp))
+                        Button(
+                            onClick = {
+                                dialogOpen.value = false
+                                navController.navigate(ScreenRoute.LogIn.route)
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth(0.8f)
+                                .padding(horizontal = 16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MainGreen
+                            ),
+                            border = BorderStroke(1.dp, color = Color.White),
+                            shape = RoundedCornerShape(7.dp)
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.log_in),
+                                color = Color.White
+                            )
+                        }
+                        Spacer(modifier = Modifier.padding(5.dp))
+                        Button(
+                            onClick = {
+                                dialogOpen.value = false
+                                navController.navigate(ScreenRoute.Home.route)
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth(0.8f)
+                                .padding(horizontal = 16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.White
+
+                            ),
+                            border = BorderStroke(1.dp, color = MainGreen),
+                            shape = RoundedCornerShape(7.dp)
+                        )
+                        {
+                            Text(text = stringResource(id = R.string.navbar_home))
+                        }
+                    }
+                }
+            }
+        }
+
+        false -> {
+            dialogOpen.value = false
+        }
+    }
 
     when(reportDialog.value){
         true -> {
-            ReportDialog(radioOptions = radioOptions, onDismissRequest = { reportDialog.value = false }, onConfirm = {
-                var content = ""
+            if (userRole.value == "user"){
+                ReportDialog(radioOptions = radioOptions, onDismissRequest = { reportDialog.value = false }, onConfirm = {
+                    var content = ""
 
-                content = when(it){
-                    radioOptions[0] -> "La publicación no contiene un tour"
-                    radioOptions[1] -> "Imagen inapropiada"
-                    radioOptions[2] -> "Descripción inapropiada"
-                    radioOptions[3] -> "Spam"
-                    else -> it
+                    content = when(it){
+                        radioOptions[0] -> "La publicación no contiene un tour"
+                        radioOptions[1] -> "Imagen inapropiada"
+                        radioOptions[2] -> "Descripción inapropiada"
+                        radioOptions[3] -> "Spam"
+                        else -> it
+                    }
+                    viewModel.reportContent(post.value.id, content)
+                })
+            }else{
+                Dialog(onDismissRequest = {reportDialog.value = false}) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(250.dp)
+                            .padding(10.dp),
+                        shape = RoundedCornerShape(16.dp),
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(15.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ){
+                            Text(text = stringResource(id = R.string.report_logged))
+                            Spacer(modifier = Modifier.padding(10.dp))
+                            Button(
+                                onClick = {
+                                    reportDialog.value = false
+                                    navController.navigate(ScreenRoute.LogIn.route)
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth(0.8f)
+                                    .padding(horizontal = 16.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MainGreen
+                                ),
+                                border = BorderStroke(1.dp, color = Color.White),
+                                shape = RoundedCornerShape(7.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.log_in),
+                                    color = Color.White
+                                )
+                            }
+                            Spacer(modifier = Modifier.padding(5.dp))
+                            Button(
+                                onClick = {
+                                    reportDialog.value = false
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth(0.8f)
+                                    .padding(horizontal = 16.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.White
+                                ),
+                                border = BorderStroke(1.dp, color = MainGreen),
+                                shape = RoundedCornerShape(7.dp)
+                            )
+                            {
+                                Text(text = stringResource(id = R.string.back))
+                            }
+                        }
+                    }
                 }
-                viewModel.reportContent(post.value.id, content)
-            })
+            }
         }
         false -> { reportDialog.value = false }
     }
@@ -162,15 +294,17 @@ fun PostViewScreen(
         }
         UiState.Ready -> {}
         is UiState.Success -> {
-
-            viewModel.setStateToReady()
-
-            if (reportDialog.value){
-                reportDialog.value = false
-                Toast.makeText(LocalContext.current, stringResource(id = R.string.post_reported), Toast.LENGTH_SHORT).show()
+            if((postViewState.value as UiState.Success).msg == "Post saved"){
+                viewModel.setStateToReady()
             }else{
-                if (navController.currentBackStackEntry?.destination?.route == ScreenRoute.PostView.route){
-                    navController.navigate(ScreenRoute.Agency.route)
+                viewModel.setStateToReady()
+                if (reportDialog.value){
+                    reportDialog.value = false
+                    Toast.makeText(LocalContext.current, stringResource(id = R.string.post_reported), Toast.LENGTH_SHORT).show()
+                }else{
+                    if (navController.currentBackStackEntry?.destination?.route == ScreenRoute.PostView.route){
+                        navController.navigate(ScreenRoute.Agency.route)
+                    }
                 }
             }
         }
@@ -190,6 +324,42 @@ fun PostViewScreen(
                     restoreState = true
                 }
             }
+        },
+        topBar = {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically){
+                Icon(
+                    modifier = Modifier
+                        .padding(start = 12.dp)
+                        .fillMaxHeight()
+                        .clickable {
+                            navController.popBackStack()
+                        },
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                    contentDescription = "Back",
+                    tint = NavGray
+                )
+                Icon(
+                        modifier = Modifier
+                            .padding(end = 12.dp)
+                            .size(30.dp)
+                            .fillMaxHeight()
+                            .clickable {
+                                if (userRole.value == "user"){
+                                    viewModel.savePost(post.value.id)
+                                }
+                            },
+                imageVector = ImageVector.vectorResource(
+                    if (userRole.value == "user" && savedIds.value.contains(post.value.id)) R.drawable.bookmark else R.drawable.bookmark_outlined),
+                contentDescription = "Back",
+                tint = NavGray
+                )
+
+            }
+
         }
     ) { innerPadding ->
         Column(

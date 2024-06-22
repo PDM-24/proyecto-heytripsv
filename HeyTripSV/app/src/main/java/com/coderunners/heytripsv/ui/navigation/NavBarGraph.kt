@@ -59,7 +59,7 @@ fun NavBarGraph(
             LogIn(navController, mainViewModel)
         }
         composable(ScreenRoute.ForgotPassword.route){
-            ForgotPassword(navController)
+            ForgotPassword(innerPadding, navController, mainViewModel)
         }
         composable(ScreenRoute.CreateAccount.route){
             CreateAccount(navController)
@@ -77,10 +77,10 @@ fun NavBarGraph(
             AgencyScreen(mainViewModel = mainViewModel, currentRoute = currentRoute, navController = navController, onClick = {navController.navigate(ScreenRoute.PostView.route)} )
         }
         composable(ScreenRoute.ConfirmationCode.route){
-            ConfirmCode( navController = navController)
+            ConfirmCode( navController = navController, mainViewModel)
         }
         composable(ScreenRoute.ChangePassowrd.route){
-            ChangePass(navController = navController)
+            ChangePass(navController = navController, mainViewModel)
         }
 
         composable(ScreenRoute.Saved.route){

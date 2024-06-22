@@ -50,6 +50,7 @@ import com.coderunners.heytripsv.ui.theme.MainGreen
 import com.coderunners.heytripsv.utils.UiState
 
 @Composable
+
 fun SavedScreen(mainViewModel: MainViewModel, currentRoute: String?, navController: NavHostController){
     val dialogOpen = remember {
         mutableStateOf(true)

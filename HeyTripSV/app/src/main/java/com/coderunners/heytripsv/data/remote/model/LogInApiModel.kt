@@ -14,7 +14,9 @@ data class LogInResponse(
     @SerializedName(value = "token")
     val token: String="",
     @SerializedName(value = "role")
-    val role: String=""
+    val role: String="",
+    @SerializedName(value = "saved")
+    val saved: MutableList<String> = mutableListOf()
 )
 //data class PostListResponse(
 //    @SerializedName(value = "posts")

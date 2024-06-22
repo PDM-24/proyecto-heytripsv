@@ -97,5 +97,10 @@
     <string name="post_reported">Post reported</string>
     <string name="agency_reported">Agency Reported</string>
     <string name="logout">Log out</string>
+    <string name="login_to_save">To save a post log into your account</string>
+    <string name="back">Back</string>
+    <string name="report_logged">To report a post you have to log into your account</string>
+    <string name="report_agn_logged">To report an agency you have to log into your account</string>
+    <string name="confirmation_code">Confirmation code</string>
 
 </resources>
