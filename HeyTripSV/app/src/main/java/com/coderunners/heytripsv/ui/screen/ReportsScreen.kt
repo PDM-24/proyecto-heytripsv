@@ -24,6 +24,7 @@ import androidx.navigation.NavController
 import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.R
 import com.coderunners.heytripsv.data.remote.model.ReportApiModel
+import com.coderunners.heytripsv.data.remote.model.ReportedAgency
 import com.coderunners.heytripsv.ui.theme.MainGreen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,8 +34,9 @@ fun ReportedScreen(
     navController: NavController
 ) {
     val (isPublicationsSelected, setIsPublicationsSelected) = remember { mutableStateOf(true) }
+    val reportedAgencies by mainViewModel.reportedAgencies.collectAsState()
 
-    SideEffect {
+    LaunchedEffect(Unit) {
         mainViewModel.getReportedAgency()
         mainViewModel.getReportedPosts()
     }
@@ -85,13 +87,14 @@ fun ReportedScreen(
                 }
 
                 LazyColumn(
+
                     modifier = Modifier.padding(16.dp)
                 ) {
                     if (isPublicationsSelected) {
                         items(mainViewModel.reportedPosts.value) { apiModel ->
                             val reportedItem = ReportedPost(
                                 title = apiModel.title ?: "",
-                                description = apiModel.description ?: "",
+                                content = apiModel.content ?: "",
                                 imageRes = R.drawable.default_image
                             )
                             ReportedPost(
@@ -102,17 +105,20 @@ fun ReportedScreen(
                             )
                         }
                     } else {
-                        items(mainViewModel.reportedAgency.value) { apiModel ->
-                            val agency = apiModel.agency.firstOrNull()
+                        items(reportedAgencies) { reportedAgency: ReportedAgency ->
+                            val agency = reportedAgency.agency.firstOrNull()
                             if (agency != null) {
                                 ReportedAgency(
                                     account = ReportedAgencyData(
                                         imageRes = R.drawable.default_image,
                                         username = agency.name,
-                                        reason = apiModel.content
+                                        content = reportedAgency.report.firstOrNull()?.content ?: ""
                                     ),
-                                    onDelete = { mainViewModel.deleteReportedAgency(apiModel.id) },
-                                    apiModel = apiModel,
+                                    onDelete = {
+                                        // Usamos el ID de la primera agencia en la lista
+                                        agency.id?.let { id -> mainViewModel.deleteReportedAgency(id) }
+                                    },
+                                    apiModel = reportedAgency,
                                     mainViewModel = mainViewModel
                                 )
                             }
@@ -200,7 +206,7 @@ fun ReportedPost(
             ) {
                 Text(item.title, fontWeight = FontWeight.Bold)
                 Column {
-                    Text(item.description, color = Color.Gray)
+                    Text(item.content, color = Color.Gray)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End
@@ -233,7 +239,7 @@ fun ReportedPost(
 fun ReportedAgency(
     account: ReportedAgencyData,
     onDelete: () -> Unit,
-    apiModel: ReportApiModel,
+    apiModel: ReportedAgency,
     mainViewModel: MainViewModel
 ) {
     var showDialog by remember { mutableStateOf(false) }
@@ -284,7 +290,7 @@ fun ReportedAgency(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(account.username, fontWeight = FontWeight.Bold)
-                Text(account.reason, color = Color.Gray)
+                Text(account.content, color = Color.Gray)
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -311,5 +317,5 @@ fun ReportedAgency(
     }
 }
 
-data class ReportedPost(val imageRes: Int, val title: String, val description: String)
-data class ReportedAgencyData(val imageRes: Int, val username: String, val reason: String)
+data class ReportedPost(val imageRes: Int, val title: String, val content: String)
+data class ReportedAgencyData(val imageRes: Int, val username: String, val content: String)

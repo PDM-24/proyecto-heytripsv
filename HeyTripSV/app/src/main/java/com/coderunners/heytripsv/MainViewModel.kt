@@ -13,6 +13,7 @@ import com.coderunners.heytripsv.data.remote.model.ItineraryApi
 import com.coderunners.heytripsv.data.remote.model.LogInBody
 import com.coderunners.heytripsv.data.remote.model.PostListResponse
 import com.coderunners.heytripsv.data.remote.model.ReportApiModel
+import com.coderunners.heytripsv.data.remote.model.ReportedAgency
 import com.coderunners.heytripsv.data.remote.model.SendCodeBody
 import com.coderunners.heytripsv.model.AgencyDataModel
 import com.coderunners.heytripsv.model.EmailAccount
@@ -101,9 +102,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val reportedPosts: StateFlow<List<ReportApiModel>> = _reportedPosts.asStateFlow()
     private val _reportedPostsState = MutableStateFlow<UiState>(UiState.Ready)
 
-    //Variable para obtener agencias reportadas
-    private val _reportedAgencies = MutableStateFlow<List<ReportApiModel>>(emptyList())
-    val reportedAgency: StateFlow<List<ReportApiModel>> = _reportedAgencies.asStateFlow()
+//Variable para obtener agencias reportadas
+    private val _reportedAgencies = MutableStateFlow<List<ReportedAgency>>(emptyList())
+    val reportedAgencies: StateFlow<List<ReportedAgency>> = _reportedAgencies.asStateFlow()
     private val _reportedAgenciesState = MutableStateFlow<UiState>(UiState.Ready)
 
     //Función para parsear el formato que devuelve la API a dd/MM/yyyy o HH:mm
@@ -574,14 +575,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 datastore.getToken().collect { token ->
                     val authHeader = "Bearer $token"
                     val response = api.getReportedPosts(authHeader)
+
                     _reportedPosts.value = response.reportedPosts ?: emptyList()
-                    _reportedPostsState.value =
-                        UiState.Success("Posts reportados obtenidos correctamente")
+                    _reportedPostsState.value = UiState.Success("Posts reportados obtenidos correctamente")
                 }
             } catch (e: Exception) {
-                Log.e("MainViewModel", "Error obteniendo posts reportados: $e")
-                _reportedPostsState.value =
-                    UiState.Error("Error al obtener posts reportados: ${e.message ?: "Error desconocido"}")
+                _reportedPostsState.value = UiState.Error("Error al obtener posts reportados: ${e.message ?: "Error desconocido"}")
             }
         }
     }
@@ -617,14 +616,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 datastore.getToken().collect { token ->
                     val authHeader = "Bearer $token"
                     val response = api.getReportedAgencies(authHeader)
+
                     _reportedAgencies.value = response.reportedAgencies ?: emptyList()
-                    _reportedAgenciesState.value =
-                        UiState.Success("Agencias reportadas obtenidas correctamente")
+                    _reportedAgenciesState.value = UiState.Success("Agencias reportadas obtenidas correctamente")
                 }
             } catch (e: Exception) {
-                Log.e("MainViewModel", "Error obteniendo agencias reportadas: $e")
-                _reportedAgenciesState.value =
-                    UiState.Error("Error al obtener agencias reportadas: ${e.message ?: "Error desconocido"}")
+                _reportedAgenciesState.value = UiState.Error("Error al obtener agencias reportadas: ${e.message ?: "Error desconocido"}")
             }
         }
     }
@@ -638,8 +635,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 api.deleteReportedAgency(authHeader, agencyId)
 
                 // Eliminar la agencia reportada de la lista de agencias reportadas
-                val updatedReportedAgencies =
-                    _reportedAgencies.value.filter { it.id != agencyId }
+
+                val updatedReportedAgencies = _reportedAgencies.value.map { reportedAgency ->
+                    val updatedAgencyList = reportedAgency.agency.filter { agency ->
+                        agency.id != agencyId
+                    }
+                    ReportedAgency(updatedAgencyList.toMutableList(), reportedAgency.report)
+                }
+
                 _reportedAgencies.value = updatedReportedAgencies
 
                 _uiState.value = UiState.Success("Agencia reportada eliminada correctamente")
