@@ -47,6 +47,11 @@ fun ReportedScreen(
         mainViewModel.getReportedPosts()
     }
 
+    SideEffect {
+        mainViewModel.getReportedAgency()
+        mainViewModel.getReportedPosts()
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(

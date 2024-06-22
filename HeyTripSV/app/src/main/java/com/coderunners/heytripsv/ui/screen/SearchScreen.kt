@@ -196,7 +196,7 @@ fun SearchScreen(currentRoute: String?,mainViewModel: MainViewModel, navControll
                         onClick = {
                             mainViewModel.saveSelectedPost(it)
                             navController.navigate(ScreenRoute.PostView.route)
-                        },
+                        }, mainViewModel = mainViewModel,
                     )
                 }
             }

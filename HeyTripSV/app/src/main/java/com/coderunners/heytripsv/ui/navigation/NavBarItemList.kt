@@ -25,6 +25,7 @@ fun navBarItemList(isAdmin: Boolean): List<NavBarItem> {
                 ScreenRoute.Profile.route,
                 ImageVector.vectorResource(id = R.drawable.account_circle)
             )
+
         )
     } else {
         listOf(
