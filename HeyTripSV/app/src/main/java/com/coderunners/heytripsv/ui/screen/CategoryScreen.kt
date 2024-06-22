@@ -47,12 +47,14 @@ fun CategoryScreen(
     var expanded by remember {
         mutableStateOf(false)
     }
+    val isAdmin = mainViewModel.isAdmin.collectAsState().value
+    val navItems = navBarItemList(isAdmin)
     var filtros = arrayOf(stringResource(id = R.string.closest), stringResource(id = R.string.recent))
     var selectedText by remember { mutableStateOf(filtros[0]) }
 
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(itemsList = navBarItemList(), currentRoute = currentRoute) {
+            BottomNavigationBar(itemsList = navBarItemList(isAdmin), currentRoute = currentRoute) {
                     currentNavigationItem ->
                 navController.navigate(currentNavigationItem.route){
                     navController.graph.startDestinationRoute?.let{startDestinationRoute ->

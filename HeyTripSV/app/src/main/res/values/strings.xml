@@ -4,6 +4,7 @@
     <string name="navbar_search">Search</string>
     <string name="navbar_saved">Saved</string>
     <string name="navbar_profile">Profile</string>
+    <string name="navbar_report">Reports</string>
     <string name="categories">Categories</string>
     <string name="categories_desc">Discover tours based on these categories</string>
     <string name="beaches">Beaches</string>
