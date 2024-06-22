@@ -94,7 +94,7 @@ fun SavedScreen(mainViewModel: MainViewModel, currentRoute: String?, navControll
 
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(itemsList = navBarItemList(), currentRoute = currentRoute) {
+            BottomNavigationBar(itemsList = navBarItemList(isAdmin = false), currentRoute = currentRoute) {
                     currentNavigationItem ->
                 navController.navigate(currentNavigationItem.route){
                     navController.graph.startDestinationRoute?.let{startDestinationRoute ->

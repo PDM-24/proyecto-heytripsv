@@ -17,6 +17,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.R
 import com.coderunners.heytripsv.ui.navigation.BottomNavigationBar
 import com.coderunners.heytripsv.ui.navigation.navBarItemList
@@ -36,11 +38,13 @@ import com.coderunners.heytripsv.ui.theme.TextGray
 import kotlinx.coroutines.withContext
 
 @Composable
-fun AboutUsScreen(currentRoute:String?, navController: NavController){
+fun AboutUsScreen(currentRoute:String?, navController: NavController, mainViewModel: MainViewModel){
     val context = LocalContext.current
+    val isAdmin = mainViewModel.isAdmin.collectAsState().value
+    val navItems = navBarItemList(isAdmin)
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(itemsList = navBarItemList(), currentRoute = currentRoute) {
+            BottomNavigationBar(itemsList = navBarItemList(isAdmin), currentRoute = currentRoute) {
                     currentNavigationItem ->
                 navController.navigate(currentNavigationItem.route){
                     navController.graph.startDestinationRoute?.let{startDestinationRoute ->

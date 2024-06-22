@@ -56,15 +56,23 @@ import com.coderunners.heytripsv.ui.theme.White
 import com.coderunners.heytripsv.utils.UiState
 
 @Composable
-fun MainScreen(currentRoute: String?, mainViewModel: MainViewModel, navController: NavHostController) {
+fun MainScreen(
+    currentRoute: String?,
+    mainViewModel: MainViewModel,
+    navController: NavHostController
+) {
     val context = LocalContext.current
     val userRole = mainViewModel.userRole.collectAsState()
     val updateScreenState = mainViewModel.uiState.collectAsState()
-    //TODO: ESTA LISTA CAMBIA A LA LISTA DE NAVBAR ITEM SI EL USUARIO ESTA LOGGEADO COMO ADMIN
-    val navItems = navBarItemList()
+    val isAdmin = mainViewModel.isAdmin.collectAsState().value
+
+    // Actualiza navItems con el valor de isAdmin
+    val navItems = navBarItemList(isAdmin)
+
     val loading = remember {
         mutableStateOf(false)
     }
+
     when (updateScreenState.value) {
         is UiState.Error -> {
             val message = (updateScreenState.value as UiState.Error).msg
@@ -84,7 +92,6 @@ fun MainScreen(currentRoute: String?, mainViewModel: MainViewModel, navControlle
 
     val upcomingList = mainViewModel.upcomingPosts.collectAsState()
     val recentList = mainViewModel.recentPosts.collectAsState()
-    val isAdmin = mainViewModel.isAdmin.collectAsState()
 
     LaunchedEffect(Unit) {
         mainViewModel.getHomePostList()
@@ -92,15 +99,14 @@ fun MainScreen(currentRoute: String?, mainViewModel: MainViewModel, navControlle
 
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(itemsList = navItems, currentRoute = currentRoute) {
-                    currentNavigationItem ->
-                navController.navigate(currentNavigationItem.route){
-                    navController.graph.startDestinationRoute?.let{startDestinationRoute ->
-                        popUpTo(startDestinationRoute){
+            BottomNavigationBar(itemsList = navItems, currentRoute = currentRoute) { currentNavigationItem ->
+                navController.navigate(currentNavigationItem.route) {
+                    navController.graph.startDestinationRoute?.let { startDestinationRoute ->
+                        popUpTo(startDestinationRoute) {
                             saveState = false
                         }
                     }
-                    launchSingleTop=true
+                    launchSingleTop = true
                     restoreState = true
                 }
             }
@@ -113,7 +119,7 @@ fun MainScreen(currentRoute: String?, mainViewModel: MainViewModel, navControlle
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
         ) {
-            //Categories
+            // Categorías
             Row(
                 modifier = Modifier
                     .background(MainGreen)
@@ -213,7 +219,8 @@ fun MainScreen(currentRoute: String?, mainViewModel: MainViewModel, navControlle
             }
 
             Spacer(modifier = Modifier.padding(5.dp))
-            //PostCards
+
+            // PostCards
             Row(
                 modifier = Modifier.padding(10.dp)
             ) {
@@ -252,13 +259,16 @@ fun MainScreen(currentRoute: String?, mainViewModel: MainViewModel, navControlle
                                     },
                                     onDelete = {
                                         mainViewModel.deletePost(it)
-                                    })
+                                    }
+                                )
                             }
                         }
                     }
                 }
             }
+
             Spacer(modifier = Modifier.padding(5.dp))
+
             Row(
                 modifier = Modifier.padding(10.dp)
             ) {

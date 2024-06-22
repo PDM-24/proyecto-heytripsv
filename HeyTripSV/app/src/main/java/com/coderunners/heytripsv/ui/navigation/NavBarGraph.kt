@@ -2,6 +2,7 @@ package com.coderunners.heytripsv.ui.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -39,6 +40,9 @@ fun NavBarGraph(
     val currentRoute: String? =navBackStackEntry?.destination?.route
     val innerPadding = PaddingValues(10.dp)
 
+    val isAdmin by mainViewModel.isAdmin.collectAsState()
+    val navItems = navBarItemList(isAdmin)
+
     NavHost(
         navController = navController,
         startDestination = ScreenRoute.Home.route
@@ -53,7 +57,7 @@ fun NavBarGraph(
                 ProfileScreen(currentRoute, navController, mainViewModel)
             }
         composable(ScreenRoute.AboutUs.route){
-                AboutUsScreen(currentRoute, navController)
+                AboutUsScreen(currentRoute, navController, mainViewModel)
             }
         composable(ScreenRoute.LogIn.route){
             LogIn(navController, mainViewModel)

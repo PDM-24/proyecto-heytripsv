@@ -212,7 +212,7 @@ fun AgencyScreen(mainViewModel: MainViewModel, currentRoute: String?, navControl
 
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(itemsList = navBarItemList(), currentRoute = currentRoute) {
+            BottomNavigationBar(itemsList = navBarItemList(isAdmin = false), currentRoute = currentRoute) {
                     currentNavigationItem ->
                 navController.navigate(currentNavigationItem.route){
                     navController.graph.startDestinationRoute?.let{startDestinationRoute ->

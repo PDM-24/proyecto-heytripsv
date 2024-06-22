@@ -101,13 +101,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _reportedPosts = MutableStateFlow<List<ReportApiModel>>(emptyList())
     val reportedPosts: StateFlow<List<ReportApiModel>> get() = _reportedPosts
 
-    private val _reportedPostsState = MutableStateFlow<UiState>(UiState.Idle)
+    private val _reportedPostsState = MutableStateFlow<UiState>(UiState.Loading)
     val reportedPostsState: StateFlow<UiState> get() = _reportedPostsState
 
     private val _reportedAgencies = MutableStateFlow<List<ReportedAgency>>(emptyList())
     val reportedAgencies: StateFlow<List<ReportedAgency>> get() = _reportedAgencies
 
-    private val _reportedAgenciesState = MutableStateFlow<UiState>(UiState.Idle)
+    private val _reportedAgenciesState = MutableStateFlow<UiState>(UiState.Loading)
     val reportedAgenciesState: StateFlow<UiState> get() = _reportedAgenciesState
 
     //Función para parsear el formato que devuelve la API a dd/MM/yyyy o HH:mm
