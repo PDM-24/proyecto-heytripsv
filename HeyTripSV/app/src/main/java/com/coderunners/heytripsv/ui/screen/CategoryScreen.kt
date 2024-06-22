@@ -127,7 +127,7 @@ fun CategoryScreen(
                 PostCardHorizontal(post = it, onClick = {
                     mainViewModel.saveSelectedPost(it)
                     onClick()
-                })
+                }, mainViewModel = mainViewModel)
             }
 
         }

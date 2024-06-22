@@ -56,16 +56,20 @@ fun SavedScreen(mainViewModel: MainViewModel, currentRoute: String?, navControll
         mutableStateOf(true)
     }
 
+    mainViewModel.getNotifs()
+
     //Estado para obtener el rol de usuario
     val userRole = mainViewModel.userRole.collectAsState()
 
     // Estado para controlar el estado de la interfaz desde viewModel
-    val postViewState = mainViewModel.uiState.collectAsState()
+    val postViewState = mainViewModel.stateSaved.collectAsState()
 
     when(postViewState.value){
         is UiState.Error -> {
             val message = (postViewState.value as UiState.Error).msg
-            Toast.makeText(LocalContext.current, message, Toast.LENGTH_SHORT).show()
+            if (message != ""){
+                Toast.makeText(LocalContext.current, message, Toast.LENGTH_SHORT).show()
+            }
             mainViewModel.setStateToReady()
         }
         UiState.Loading -> {
@@ -88,7 +92,7 @@ fun SavedScreen(mainViewModel: MainViewModel, currentRoute: String?, navControll
         }
         UiState.Ready -> {}
         is UiState.Success -> {
-            mainViewModel.setStateToReady()
+            mainViewModel.setSavedStateToReady()
         }
     }
 
@@ -202,7 +206,7 @@ fun SavedScreen(mainViewModel: MainViewModel, currentRoute: String?, navControll
                     PostCardHorizontal(post = it, onClick = {
                         mainViewModel.saveSelectedPost(it)
                         navController.navigate(ScreenRoute.PostView.route)
-                    }, save = true)
+                    }, save = true, mainViewModel = mainViewModel)
                 }
             }
 

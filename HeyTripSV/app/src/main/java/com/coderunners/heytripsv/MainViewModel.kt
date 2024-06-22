@@ -42,6 +42,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //ESTADO DE APP (LOADING)
     private val _uiState = MutableStateFlow<UiState>(UiState.Ready)
     val uiState: StateFlow<UiState> = _uiState
+    private val _stateSaved = MutableStateFlow<UiState>(UiState.Ready)
+    val stateSaved: StateFlow<UiState> = _stateSaved
 
     //VARIABLE DATASTORE
     private val viewModelContext = getApplication<Application>()
@@ -52,6 +54,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val api = ApiClient.apiService
 
     //FLOWS
+    private val _notifications = MutableStateFlow(mutableListOf<Int>())
+    val notifications = _notifications.asStateFlow()
+
     private val _selectedPost = MutableStateFlow(PostDataModel())
     val selectedPost = _selectedPost.asStateFlow()
 
@@ -104,6 +109,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _reportedPostsState = MutableStateFlow<UiState>(UiState.Idle)
     val reportedPostsState: StateFlow<UiState> get() = _reportedPostsState
 
+    //Variable para obtener agencias reportadas
     private val _reportedAgencies = MutableStateFlow<List<ReportedAgency>>(emptyList())
     val reportedAgencies: StateFlow<List<ReportedAgency>> get() = _reportedAgencies
 
@@ -313,7 +319,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 datastore.getToken().collect() { token ->
-                    _uiState.value = UiState.Loading
+                    _stateSaved.value = UiState.Loading
                     val apiList =
                         api.getSaved("Bearer $token")
                     _savedPostList.value = mutableListOf()
@@ -346,11 +352,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         )
                     }
                     Log.i("MainVewModel", "Posts retrieved correctly")
-                    _uiState.value = UiState.Success("Posts retrieved correctly")
+                    _stateSaved.value = UiState.Success("Posts retrieved correctly")
                 }
             } catch (e: Exception) {
                 Log.i("MainVewModel", e.toString())
-                _uiState.value = UiState.Error("Error getting the saved posts")
+                _stateSaved.value = UiState.Error("Error getting the saved posts")
             }
         }
     }
@@ -414,6 +420,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 datastore.saveToken(response.token)
                 _userRole.value = response.role
                 _userToken.value = response.token
+                datastore.resetNotif()
+                _notifications.value = mutableListOf()
 
                 if (response.role == "user") {
                     _savedIDs.value = response.saved
@@ -514,6 +522,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 _uiState.value = UiState.Loading
                 datastore.saveRole("")
                 datastore.saveToken("")
+                datastore.resetNotif()
+                _notifications.value = mutableListOf()
                 _userToken.value = ""
                 _userRole.value = ""
                 _uiState.value = UiState.Success("Logged out correctly")
@@ -542,6 +552,56 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    //Función para obtener los ids de notificaciones
+    fun getNotifs(){
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                datastore.getNotifs().collect() { notifs ->
+                    _stateSaved.value = UiState.Loading
+                    Log.i("Notifs", notifs.toString())
+                    _notifications.value = notifs as MutableList<Int>
+                    Log.i("Notifs", _notifications.value.toString())
+                    _stateSaved.value = UiState.Success("")
+                }
+            }catch (e: Exception){
+                Log.i("MainViewModel", e.toString())
+                _stateSaved.value = UiState.Error("")
+            }
+        }
+    }
+
+    fun saveNotif(id: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+
+                    _stateSaved.value = UiState.Loading
+                    datastore.addNotif(id)
+                    _stateSaved.value = UiState.Success("")
+            }catch (e: Exception){
+                Log.i("MainViewModel", e.toString())
+                _stateSaved.value = UiState.Error("")
+            }
+        }
+    }
+
+    fun removeNotif(id: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+
+                _stateSaved.value = UiState.Loading
+                datastore.removeNotif(id)
+                _notifications.value.remove(id.toInt())
+                _stateSaved.value = UiState.Success("")
+            }catch (e: Exception){
+                Log.i("MainViewModel", e.toString())
+                _stateSaved.value = UiState.Error("")
+            }
+        }
+    }
+
+    fun setSavedStateToReady(){
+        _stateSaved.value = UiState.Ready
+    }
     fun setStateToReady() {
         _uiState.value = UiState.Ready
     }
@@ -583,6 +643,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     _reportedPostsState.value = UiState.Success("Posts reportados obtenidos correctamente")
                 }
             } catch (e: Exception) {
+                Log.i("Mainviewmodel", e.toString())
                 _reportedPostsState.value = UiState.Error("Error al obtener posts reportados: ${e.message ?: "Error desconocido"}")
             }
         }

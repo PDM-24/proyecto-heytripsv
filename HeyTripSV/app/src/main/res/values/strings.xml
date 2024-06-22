@@ -102,5 +102,6 @@
     <string name="report_logged">To report a post you have to log into your account</string>
     <string name="report_agn_logged">To report an agency you have to log into your account</string>
     <string name="confirmation_code">Confirmation code</string>
+    <string name="close_tour">This tour is right around the corner</string>
 
 </resources>

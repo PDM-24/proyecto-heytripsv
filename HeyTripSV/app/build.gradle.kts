@@ -69,6 +69,8 @@ android {
 dependencies {
 
     val lifecycle_version = "2.7.0"
+    //WorkManager
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
 // Data store
     implementation("androidx.datastore:datastore-preferences:1.1.0")
     //retrofit
