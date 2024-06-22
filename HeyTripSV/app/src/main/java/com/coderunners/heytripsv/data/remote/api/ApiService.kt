@@ -3,6 +3,7 @@ package com.coderunners.heytripsv.data.remote.api
 import android.net.Uri
 import com.coderunners.heytripsv.data.remote.model.ItineraryApi
 import com.coderunners.heytripsv.data.remote.model.AgencyResponse
+import com.coderunners.heytripsv.data.remote.model.ApiReportResponse
 import com.coderunners.heytripsv.data.remote.model.ChangePassBody
 import com.coderunners.heytripsv.data.remote.model.CompareCodeBody
 import com.coderunners.heytripsv.data.remote.model.LogInBody
@@ -89,20 +90,20 @@ interface ApiService {
     @POST(value= Constants.API_PATH + Constants.POST_RECOVER_PASSWORD)
     suspend fun sendCode(@Body email : SendCodeBody): APIResponseSuccesful
     @GET(value = Constants.API_PATH + Constants.GET_REPORTED_POST)
-    suspend fun getReportedPosts(@Header("Authorization") authHeader: String): APIResponseSuccesful
+    suspend fun getReportedPosts(@Header("Authorization") authHeader: String): ApiReportResponse
 
     @Headers(value = ["Content-Type: application/json"])
     @DELETE(value = Constants.API_PATH + Constants.DELETE_REPORTED_POST + "{_id}")
     suspend fun deleteReportedPost(
         @Header("Authorization") authHeader: String,
         @Path("postId") postId: String
-    ): APIResponseSuccesful
+    ): ApiReportResponse
 
     @Headers(value = ["Content-Type: application/json"])
     @GET(Constants.API_PATH + Constants.GET_REPORTED_AGENCY)
     suspend fun getReportedAgencies(
         @Header("Authorization") authHeader: String
-    ): APIResponseSuccesful
+    ): ApiReportResponse
 
     @Headers(value = ["Content-Type: application/json"])
     @DELETE(Constants.API_PATH + Constants.DELETE_REPORTED_AGENCY + "{_id}")
