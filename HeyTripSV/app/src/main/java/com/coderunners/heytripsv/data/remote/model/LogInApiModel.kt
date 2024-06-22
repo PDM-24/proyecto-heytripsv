@@ -18,9 +18,3 @@ data class LogInResponse(
     @SerializedName(value = "saved")
     val saved: MutableList<String> = mutableListOf()
 )
-//data class PostListResponse(
-//    @SerializedName(value = "posts")
-//    val posts: List<PostApi> = listOf(),
-//    @SerializedName(value = "count")
-//    val count: Int = 0
-//)

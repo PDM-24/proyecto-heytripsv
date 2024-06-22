@@ -6,6 +6,7 @@ import com.coderunners.heytripsv.data.remote.model.AgencyResponse
 import com.coderunners.heytripsv.data.remote.model.ApiReportResponse
 import com.coderunners.heytripsv.data.remote.model.ChangePassBody
 import com.coderunners.heytripsv.data.remote.model.CompareCodeBody
+import com.coderunners.heytripsv.data.remote.model.CreateUserBody
 import com.coderunners.heytripsv.data.remote.model.LogInBody
 import com.coderunners.heytripsv.data.remote.model.LogInResponse
 import com.coderunners.heytripsv.data.remote.model.PostListResponse
@@ -133,4 +134,8 @@ interface ApiService {
     @Headers(value = ["Content-Type: application/json"])
     @POST(value= Constants.API_PATH + Constants.POST_CHANGE_PASSWORD)
     suspend fun changePassword(@Body changePass : ChangePassBody): APIResponseSuccesful
+
+    @Headers(value = ["Content-Type: application/json "])
+    @POST(value= Constants.API_PATH + Constants.POST_REGISTER_USER)
+    suspend fun createUser(@Body createUserBody: CreateUserBody): APIResponseSuccesful
 }

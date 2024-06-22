@@ -89,6 +89,8 @@ fun SavedScreen(mainViewModel: MainViewModel, currentRoute: String?, navControll
         UiState.Ready -> {}
         is UiState.Success -> {
             mainViewModel.setStateToReady()
+        }else->{
+
         }
     }
 
