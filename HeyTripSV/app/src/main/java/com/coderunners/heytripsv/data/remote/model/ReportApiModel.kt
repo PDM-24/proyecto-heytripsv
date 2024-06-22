@@ -63,3 +63,10 @@ data class Agency(
     @SerializedName(value="email")
     val email:String =""
 )
+
+data class ReportedAgency(
+    @SerializedName(value = "agency")
+    val agency: MutableList<Agency> = mutableListOf(),
+    @SerializedName(value = "reports")
+    val report: MutableList<Reports> = mutableListOf()
+)
