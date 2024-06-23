@@ -84,4 +84,6 @@ object Constants {
     const val RESPONSE_SUCCESFUL = "result"
     const val RESPONSE_ERROR = "error"
 
+    //Own User
+    const val GET_OWN_USER = "/auth/whoami/user/"
 }

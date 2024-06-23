@@ -101,5 +101,6 @@
     <string name="report_agn_logged">Para reportar una agencia necesitas iniciar sesión</string>
     <string name="confirmation_code">Código de confirmación</string>
     <string name="close_tour">Este tour está a la vuelta de la esquina</string>
+    <string name="mi_perfil">Mi perfil</string>
 
 </resources>

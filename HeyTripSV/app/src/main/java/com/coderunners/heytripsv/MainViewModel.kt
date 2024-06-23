@@ -12,11 +12,13 @@ import com.coderunners.heytripsv.data.remote.model.ChangePassBody
 import com.coderunners.heytripsv.data.remote.model.CompareCodeBody
 import com.coderunners.heytripsv.data.remote.model.ItineraryApi
 import com.coderunners.heytripsv.data.remote.model.LogInBody
+import com.coderunners.heytripsv.data.remote.model.Own
 import com.coderunners.heytripsv.data.remote.model.PostListResponse
 import com.coderunners.heytripsv.data.remote.model.Report
 import com.coderunners.heytripsv.data.remote.model.ReportApiModel
 import com.coderunners.heytripsv.data.remote.model.ReportedAgency
 import com.coderunners.heytripsv.data.remote.model.SendCodeBody
+import com.coderunners.heytripsv.data.remote.model.editOwnBody
 import com.coderunners.heytripsv.model.AgencyDataModel
 import com.coderunners.heytripsv.model.EmailAccount
 import com.coderunners.heytripsv.model.Itinerary
@@ -111,6 +113,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val reportedAgencies= _reportedAgencies.asStateFlow()
     private val _reportedAgenciesState = MutableStateFlow<UiState>(UiState.Loading)
     val reportedAgenciesState: StateFlow<UiState> get() = _reportedAgenciesState
+
+    private val _ownUser= MutableStateFlow(Own())
+    val ownUser = _ownUser.asStateFlow()
 
     //Función para parsear el formato que devuelve la API a dd/MM/yyyy o HH:mm
     private fun isoDateFormat(dateToFormat: String, time: Boolean = false): String {
@@ -742,6 +747,60 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
+
+    fun getOwnUser(){
+        viewModelScope.launch(Dispatchers.IO) {
+            try{
+                datastore.getToken().collect() {token ->
+                    val authHeader = "Bearer $token"
+                    val ownuser = api.getUser(authHeader)
+
+                    _ownUser.value = ownuser
+                    Log.d("MainViewModel", ownuser.id)
+                }
+            }catch (e : Exception){
+                Log.e("MainViewModel", "Error identificando usuario: ${e.message}")
+            }
+        }
+    }
+
+    fun editOwnUser(id : String, email : String, name : String){
+        viewModelScope.launch(Dispatchers.IO) {
+            try{
+                _uiState.value = UiState.Loading
+                datastore.getToken().collect() {token ->
+                    val authHeader = "Bearer $token"
+                    api.editUser(authHeader, editOwnBody(
+                        id =id,
+                        email = email,
+                        name = name
+                    ))
+                    _uiState.value = UiState.Success("User correctly edited!")
+                }
+
+            }catch (e : Exception){
+                Log.e("MainViewModel", "Error editando usuario: ${e.message}")
+                _uiState.value = UiState.Error("Error al editar el usuario")
+            }
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 
