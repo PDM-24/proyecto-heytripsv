@@ -40,11 +40,11 @@ import kotlinx.coroutines.withContext
 @Composable
 fun AboutUsScreen(currentRoute:String?, navController: NavController, mainViewModel: MainViewModel){
     val context = LocalContext.current
-    val isAdmin = mainViewModel.isAdmin.collectAsState().value
-    val navItems = navBarItemList(isAdmin)
+
+    val navItems = navBarItemList(mainViewModel)
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(itemsList = navBarItemList(isAdmin), currentRoute = currentRoute) {
+            BottomNavigationBar(itemsList = navItems, currentRoute = currentRoute) {
                     currentNavigationItem ->
                 navController.navigate(currentNavigationItem.route){
                     navController.graph.startDestinationRoute?.let{startDestinationRoute ->

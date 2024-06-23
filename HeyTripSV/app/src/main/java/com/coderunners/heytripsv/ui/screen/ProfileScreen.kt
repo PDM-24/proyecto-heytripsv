@@ -52,8 +52,7 @@ import com.coderunners.heytripsv.utils.UiState
 fun ProfileScreen(currentRoute: String?, navController: NavController, mainViewModel: MainViewModel) {
 
     val userRole = mainViewModel.userRole.collectAsState()
-    val isAdmin = mainViewModel.isAdmin.collectAsState().value
-    val navItems = navBarItemList(isAdmin)
+    val navItems = navBarItemList(mainViewModel)
 
     val logInViewState = mainViewModel.uiState.collectAsState()
 
@@ -93,7 +92,7 @@ fun ProfileScreen(currentRoute: String?, navController: NavController, mainViewM
     Scaffold(
         bottomBar = {
             BottomNavigationBar(
-                itemsList = navBarItemList(isAdmin),
+                itemsList = navItems,
                 currentRoute = currentRoute
             ) { currentNavigationItem ->
                 navController.navigate(currentNavigationItem.route) {

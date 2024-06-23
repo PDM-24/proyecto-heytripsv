@@ -25,6 +25,8 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.R
+import com.coderunners.heytripsv.data.remote.model.AgencyReports
+import com.coderunners.heytripsv.data.remote.model.Report
 import com.coderunners.heytripsv.data.remote.model.ReportApiModel
 import com.coderunners.heytripsv.data.remote.model.ReportedAgency
 import com.coderunners.heytripsv.ui.theme.MainGreen
@@ -39,17 +41,15 @@ fun ReportedScreen(
     val (isPublicationsSelected, setIsPublicationsSelected) = remember { mutableStateOf(true) }
     val reportedAgencies by mainViewModel.reportedAgencies.collectAsState()
     val reportedPosts by mainViewModel.reportedPosts.collectAsState()
-    val reportedPostsState by mainViewModel.reportedPostsState.collectAsState()
-    val reportedAgenciesState by mainViewModel.reportedAgenciesState.collectAsState()
+    val reportedPostsState by mainViewModel.stateSaved.collectAsState()
+    val reportedAgenciesState by mainViewModel.stateSaved.collectAsState()
 
-    LaunchedEffect(Unit) {
-        mainViewModel.getReportedAgency()
-        mainViewModel.getReportedPosts()
-    }
-
-    SideEffect {
-        mainViewModel.getReportedAgency()
-        mainViewModel.getReportedPosts()
+    LaunchedEffect(isPublicationsSelected) {
+        if (isPublicationsSelected) {
+            mainViewModel.getReportedPosts()
+        } else {
+            mainViewModel.getReportedAgency()
+        }
     }
 
     Scaffold(
@@ -87,14 +87,7 @@ fun ReportedScreen(
                         .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.Start
                 ) {
-                    Text(
-                        "Ordenar por: A-Z",
-                        color = Color.Gray,
-                        textDecoration = TextDecoration.Underline,
-                        modifier = Modifier.clickable {
-                            mainViewModel.sortReportedPostsAlphabetically()
-                        }
-                    )
+
                 }
 
                 when {
@@ -107,8 +100,8 @@ fun ReportedScreen(
                             ) {
                                 items(reportedPosts) { apiModel ->
                                     val reportedItem = ReportedPost(
-                                        title = apiModel.title ?: "",
-                                        content = apiModel.content ?: "",
+                                        title = apiModel.title,
+                                        content = apiModel.reports,
                                         imageRes = apiModel.image
                                     )
                                     ReportedPost(
@@ -121,8 +114,8 @@ fun ReportedScreen(
                             }
                             else -> Unit
                         }
-
-
+                    }
+                    !isPublicationsSelected -> {
                         when (reportedAgenciesState) {
                             is UiState.Loading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                             is UiState.Error -> Text((reportedAgenciesState as UiState.Error).msg, color = Color.Red)
@@ -130,16 +123,14 @@ fun ReportedScreen(
                                 modifier = Modifier.padding(16.dp)
                             ) {
                                 items(reportedAgencies) { reportedAgency ->
-                                    val agency = reportedAgency.agency
+                                    val agency = ReportedAgencyData(
+                                        username = reportedAgency.name,
+                                        report = reportedAgency.reports,
+                                        imageRes = reportedAgency.image
+                                    )
                                     ReportedAgency(
-                                        account = ReportedAgencyData(
-                                            imageRes = reportedAgency.agency.image,
-                                            username = reportedAgency.agency.name,
-                                            content = reportedAgency.report.firstOrNull()?.content ?: ""
-                                        ),
-                                        onDelete = {
-                                            agency.id?.let { id -> mainViewModel.deleteReportedAgency(id) }
-                                        },
+                                        account = agency,
+                                        onDelete = { mainViewModel.deleteReportedAgency(reportedAgency.id ?: "")},
                                         apiModel = reportedAgency,
                                         mainViewModel = mainViewModel
                                     )
@@ -153,8 +144,6 @@ fun ReportedScreen(
         }
     )
 }
-
-
 
 @Composable
 fun ToggleButton(
@@ -233,7 +222,7 @@ fun ReportedPost(
             ) {
                 Text(item.title, fontWeight = FontWeight.Bold)
                 Column {
-                    Text(item.content, color = Color.Gray)
+                    Text(item.content.joinToString(", ") { it.content }, color = Color.Gray)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End
@@ -317,7 +306,7 @@ fun ReportedAgency(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(account.username, fontWeight = FontWeight.Bold)
-                Text(account.content, color = Color.Gray)
+                Text(account.report.joinToString(", ") { it.content}, color = Color.Gray)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
@@ -347,12 +336,12 @@ fun ReportedAgency(
 
 data class ReportedPost(
     val title: String,
-    val content: String,
+    val content: List<Report>,
     val imageRes: String
 )
 
 data class ReportedAgencyData(
     val imageRes: String,
     val username: String,
-    val content: String
+    val report: List<AgencyReports>
 )

@@ -63,7 +63,7 @@ fun SavedScreen(mainViewModel: MainViewModel, currentRoute: String?, navControll
 
     // Estado para controlar el estado de la interfaz desde viewModel
     val postViewState = mainViewModel.stateSaved.collectAsState()
-
+    val navItems = navBarItemList(mainViewModel)
     when(postViewState.value){
         is UiState.Error -> {
             val message = (postViewState.value as UiState.Error).msg
@@ -98,7 +98,7 @@ fun SavedScreen(mainViewModel: MainViewModel, currentRoute: String?, navControll
 
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(itemsList = navBarItemList(isAdmin = false), currentRoute = currentRoute) {
+            BottomNavigationBar(itemsList = navItems, currentRoute = currentRoute) {
                     currentNavigationItem ->
                 navController.navigate(currentNavigationItem.route){
                     navController.graph.startDestinationRoute?.let{startDestinationRoute ->
