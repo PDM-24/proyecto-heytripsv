@@ -174,6 +174,25 @@ fun ProfileScreen(currentRoute: String?, navController: NavController, mainViewM
             ) {
                 Text(text = stringResource(R.string.about_us), color = TextGray)
             }
+            if(userRole.value == "user"){
+                Divider(color = DSpacer, thickness = 1.dp)
+                Spacer(modifier = Modifier.height(10.dp))
+                Button(
+                    onClick = { navController.navigate(ScreenRoute.userProfile.route) },
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .padding(horizontal = 16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White
+
+                    ),
+                    border = BorderStroke(1.dp, color = MainGreen),
+                    shape = RoundedCornerShape(7.dp)
+                ) {
+                    Text(text = stringResource(R.string.mi_perfil), color = TextGray)
+                }
+            }
+
         }
 
 

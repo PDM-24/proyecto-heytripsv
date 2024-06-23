@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 object Constants {
     //api service
-    const val BASE_URL = "http://192.168.1.12:3000"
+    const val BASE_URL = "http://192.168.1.6:3000"
     const val API_PATH ="/api"
 
     //Obtener post Home
@@ -84,4 +84,6 @@ object Constants {
     const val RESPONSE_SUCCESFUL = "result"
     const val RESPONSE_ERROR = "error"
 
+    //Own User
+    const val GET_OWN_USER = "/auth/whoami/user/"
 }

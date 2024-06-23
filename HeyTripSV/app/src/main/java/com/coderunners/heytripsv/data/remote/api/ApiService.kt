@@ -8,9 +8,11 @@ import com.coderunners.heytripsv.data.remote.model.ChangePassBody
 import com.coderunners.heytripsv.data.remote.model.CompareCodeBody
 import com.coderunners.heytripsv.data.remote.model.LogInBody
 import com.coderunners.heytripsv.data.remote.model.LogInResponse
+import com.coderunners.heytripsv.data.remote.model.Own
 import com.coderunners.heytripsv.data.remote.model.PostListResponse
 import com.coderunners.heytripsv.data.remote.model.ReportApiModel
 import com.coderunners.heytripsv.data.remote.model.SendCodeBody
+import com.coderunners.heytripsv.data.remote.model.editOwnBody
 import com.coderunners.heytripsv.data.remote.model.savedPosts
 import com.coderunners.heytripsv.utils.Constants
 import okhttp3.MultipartBody
@@ -133,4 +135,15 @@ interface ApiService {
     @Headers(value = ["Content-Type: application/json"])
     @POST(value= Constants.API_PATH + Constants.POST_CHANGE_PASSWORD)
     suspend fun changePassword(@Body changePass : ChangePassBody): APIResponseSuccesful
+
+    @Headers(value = ["Content-Type: application/json"])
+    @GET(value= Constants.API_PATH + Constants.GET_OWN_USER)
+    suspend fun getUser(@Header("Authorization") authHeader: String): Own
+
+    @Headers(value = ["Content-Type: application/json"])
+    @POST(value= Constants.API_PATH + Constants.POST_EDIT_PROFILE)
+    suspend fun editUser(
+        @Header("Authorization") authHeader: String,
+        @Body editOwn : editOwnBody
+    ): Own
 }

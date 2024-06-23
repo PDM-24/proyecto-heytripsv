@@ -103,7 +103,7 @@ fun NavBarGraph(
             EditAgencyScreen(mainViewModel = mainViewModel, innerPadding = innerPadding)
         }
         composable(ScreenRoute.userProfile.route){
-            UserProfile(innerPadding = innerPadding, navController = navController)
+            UserProfile(innerPadding = innerPadding, navController = navController, mainViewModel)
         }
         composable(ScreenRoute.addPost.route){
             AddPostScreen(innerPadding = innerPadding, mainViewModel = mainViewModel)
