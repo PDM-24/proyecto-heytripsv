@@ -105,8 +105,7 @@ fun PostViewScreen(
     val savedIds = viewModel.savedIDs.collectAsState()
     val userRole = viewModel.userRole.collectAsState()
     val post = viewModel.selectedPost.collectAsState()
-    val isAdmin = viewModel.isAdmin.collectAsState().value
-    val navItems = navBarItemList(isAdmin)
+    val navItems = navBarItemList(viewModel)
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(post.value.position.lat, post.value.position.long), 10f)
@@ -314,7 +313,7 @@ fun PostViewScreen(
 
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(itemsList = navBarItemList(isAdmin), currentRoute = currentRoute) {
+            BottomNavigationBar(itemsList = navItems, currentRoute = currentRoute) {
                     currentNavigationItem ->
                 navController.navigate(currentNavigationItem.route){
                     navController.graph.startDestinationRoute?.let{startDestinationRoute ->

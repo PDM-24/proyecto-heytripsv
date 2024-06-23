@@ -91,10 +91,10 @@ fun SearchScreen(currentRoute: String?,mainViewModel: MainViewModel, navControll
     val filtros = arrayOf(stringResource(id = R.string.closest), stringResource(id = R.string.recent))
     var selectedText by remember { mutableStateOf(filtros[0]) }
     val savedList = mainViewModel.savedPostList.collectAsState()
-
+    val navItems = navBarItemList(mainViewModel)
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(itemsList = navBarItemList(isAdmin = false), currentRoute = currentRoute) {
+            BottomNavigationBar(itemsList = navItems, currentRoute = currentRoute) {
                     currentNavigationItem ->
                 navController.navigate(currentNavigationItem.route){
                     navController.graph.startDestinationRoute?.let{startDestinationRoute ->

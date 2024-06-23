@@ -93,7 +93,7 @@ fun AgencyScreen(mainViewModel: MainViewModel, currentRoute: String?, navControl
         stringResource(R.string.report_acc1), stringResource(R.string.report_acc2), stringResource(R.string.report_acc3), stringResource(R.string.report_acc4), stringResource(R.string.report_other)
     )
 
-
+    val navItems = navBarItemList(mainViewModel)
     val reportDialog = remember {
         mutableStateOf(false)
     }
@@ -212,7 +212,7 @@ fun AgencyScreen(mainViewModel: MainViewModel, currentRoute: String?, navControl
 
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(itemsList = navBarItemList(isAdmin = false), currentRoute = currentRoute) {
+            BottomNavigationBar(itemsList = navItems, currentRoute = currentRoute) {
                     currentNavigationItem ->
                 navController.navigate(currentNavigationItem.route){
                     navController.graph.startDestinationRoute?.let{startDestinationRoute ->

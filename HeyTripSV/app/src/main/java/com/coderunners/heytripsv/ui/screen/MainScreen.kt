@@ -64,10 +64,9 @@ fun MainScreen(
     val context = LocalContext.current
     val userRole = mainViewModel.userRole.collectAsState()
     val updateScreenState = mainViewModel.uiState.collectAsState()
-    val isAdmin = mainViewModel.isAdmin.collectAsState().value
 
     // Actualiza navItems con el valor de isAdmin
-    val navItems = navBarItemList(isAdmin)
+    val navItems = navBarItemList(mainViewModel)
 
     val loading = remember {
         mutableStateOf(false)
