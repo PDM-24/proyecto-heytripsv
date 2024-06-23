@@ -13,6 +13,7 @@ import com.coderunners.heytripsv.data.remote.model.CompareCodeBody
 import com.coderunners.heytripsv.data.remote.model.ItineraryApi
 import com.coderunners.heytripsv.data.remote.model.LogInBody
 import com.coderunners.heytripsv.data.remote.model.PostListResponse
+import com.coderunners.heytripsv.data.remote.model.Report
 import com.coderunners.heytripsv.data.remote.model.ReportApiModel
 import com.coderunners.heytripsv.data.remote.model.ReportedAgency
 import com.coderunners.heytripsv.data.remote.model.SendCodeBody
@@ -99,20 +100,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _userRole = MutableStateFlow("")
     val userRole = _userRole.asStateFlow()
 
-    // Variable para el rol de administrador
-    private val _isAdmin = MutableStateFlow(false)
-    val isAdmin = _isAdmin.asStateFlow()
-
-    private val _reportedPosts = MutableStateFlow<List<ReportApiModel>>(emptyList())
-    val reportedPosts: StateFlow<List<ReportApiModel>> get() = _reportedPosts
-
+    //Obtener post reportados
+    private val _reportedPosts = MutableStateFlow(mutableListOf<ReportApiModel>())
+    val reportedPosts = _reportedPosts.asStateFlow()
     private val _reportedPostsState = MutableStateFlow<UiState>(UiState.Loading)
     val reportedPostsState: StateFlow<UiState> get() = _reportedPostsState
 
     //Variable para obtener agencias reportadas
-    private val _reportedAgencies = MutableStateFlow<List<ReportedAgency>>(emptyList())
-    val reportedAgencies: StateFlow<List<ReportedAgency>> get() = _reportedAgencies
-
+    private val _reportedAgencies = MutableStateFlow(mutableListOf<ReportedAgency>())
+    val reportedAgencies= _reportedAgencies.asStateFlow()
     private val _reportedAgenciesState = MutableStateFlow<UiState>(UiState.Loading)
     val reportedAgenciesState: StateFlow<UiState> get() = _reportedAgenciesState
 
@@ -606,13 +602,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.value = UiState.Ready
     }
 
-    //Funcion para ordenar de forma alfabetica la lista de post reportados
-    fun sortReportedPostsAlphabetically() {
-        val sortedList = _reportedPosts.value.sortedBy { it.title }
-        _reportedPosts.value = sortedList
-    }
-
-
     //Funcion para eliminar post
     fun deletePost(postId: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -631,20 +620,46 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     //Funcion para obtener post reportados
-    fun getReportedPosts() {
+    suspend fun getReportedPosts() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                _reportedPostsState.value = UiState.Loading
                 datastore.getToken().collect { token ->
-                    val authHeader = "Bearer $token"
-                    val response: ApiReportResponse = api.getReportedPosts(authHeader)
+                    _stateSaved.value = UiState.Loading
+                    val apiList = api.getReportedPosts("Bearer $token")
+                    _reportedPosts.value = mutableListOf()
+                   for(post in apiList) {
+                       _reportedPosts.value.add(
+                           ReportApiModel(
+                           id = post.id,
+                           title = post.title,
+                           image = post.image,
+                           date = isoDateFormat(post.date),
+                           price = post.price,
+                           description = post.description,
+                           meeting = post.meeting,
+                           itinerary = post.itinerary.map { it ->
+                               Itinerary(
+                                   isoDateFormat(it.time, true),
+                                   it.event
+                               )
+                           }.toMutableList(),
+                           category = post.category,
+                           reports = post.reports.map { it ->
+                               Report(
+                                   id = it.id,
+                                   user = it.user,
+                                   content = it.content
+                               )
+                           }.toMutableList()
+                       )
+                       )
 
-                    _reportedPosts.value = response.data
-                    _reportedPostsState.value = UiState.Success("Posts reportados obtenidos correctamente")
+                    }
+                    _stateSaved.value = UiState.Success("Reported Posts retrieved correctly")
                 }
             } catch (e: Exception) {
-                Log.i("Mainviewmodel", e.toString())
-                _reportedPostsState.value = UiState.Error("Error al obtener posts reportados: ${e.message ?: "Error desconocido"}")
+                Log.i("MainViewModel", e.toString())
+                _stateSaved.value = UiState.Error("Error getting the reported posts")
             }
         }
     }
@@ -659,7 +674,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     api.deleteReportedPost(authHeader, postId)
 
                     // Actualizar la lista de posts reportados
-                    _reportedPosts.value = _reportedPosts.value.filter { it.id != postId }
+                    _reportedPosts.value = _reportedPosts.value.toMutableList().apply {
+                        removeAll { it.id == postId }
+                    }.toList().toMutableList()
 
                     _uiState.value = UiState.Success("El post reportado ha sido eliminado exitosamente")
                 }
@@ -674,18 +691,30 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun getReportedAgency() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                _reportedAgenciesState.value = UiState.Loading
                 datastore.getToken().collect { token ->
-                    val authHeader = "Bearer $token"
-                    val response: ApiReportResponse = api.getReportedAgencies(authHeader)
+                    _stateSaved.value = UiState.Loading
+                    val apiList = api.getReportedAgencies("Bearer $token")
+                    _reportedAgencies.value = mutableListOf()
+                    for(post in apiList) {
+                        _reportedAgencies.value.add(
+                            ReportedAgency(
+                                id = post.id,
+                                name = post.name,
+                                email = post.email,
+                                dui = post.dui,
+                                description = post.description,
+                                instragram = post.instragram,
+                                facebook = post.facebook,
+                                image = post.image,
+                                reports = post.reports
+                            )
+                        )
 
-                    _reportedAgencies.value = response.data.map { agency ->
-                        ReportedAgency(agency.agency, agency.reports)
                     }
-                    _reportedAgenciesState.value = UiState.Success("Agencias reportadas obtenidas correctamente")
+                    _stateSaved.value = UiState.Success("Reported Posts retrieved correctly")
                 }
             } catch (e: Exception) {
-                _reportedAgenciesState.value = UiState.Error("Error al obtener agencias reportadas: ${e.message ?: "Error desconocido"}")
+                _stateSaved.value = UiState.Error("Error getting the reported posts")
             }
         }
     }
@@ -700,7 +729,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     api.deleteReportedAgency(authHeader, agencyId)
 
                     // Actualizar la lista de agencias reportadas
-                    _reportedAgencies.value = _reportedAgencies.value.filter { it.agency.id != agencyId }
+                    _reportedAgencies.value = _reportedAgencies.value
+                        ?.filter { it.id != agencyId }
+                        ?.toMutableList()
+                        ?: mutableListOf()
 
                     _uiState.value = UiState.Success("La agencia reportada ha sido eliminada exitosamente")
                 }

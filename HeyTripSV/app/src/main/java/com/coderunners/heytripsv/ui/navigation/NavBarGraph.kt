@@ -40,9 +40,6 @@ fun NavBarGraph(
     val currentRoute: String? =navBackStackEntry?.destination?.route
     val innerPadding = PaddingValues(10.dp)
 
-    val isAdmin by mainViewModel.isAdmin.collectAsState()
-    val navItems = navBarItemList(isAdmin)
-
     NavHost(
         navController = navController,
         startDestination = ScreenRoute.Home.route
