@@ -29,15 +29,19 @@ import com.coderunners.heytripsv.data.remote.model.AgencyReports
 import com.coderunners.heytripsv.data.remote.model.Report
 import com.coderunners.heytripsv.data.remote.model.ReportApiModel
 import com.coderunners.heytripsv.data.remote.model.ReportedAgency
+import com.coderunners.heytripsv.ui.navigation.BottomNavigationBar
+import com.coderunners.heytripsv.ui.navigation.navBarItemList
 import com.coderunners.heytripsv.ui.theme.MainGreen
 import com.coderunners.heytripsv.utils.UiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportedScreen(
+    currentRoute: String?,
     mainViewModel: MainViewModel,
     navController: NavController
 ) {
+    val navItems = navBarItemList(mainViewModel)
     val (isPublicationsSelected, setIsPublicationsSelected) = remember { mutableStateOf(true) }
     val reportedAgencies by mainViewModel.reportedAgencies.collectAsState()
     val reportedPosts by mainViewModel.reportedPosts.collectAsState()
@@ -63,6 +67,19 @@ fun ReportedScreen(
                 }
             )
         },
+        bottomBar = {
+            BottomNavigationBar(itemsList = navItems, currentRoute = currentRoute) { currentNavigationItem ->
+                navController.navigate(currentNavigationItem.route) {
+                    navController.graph.startDestinationRoute?.let { startDestinationRoute ->
+                        popUpTo(startDestinationRoute) {
+                            saveState = false
+                        }
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            }
+        },
         content = { innerPadding ->
             Column(
                 modifier = Modifier
@@ -81,15 +98,6 @@ fun ReportedScreen(
                     ToggleButton("Cuentas", !isPublicationsSelected) { setIsPublicationsSelected(false) }
                 }
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.Start
-                ) {
-
-                }
-
                 when {
                     isPublicationsSelected -> {
                         when (reportedPostsState) {
@@ -106,9 +114,7 @@ fun ReportedScreen(
                                     )
                                     ReportedPost(
                                         item = reportedItem,
-                                        onDelete = { mainViewModel.deleteReportedPost(apiModel.id ?: "") },
-                                        mainViewModel = mainViewModel,
-                                        apiModel = apiModel
+                                        onDelete = { mainViewModel.patchReportedPost(apiModel.id ?: "") }
                                     )
                                 }
                             }
@@ -130,9 +136,7 @@ fun ReportedScreen(
                                     )
                                     ReportedAgency(
                                         account = agency,
-                                        onDelete = { mainViewModel.deleteReportedAgency(reportedAgency.id ?: "")},
-                                        apiModel = reportedAgency,
-                                        mainViewModel = mainViewModel
+                                        onDelete = { mainViewModel.patchReportedAgency(reportedAgency.id ?: "") }
                                     )
                                 }
                             }
@@ -168,36 +172,9 @@ fun ToggleButton(
 @Composable
 fun ReportedPost(
     item: ReportedPost,
-    onDelete: () -> Unit,
-    mainViewModel: MainViewModel,
-    apiModel: ReportApiModel
+    onDelete: () -> Unit
 ) {
     var showDialog by remember { mutableStateOf(false) }
-
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text("Eliminar publicación") },
-            text = { Text("¿Estás seguro de que deseas eliminar esta publicación?") },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        onDelete()
-                        showDialog = false
-                    }
-                ) {
-                    Text("Sí")
-                }
-            },
-            dismissButton = {
-                Button(
-                    onClick = { showDialog = false }
-                ) {
-                    Text("No")
-                }
-            }
-        )
-    }
 
     Card(
         modifier = Modifier
@@ -213,8 +190,7 @@ fun ReportedPost(
                 contentDescription = null,
                 modifier = Modifier
                     .size(100.dp)
-                    .clip(RoundedCornerShape(16.dp)),
-                contentScale = ContentScale.Crop
+                    .clip(RoundedCornerShape(16.dp))
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(
@@ -249,22 +225,12 @@ fun ReportedPost(
             }
         }
     }
-}
-
-@Composable
-fun ReportedAgency(
-    account: ReportedAgencyData,
-    onDelete: () -> Unit,
-    apiModel: ReportedAgency,
-    mainViewModel: MainViewModel
-) {
-    var showDialog by remember { mutableStateOf(false) }
 
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Eliminar agencia") },
-            text = { Text("¿Estás seguro de que deseas eliminar esta agencia?") },
+            title = { Text("Eliminar publicación") },
+            text = { Text("¿Estás seguro de que deseas eliminar esta publicación?") },
             confirmButton = {
                 Button(
                     onClick = {
@@ -284,6 +250,14 @@ fun ReportedAgency(
             }
         )
     }
+}
+
+@Composable
+fun ReportedAgency(
+    account: ReportedAgencyData,
+    onDelete: () -> Unit
+) {
+    var showDialog by remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier
@@ -331,6 +305,31 @@ fun ReportedAgency(
                 }
             }
         }
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Eliminar agencia") },
+            text = { Text("¿Estás seguro de que deseas eliminar esta agencia?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onDelete()
+                        showDialog = false
+                    }
+                ) {
+                    Text("Sí")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { showDialog = false }
+                ) {
+                    Text("No")
+                }
+            }
+        )
     }
 }
 
