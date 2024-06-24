@@ -1,5 +1,6 @@
 package com.coderunners.heytripsv.ui.screen
 
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -43,7 +44,7 @@ fun RegisterAgency(
     innerPadding : PaddingValues,
     navController: NavController
 ){
-
+    val selectedImage= remember { mutableStateOf<Uri?>(null) }
     var name = remember { mutableStateOf("") }
     var email = remember { mutableStateOf("") }
     var dui = remember { mutableStateOf("") }
@@ -182,9 +183,7 @@ fun RegisterAgency(
                 .padding(horizontal = 10.dp)
         )
         Spacer(modifier = Modifier.height(8.dp))
-        PhotoSelectorView(
-            maxSelectionCount = 1
-        )
+        PhotoSelectorView(selectImage = {selectedImage.value= it})
         Spacer(modifier = Modifier.height(15.dp))
         Column(
             modifier = Modifier

@@ -67,7 +67,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val recentPosts = _recentPosts.asStateFlow()
 
     //Función para parsear el formato que devuelve la API a dd/MM/yyyy o HH:mm
-    private fun isoDateFormat(dateToFormat: String, time: Boolean = false): String{
+    fun isoDateFormat(dateToFormat: String, time: Boolean = false): String{
         try {
             val dateStr = dateToFormat.removeSuffix("Z")
             val dateTime = LocalDateTime.parse(dateStr)
