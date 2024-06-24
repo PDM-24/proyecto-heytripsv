@@ -804,9 +804,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     email = createPartFromString(agency.email),
                     facebook = createPartFromString(agency.facebook),
                     instagram = createPartFromString(agency.instagram),
-                    number = createPartFromString(agency.number.toString()),
+                    number = createPartFromString(agency.number),
                     password = createPartFromString(agency.password),
-                    image = thisimage
+                    image =  thisimage
                     )
                 Log.d("ViewModel", response.toString())
                 _uiState.value = UiState.Success(response.result)

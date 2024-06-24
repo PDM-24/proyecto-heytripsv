@@ -14,7 +14,7 @@ data class AgencyApi(
     @SerializedName(value = Constants.POST_DESCRIPTION)
     val description: String = "",
     @SerializedName(value = Constants.POST_NUMBER)
-    val number: Int = 0 ,
+    val number: String = "" ,
     @SerializedName(value = Constants.POST_INSTAGRAM)
     val instagram:String ="",
     @SerializedName(value = Constants.POST_FACEBOOK)

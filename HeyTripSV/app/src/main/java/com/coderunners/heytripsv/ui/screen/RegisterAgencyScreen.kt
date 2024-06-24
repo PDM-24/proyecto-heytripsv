@@ -291,11 +291,29 @@ fun RegisterAgency(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Button(
+
                     onClick = {
-                              mainViewModel.registerAgency(
-                                  context,
-                                  agency.value.copy(number = numberValue.value.toInt())
-                              )
+                        val regex = """^\d{8}-\d$""".toRegex()
+                        if(agency.value.dui.trim() != "" && !regex.matches(agency.value.dui.trim())){
+                            Toast.makeText(context, "Formato de DUI no válido", Toast.LENGTH_LONG).show()
+                        } else if(agency.value.dui.trim() != "") {
+                            val _dui = agency.value.dui.replace("-", "");
+                            var sum = 0
+                            var pos = 9;
+                            for (i in 0..<_dui.length - 1) {
+                                sum += (_dui[i].digitToInt() * pos);
+                                pos -= 1
+                            }
+                            sum = 10 - (sum % 10)
+                            if (sum != _dui[8].digitToInt() && sum != 0) {
+                                Toast.makeText(context, "DUI no válido", Toast.LENGTH_LONG).show()
+                            } else {
+                                mainViewModel.registerAgency(
+                                    context,
+                                    agency.value.copy(number = numberValue.value)
+                                )
+                            }
+                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth(0.5f)
