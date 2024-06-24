@@ -106,7 +106,7 @@ fun NavBarGraph(
             AddPostScreen(innerPadding = innerPadding, mainViewModel = mainViewModel)
         }
         composable(ScreenRoute.ReportedPost.route){
-            ReportedScreen(navController = navController, mainViewModel = mainViewModel)
+            ReportedScreen(navController = navController, mainViewModel = mainViewModel,currentRoute = currentRoute)
         }
     }
 }

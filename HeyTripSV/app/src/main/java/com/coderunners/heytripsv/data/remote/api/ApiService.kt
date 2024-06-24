@@ -75,10 +75,11 @@ interface ApiService {
     suspend fun logIn(@Body logInBody: LogInBody): LogInResponse
 
     @Headers(value = ["Content-Type: application/json"])
-    @DELETE(value = Constants.API_PATH + Constants.DELETE_POST )
+    @DELETE(value = Constants.API_PATH + Constants.DELETE_POST)
     suspend fun deletePost(
         @Header("Authorization") authHeader: String,
-        @Path("postId") postId: String): APIResponseSuccesful
+        @Path("postId") postId: String
+    ): PostListResponse
 
     @Headers(value = ["Content-Type: application/json"])
     @PATCH(value = Constants.API_PATH + Constants.PATCH_REPORT_POST + "{postId}")
@@ -91,15 +92,16 @@ interface ApiService {
     @Headers(value = ["Content-Type: application/json"])
     @POST(value= Constants.API_PATH + Constants.POST_RECOVER_PASSWORD)
     suspend fun sendCode(@Body email : SendCodeBody): APIResponseSuccesful
+    @Headers(value = ["Content-Type: application/json"])
     @GET(value = Constants.API_PATH + Constants.GET_REPORTED_POST)
     suspend fun getReportedPosts(@Header("Authorization") authHeader: String): List<ReportApiModel>
 
     @Headers(value = ["Content-Type: application/json"])
-    @DELETE(value = Constants.API_PATH + Constants.DELETE_REPORTED_POST + "{_id}")
-    suspend fun deleteReportedPost(
+    @PATCH(value = Constants.API_PATH + Constants.PATCH_REPORTED_POST + "{id}")
+    suspend fun patchReportedPost(
         @Header("Authorization") authHeader: String,
-        @Path("postId") postId: String
-    ): ApiReportResponse
+        @Path("id") postId: String
+    ): APIResponseSuccesful
 
     @Headers(value = ["Content-Type: application/json"])
     @GET(Constants.API_PATH + Constants.GET_REPORTED_AGENCY)
@@ -108,10 +110,10 @@ interface ApiService {
     ): List<ReportedAgency>
 
     @Headers(value = ["Content-Type: application/json"])
-    @DELETE(Constants.API_PATH + Constants.DELETE_REPORTED_AGENCY + "{_id}")
+    @PATCH(Constants.API_PATH + Constants.PATCH_REPORT_AGENCY + "{id}")
     suspend fun deleteReportedAgency(
         @Header("Authorization") authHeader: String,
-        @Path("agencyId") agencyId: String
+        @Path("id") agencyId: String
     ): APIResponseSuccesful
   
     @PATCH(value = Constants.API_PATH + Constants.PATCH_REPORTED_AGENCY + "{agencyId}")

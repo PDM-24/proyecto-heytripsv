@@ -244,7 +244,7 @@ controller.deletePost = async (req, res, next) => {
             return res.status(500).json({error: "There was an error deleting the post"})
         }
 
-        return res.status(200).json({post});
+        return res.status(200).json({Post});
 
     } catch (error) {
         next(error)

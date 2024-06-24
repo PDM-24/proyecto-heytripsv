@@ -606,15 +606,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun deletePost(postId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                _uiState.value = UiState.Loading
-                val response = api.deletePost("Bearer " + datastore.getToken(), postId)
-                // Actualizar la lista de posts eliminando el post con el postId
-                val updatedPosts = _upcomingPosts.value.filter { it.id != postId }
-                _upcomingPosts.value = updatedPosts.toMutableList()
-                _uiState.value = UiState.Success("El post ha sido eliminado exitosamente!")
+                datastore.getToken().collect { token ->
+                    _uiState.value = UiState.Loading
+                    val authHeader = "Bearer $token"
+                    api.deletePost(authHeader, postId)
+                    _uiState.value = UiState.Success("Post deleted successfully")
+                }
             } catch (e: Exception) {
-                Log.e("MainViewModel", "Error eliminando post: $e")
-                _uiState.value = UiState.Error("Error eliminando post")
+                Log.i("ViewModel", e.toString())
+                _uiState.value = UiState.Error("Error deleting the post")
             }
         }
     }
@@ -665,24 +665,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     //Funcion eliminar post de la lista de reportes
-    fun deleteReportedPost(postId: String) {
+    fun patchReportedPost(id: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                _uiState.value = UiState.Loading
                 datastore.getToken().collect { token ->
+                    _uiState.value = UiState.Loading
                     val authHeader = "Bearer $token"
-                    api.deleteReportedPost(authHeader, postId)
-
-                    // Actualizar la lista de posts reportados
-                    _reportedPosts.value = _reportedPosts.value.toMutableList().apply {
-                        removeAll { it.id == postId }
-                    }.toList().toMutableList()
-
-                    _uiState.value = UiState.Success("El post reportado ha sido eliminado exitosamente")
+                    val response = api.patchReportedPost(authHeader, id)
+                    _uiState.value = UiState.Success(response.result)
                 }
             } catch (e: Exception) {
-                Log.e("MainViewModel", "Error eliminando post reportado: ${e.message}")
-                _uiState.value = UiState.Error("Error al eliminar el post reportado")
+                Log.i("ViewModel", e.toString())
+                _uiState.value = UiState.Error("Error patching reported post")
             }
         }
     }
@@ -720,28 +714,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     //Funcion para eliminar agencias reportadas
-    fun deleteReportedAgency(agencyId: String) {
+    fun patchReportedAgency(id: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                _uiState.value = UiState.Loading
                 datastore.getToken().collect { token ->
+                    _uiState.value = UiState.Loading
                     val authHeader = "Bearer $token"
-                    api.deleteReportedAgency(authHeader, agencyId)
-
-                    // Actualizar la lista de agencias reportadas
-                    _reportedAgencies.value = _reportedAgencies.value
-                        ?.filter { it.id != agencyId }
-                        ?.toMutableList()
-                        ?: mutableListOf()
-
-                    _uiState.value = UiState.Success("La agencia reportada ha sido eliminada exitosamente")
+                    val response = api.deleteReportedAgency(authHeader, id)
+                    _uiState.value = UiState.Success(response.result)
                 }
             } catch (e: Exception) {
-                Log.e("MainViewModel", "Error eliminando agencia reportada: ${e.message}")
-                _uiState.value = UiState.Error("Error al eliminar la agencia reportada")
+                Log.i("ViewModel", e.toString())
+                _uiState.value = UiState.Error("Error patching reported agency")
             }
         }
     }
+
 }
 
 

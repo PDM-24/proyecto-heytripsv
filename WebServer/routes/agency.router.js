@@ -1,4 +1,4 @@
-const express = require('express');
+    const express = require('express');
 const router = express.Router();
 const agencyController = require('../controllers/agency.controller')
 const { authentication, authorization, checkRepeatedEmail } = require("../middlewares/auth.middlewares");
