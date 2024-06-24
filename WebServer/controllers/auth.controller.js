@@ -1,7 +1,7 @@
 const User = require('../models/User.model');
 const Agency = require('../models/Agency.model');
 const axios = require('axios')
-const cloudinary = require('cloudinary')
+const cloudinary = require('cloudinary').v2
 const { createToken, verifyToken } = require("../utils/jwt.tools");
 const { sendEmailWithNodemailer } = require("../utils/email.tools");
 
@@ -57,7 +57,7 @@ controller.registerAgency = async (req, res, next) => {
         const savedAgency = await newAgency.save();
 
         if (!image) {
-            return res.status(201).json({ message: "Agency registered" });
+            return res.status(200).json({ message: "Agency registered" });
         }
 
         const timestamp = Math.round(new Date().getTime() / 1000);
@@ -85,6 +85,7 @@ controller.registerAgency = async (req, res, next) => {
             formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
+                ...formData.getHeaders()
             }
         }
         );
@@ -94,13 +95,13 @@ controller.registerAgency = async (req, res, next) => {
         const imgAgency = await savedAgency.save();
 
         if (!imgAgency) {
-            return res.status(201).json({ message: "Agency registered, but there was an error saving the profile image" });
+            return res.status(200).json({ message: "Agency registered, but there was an error saving the profile image" });
         }
 
-        return res.status(201).json({ message: "Agency registered" });
+        return res.status(200).json({ message: "Agency registered" });
 
     } catch (error) {
-        next(error)
+        next(error.message);
     }
 }
 

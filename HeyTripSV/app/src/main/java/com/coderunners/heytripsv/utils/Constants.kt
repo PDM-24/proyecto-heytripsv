@@ -40,7 +40,7 @@ object Constants {
     const val POST_NUMBER = "number"
     const val POST_INSTAGRAM ="instagram"
     const val POST_FACEBOOK ="facebook"
-    //const val POST_IMAGE= "image"
+    const val POST_IMAGE= "image"
     const val POST_PASSWORD ="password"
 
     //Registrar usuario

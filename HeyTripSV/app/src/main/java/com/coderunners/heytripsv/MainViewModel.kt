@@ -6,6 +6,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.coderunners.heytripsv.data.remote.api.AgencyApi
 import com.coderunners.heytripsv.data.remote.api.ApiClient
 import com.coderunners.heytripsv.data.remote.model.ApiReportResponse
 import com.coderunners.heytripsv.data.remote.model.ChangePassBody
@@ -787,6 +788,46 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
+    fun registerAgency(
+        context : Context,
+        agency : AgencyApi
+    ){
+        Log.i("ViewModel", agency.toString())
+        Log.i("ViewModel", agency.image.toString())
+
+        val thisimage = agency.image?.let {
+            createFilePart(
+                "image",
+                it,
+                contentResolver = context.contentResolver
+            )
+        }
+        Log.d("ViewModel", thisimage.toString())
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try{
+                _uiState.value = UiState.Loading
+                Log.i("ViewModel", "Starting registration")
+
+                val response = api.addAgency(
+                    name = createPartFromString(agency.name),
+                    description = createPartFromString(agency.description),
+                    dui = createPartFromString(agency.dui),
+                    email = createPartFromString(agency.email),
+                    facebook = createPartFromString(agency.facebook),
+                    instagram = createPartFromString(agency.instagram),
+                    number = createPartFromString(agency.number.toString()),
+                    password = createPartFromString(agency.password),
+                    image = thisimage
+                    )
+                Log.d("ViewModel", response.toString())
+                _uiState.value = UiState.Success(response.result)
+            }catch(e : Exception){
+                Log.i("ViewModel", e.toString())
+                _uiState.value = UiState.Error("Error registering agency")
+            }
+        }
+    }
 
 
 

@@ -1,5 +1,6 @@
 package com.coderunners.heytripsv.data.remote.api
 
+import android.net.Uri
 import com.coderunners.heytripsv.utils.Constants
 import com.google.gson.annotations.SerializedName
 
@@ -18,8 +19,8 @@ data class AgencyApi(
     val instagram:String ="",
     @SerializedName(value = Constants.POST_FACEBOOK)
     val facebook: String ="",
-    // @SerializedName(value = "image")
-    // val image: String ="",
+    @SerializedName(value = Constants.POST_IMAGE)
+    val image: Uri? = Uri.parse("https://res.cloudinary.com/dlmtei8cc/image/upload/v1718430757/zjyr4khxybczk6hjibw9.jpg"),
     @SerializedName(value = Constants.POST_PASSWORD)
     val password: String ="",
 )

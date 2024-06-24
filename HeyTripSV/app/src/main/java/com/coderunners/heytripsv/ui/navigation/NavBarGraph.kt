@@ -88,7 +88,7 @@ fun NavBarGraph(
             SavedScreen(mainViewModel = mainViewModel, currentRoute = currentRoute ,navController = navController)
         }
         composable(ScreenRoute.RegisterAgency.route){
-            RegisterAgency(navController = navController)
+            RegisterAgency(navController = navController, mainViewModel)
         }
 
         /*TODO: Estas pantallas ya no usan el navbar de la vista pública

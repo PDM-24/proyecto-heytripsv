@@ -126,6 +126,7 @@ fun PasswordTextField2() {
 
                 onClick = {
 
+                    navController.navigate(ScreenRoute.RegisterAgency.route)
                 },
                 modifier = Modifier
                     .fillMaxWidth(0.8f)

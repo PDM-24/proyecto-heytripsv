@@ -32,9 +32,19 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
-    @Headers(value = ["Content-Type: application/json "])
+    @Multipart
     @POST(value= Constants.API_PATH + Constants.POST_REGISTER_AGENCY)
-    suspend fun addAgency(@Body agencyApi: AgencyApi): APIResponseSuccesful
+    suspend fun addAgency(
+        @Part("name") name: RequestBody,
+        @Part("email") email: RequestBody,
+        @Part("dui") dui: RequestBody,
+        @Part("description") description: RequestBody,
+        @Part("number") number: RequestBody,
+        @Part("instagram") instagram: RequestBody?,
+        @Part("facebook") facebook: RequestBody?,
+        @Part("password") password: RequestBody,
+        @Part image: MultipartBody.Part?
+    ): APIResponseSuccesful
 
     @Headers(value = ["Content-Type: application/json"])
     @POST(value = Constants.API_PATH + Constants.POST_REGISTER_USER)
