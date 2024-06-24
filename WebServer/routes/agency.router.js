@@ -1,4 +1,4 @@
-const express = require('express');
+    const express = require('express');
 const router = express.Router();
 const agencyController = require('../controllers/agency.controller')
 const { authentication, authorization, checkRepeatedEmail } = require("../middlewares/auth.middlewares");
@@ -11,6 +11,8 @@ router.get('/reported/', authentication, authorization, runValidation, agencyCon
 
 //Reportar agencia
 router.patch("/report/:id", authentication, validateId, reportValidator, runValidation, agencyController.reportAgency);
+//Eliminar reporte
+router.patch("/undo-report/:id", authentication, validateId, runValidation, agencyController.undoReport);
 
 //Editar perfil
 router.post("/edit-profile/", authentication, checkRepeatedEmail, runValidation, agencyController.editOwn);

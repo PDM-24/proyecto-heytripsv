@@ -40,7 +40,7 @@ const agencySchema = new Schema({
     },
     image: {
         type: String,
-        trim: true
+        default: "https://res.cloudinary.com/dlmtei8cc/image/upload/v1718430757/zjyr4khxybczk6hjibw9.jpg"
     },
     hashedPassword: {
         type: String,

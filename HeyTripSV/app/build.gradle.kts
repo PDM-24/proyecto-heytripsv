@@ -2,8 +2,8 @@ plugins {
     alias(libs.plugins.androidApplication)
     //alias(libs.plugins.jetbrains.kotlin.android)
     id("org.jetbrains.kotlin.android")
-    id("com.google.devtools.ksp")
 
+    id("com.google.devtools.ksp")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 
 }
@@ -69,7 +69,10 @@ android {
 dependencies {
 
     val lifecycle_version = "2.7.0"
-
+    //WorkManager
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+// Data store
+    implementation("androidx.datastore:datastore-preferences:1.1.0")
     //retrofit
     val retrofit_version = "2.11.0"
     implementation ("com.squareup.retrofit2:retrofit:$retrofit_version")
@@ -84,9 +87,9 @@ dependencies {
     ksp("androidx.room:room-compiler:$room_version")
 
     implementation(libs.cronet.embedded)
-
     // Navigation
     val nav_version = "2.7.7"
+
     implementation("androidx.navigation:navigation-compose:$nav_version")
     implementation ("com.google.maps.android:maps-compose:4.4.1")
 

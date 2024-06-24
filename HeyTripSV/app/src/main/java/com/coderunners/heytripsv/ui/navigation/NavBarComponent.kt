@@ -21,25 +21,34 @@ import com.coderunners.heytripsv.ui.theme.White
 fun BottomNavigationBar(
     itemsList: List<NavBarItem>,
     currentRoute: String?,
-    onClick:(NavBarItem) -> Unit
-){
+    onClick: (NavBarItem) -> Unit
+) {
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.background,
         modifier = Modifier.shadow(elevation = 10.dp, ambientColor = MaterialTheme.colorScheme.onBackground)
     ) {
         itemsList.forEach { navBarItem ->
-            NavigationBarItem(selected = currentRoute == navBarItem.route,
+            NavigationBarItem(
+                selected = currentRoute == navBarItem.route,
                 onClick = { onClick(navBarItem) },
-                icon = { Icon(
-                    modifier = Modifier.size(30.dp),
-                    imageVector = navBarItem.icon,
-                    contentDescription = navBarItem.title,
-                    tint = if (currentRoute == navBarItem.route) NavBarGreen else NavGray ) },
+                icon = {
+                    Icon(
+                        modifier = Modifier.size(30.dp),
+                        imageVector = navBarItem.icon,
+                        contentDescription = navBarItem.title,
+                        tint = if (currentRoute == navBarItem.route) NavBarGreen else NavGray
+                    )
+                },
                 label = {
-                    Text(text = navBarItem.title, fontSize= 10.sp,  color = if (currentRoute == navBarItem.route) NavBarGreen else Color.Unspecified)
+                    Text(
+                        text = navBarItem.title,
+                        fontSize = 10.sp,
+                        color = if (currentRoute == navBarItem.route) NavBarGreen else Color.Unspecified
+                    )
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    indicatorColor = MaterialTheme.colorScheme.background)
+                    indicatorColor = MaterialTheme.colorScheme.background
+                )
             )
         }
     }

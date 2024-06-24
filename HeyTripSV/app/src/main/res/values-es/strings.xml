@@ -5,6 +5,7 @@
     <string name="navbar_search">Buscar</string>
     <string name="navbar_saved">Guardados</string>
     <string name="navbar_profile">Perfil</string>
+    <string name="navbar_report">Reportes</string>
     <string name="categories">Categorías</string>
     <string name="categories_desc">Descubre tours basados en las siguientes categorías</string>
     <string name="beaches">Playas</string>
@@ -91,5 +92,15 @@
     <string name="new_email">Editar Correo</string>
     <string name="save_changes">Guardar cambios</string>
     <string name="no_posts">No hay publicaciones que mostrar</string>
+    <string name="post_reported">Publicación reportada</string>
+    <string name="agency_reported">Agencia reportada</string>
+    <string name="logout">Cerrar sesión</string>
+    <string name="login_to_save">Para guardar una publicación inicia sesión</string>
+    <string name="back">Regresar</string>
+    <string name="report_logged">Para reportar un post necesitas iniciar sesión</string>
+    <string name="report_agn_logged">Para reportar una agencia necesitas iniciar sesión</string>
+    <string name="confirmation_code">Código de confirmación</string>
+    <string name="close_tour">Este tour está a la vuelta de la esquina</string>
+    <string name="mi_perfil">Mi perfil</string>
 
 </resources>

@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class APIResponseSuccesful(
     @SerializedName(value = Constants.RESPONSE_SUCCESFUL)
-    val result : String
+    val result: String,
 )
 
 data class APIResponseError(

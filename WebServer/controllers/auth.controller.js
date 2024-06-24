@@ -1,7 +1,7 @@
 const User = require('../models/User.model');
 const Agency = require('../models/Agency.model');
 const axios = require('axios')
-const cloudinary = require('cloudinary')
+const cloudinary = require('cloudinary').v2
 const { createToken, verifyToken } = require("../utils/jwt.tools");
 const { sendEmailWithNodemailer } = require("../utils/email.tools");
 
@@ -57,14 +57,14 @@ controller.registerAgency = async (req, res, next) => {
         const savedAgency = await newAgency.save();
 
         if (!image) {
-            return res.status(201).json({ message: "Agency registered" });
+            return res.status(200).json({ message: "Agency registered" });
         }
 
         const timestamp = Math.round(new Date().getTime() / 1000);
         const signature = cloudinary.utils.api_sign_request({
             timestamp: timestamp,
             public_id: savedAgency._id,
-            upload_preset: "HeyTripSV",
+            upload_preset: "FoundHound",
             overwrite: true
         }, process.env.CLOUDINARY_SECRET);
 
@@ -72,7 +72,7 @@ controller.registerAgency = async (req, res, next) => {
         let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
         const formData = new FormData();
         formData.append("file", dataURI);
-        formData.append("upload_preset", "HeyTripSV");
+        formData.append("upload_preset", "FoundHound");
         formData.append("cloud_name", "dlmtei8cc")
         formData.append("public_id", savedAgency._id);
         formData.append("overwrite", true);
@@ -85,6 +85,7 @@ controller.registerAgency = async (req, res, next) => {
             formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
+                ...formData.getHeaders ? formData.getHeaders() : ""
             }
         }
         );
@@ -94,13 +95,14 @@ controller.registerAgency = async (req, res, next) => {
         const imgAgency = await savedAgency.save();
 
         if (!imgAgency) {
-            return res.status(201).json({ message: "Agency registered, but there was an error saving the profile image" });
+            return res.status(200).json({ message: "Agency registered, but there was an error saving the profile image" });
         }
 
-        return res.status(201).json({ message: "Agency registered" });
+        return res.status(200).json({ message: "Agency registered" });
 
     } catch (error) {
-        next(error)
+        console.log(error);
+        next(error.message);
     }
 }
 
@@ -168,8 +170,15 @@ controller.login = async (req, res, next) => {
         _tokens = [token, ..._tokens];
         user.tokens = _tokens;
         await user.save();
-        let role = user.admin ? "admin" : "user";
-        return res.status(200).json({ token: token, role: role })
+        let role = "";
+        let saved = []
+        if (user.admin) {
+            role = "admin"
+        }else {
+            role = "user"
+            saved = user.saved
+        }
+        return res.status(200).json({ token: token, role: role, saved: saved })
 
     } catch (error) {
         next(error)
@@ -289,70 +298,71 @@ controller.sendCode = async (req, res, next) => {
     }
 }
 
-//Compara el código escrito por el usuario al que está ingresado en la base de datos
+// Controlador para verificar el código
 controller.compareCode = async (req, res, next) => {
     try {
-        //Obtener la info identificador, contrasenia y el rol
-        const { email, code, password } = req.body;
+        const { email, code } = req.body;
 
-        //Verificar si el usuario existe basado en el rol
-        let user;
-        user = await User.findOne({ email: email });
-        //Si no existe, verificar agencia
+        let user = await User.findOne({ email: email });
+        let agency;
+
         if (!user) {
-            let agency;
-            agency = await Agency.findOne({ email: email })
-
+            agency = await Agency.findOne({ email: email });
             if (!agency) {
                 return res.status(404).json({ error: "User not found" });
             }
 
-            //Verificar la validez del código
-            //Si no coincide, 401
             if (!agency.compareCode(code) || !checkCodeDate(new Date(), agency.codeDate)) {
                 return res.status(401).json({ error: "Invalid code" });
             }
 
-            if (password) {
-                //Reemplazar el código para que no se pueda reutilizar
-                let _code = '';
-                while (_code.length < 5) {
-                    _code += Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(36);
-                }
-                _code = _code.substring(0, 5).toUpperCase();
-                agency.code = _code;
-                agency.password = password;
-                const _agency = await agency.save();
-    
-                if (!_agency) {
-                    return res.status(500).json({ error: "There was an error updating the password" });
-                }
-    
-                return res.status(200).json({ message: "Password updated correctly" });
-            }
-
             return res.status(200).json({ message: "Correct code" });
-
         }
 
-        //Verificar la validez del código
-        //Si no coincide, 401
         if (!user.compareCode(code) || !checkCodeDate(new Date(), user.codeDate)) {
             return res.status(401).json({ error: "Invalid code" });
         }
 
-        if (password) {
-            //Reemplazar el código para que no se pueda reutilizar
-            let _code = '';
-            while (_code.length < 5) {
-                _code += Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(36);
-            }
-            _code = _code.substring(0, 5).toUpperCase();
-            user.code = _code;
-            user.password = password;
-            const _user = await user.save();
+        return res.status(200).json({ message: "Correct code" });
+    } catch (error) {
+        next(error);
+    }
+};
 
-            if (!_user) {
+// Controlador para cambiar la contraseña
+controller.changePassword = async (req, res, next) => {
+    try {
+        const { email, pass } = req.body;
+
+        let user = await User.findOne({ email: email });
+        let agency;
+
+        if (!user) {
+            agency = await Agency.findOne({ email: email });
+            if (!agency) {
+                return res.status(404).json({ error: "User not found" });
+            }
+
+            if (pass) {
+                agency.password = pass;
+                const updatedAgency = await agency.save();
+
+                if (!updatedAgency) {
+                    return res.status(500).json({ error: "There was an error updating the password" });
+                }
+
+                return res.status(200).json({ message: "Password updated correctly" });
+            }
+
+            return res.status(200).json({ message: "Correct code" });
+        }
+
+
+        if (pass) {
+            user.password = pass;
+            const updatedUser = await user.save();
+
+            if (!updatedUser) {
                 return res.status(500).json({ error: "There was an error updating the password" });
             }
 
@@ -360,10 +370,18 @@ controller.compareCode = async (req, res, next) => {
         }
 
         return res.status(200).json({ message: "Correct code" });
-
     } catch (error) {
         next(error);
     }
+};
+
+// Función para generar un código aleatorio
+function generateRandomCode() {
+    let _code = '';
+    while (_code.length < 5) {
+        _code += Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(36);
+    }
+    return _code.substring(0, 5).toUpperCase();
 }
 
 //Verificar el tiempo de vencimiento del código de recuperación

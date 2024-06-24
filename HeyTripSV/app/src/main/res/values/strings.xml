@@ -4,6 +4,7 @@
     <string name="navbar_search">Search</string>
     <string name="navbar_saved">Saved</string>
     <string name="navbar_profile">Profile</string>
+    <string name="navbar_report">Reports</string>
     <string name="categories">Categories</string>
     <string name="categories_desc">Discover tours based on these categories</string>
     <string name="beaches">Beaches</string>
@@ -35,7 +36,7 @@
     <string name="password">Password</string>
     <string name="fg_password">Forgot Password</string>
     <string name="register">Sign In</string>
-    <string name="dont_re">Don´t you have an account?</string>
+    <string name="dont_re">You don\'t have an account?</string>
     <string name="sign_up">Sign Up</string>
     <string name="create_ac">Create Account</string>
     <string name="name">Name</string>
@@ -94,5 +95,15 @@
     <string name="new_email">Edit Email</string>
     <string name="save_changes">Save Changes</string>
     <string name="no_posts">There are no posts to show</string>
+    <string name="post_reported">Post reported</string>
+    <string name="agency_reported">Agency Reported</string>
+    <string name="logout">Log out</string>
+    <string name="login_to_save">To save a post log into your account</string>
+    <string name="back">Back</string>
+    <string name="report_logged">To report a post you have to log into your account</string>
+    <string name="report_agn_logged">To report an agency you have to log into your account</string>
+    <string name="confirmation_code">Confirmation code</string>
+    <string name="close_tour">This tour is right around the corner</string>
+    <string name="mi_perfil">My profile</string>
 
 </resources>
