@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 object Constants {
     //api service
-    const val BASE_URL = "http://192.168.0.5:3000"
+    const val BASE_URL = "http://192.168.7.128:3000"
     const val API_PATH ="/api"
 
     //Obtener post Home

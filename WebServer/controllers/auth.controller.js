@@ -64,7 +64,7 @@ controller.registerAgency = async (req, res, next) => {
         const signature = cloudinary.utils.api_sign_request({
             timestamp: timestamp,
             public_id: savedAgency._id,
-            upload_preset: "HeyTripSV",
+            upload_preset: "FoundHound",
             overwrite: true
         }, process.env.CLOUDINARY_SECRET);
 
@@ -72,7 +72,7 @@ controller.registerAgency = async (req, res, next) => {
         let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
         const formData = new FormData();
         formData.append("file", dataURI);
-        formData.append("upload_preset", "HeyTripSV");
+        formData.append("upload_preset", "FoundHound");
         formData.append("cloud_name", "dlmtei8cc")
         formData.append("public_id", savedAgency._id);
         formData.append("overwrite", true);
@@ -85,7 +85,7 @@ controller.registerAgency = async (req, res, next) => {
             formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
-                ...formData.getHeaders()
+                ...formData.getHeaders ? formData.getHeaders() : ""
             }
         }
         );
@@ -101,6 +101,7 @@ controller.registerAgency = async (req, res, next) => {
         return res.status(200).json({ message: "Agency registered" });
 
     } catch (error) {
+        console.log(error);
         next(error.message);
     }
 }
