@@ -1,5 +1,6 @@
 package com.coderunners.heytripsv.ui.screen
 
+import android.app.TimePickerDialog
 import android.net.Uri
 import android.util.Log
 import android.view.MotionEvent
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,14 +28,19 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimeInput
+import androidx.compose.material3.TimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -54,6 +61,7 @@ import com.coderunners.heytripsv.R
 import com.coderunners.heytripsv.model.Itinerary
 import com.coderunners.heytripsv.model.Position
 import com.coderunners.heytripsv.model.PostDataModel
+import com.coderunners.heytripsv.ui.components.DropDown
 import com.coderunners.heytripsv.ui.components.PhotoSelectorView
 import com.coderunners.heytripsv.ui.theme.MainGreen
 import com.coderunners.heytripsv.ui.theme.TextGray
@@ -69,21 +77,39 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
+fun isoDateFormat(dateToFormat: String): String{
+    try {
+        var _dateToFormat = dateToFormat.replace(' ', 'T')
+        val dateTime = LocalDateTime.parse(_dateToFormat)
+
+        val formatter = DateTimeFormatter.ofPattern("hh:mm a")
+        return dateTime.format(formatter)
+    }catch(e: Exception){
+        Log.i("MainViewModel", e.toString())
+        return "00:00 AM"
+    }
+}
+
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun AddPostScreen(
     mainViewModel: MainViewModel,
     innerPadding: PaddingValues
     ) {
+
+    val timeindex = remember{ mutableStateOf(-1)}
+    val timeState = remember {mutableStateListOf<TimePickerState>(TimePickerState(0,0,true))}
+    val categoryOptions = listOf(stringResource(R.string.mountains), stringResource(R.string.beaches), stringResource(R.string.towns), stringResource(R.string.routes), stringResource(R.string.report_other))
     val context = LocalContext.current
     val selectedImage= remember { mutableStateOf<Uri?>(null) }
     val count = remember { mutableStateOf(1) }
+    val showTimeDialog = remember { mutableStateOf(false)}
     val itiCount = remember { mutableStateOf(1) }
     val selectedDate = remember { mutableStateOf(LocalDate.now())}
     val priceText = remember { mutableStateOf("") }
     val post = remember { mutableStateOf(PostDataModel(
         position = Position(13.699217, -89.1921333),
-        itinerary = mutableListOf(Itinerary("", "")),
+        itinerary = mutableListOf(Itinerary("00:00", "")),
         includes = mutableListOf(""))) }
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(post.value.position.lat, post.value.position.long), 10f)
@@ -128,6 +154,33 @@ fun AddPostScreen(
             mainViewModel.setStateToReady()
 
         }
+    }
+
+    if(showTimeDialog.value){
+        TimeDialog(onConfirm = {
+                               var itinerary = post.value.itinerary
+                var time = ""
+            if (timeState[timeindex.value].minute<10){
+                if (timeState[timeindex.value].hour<10){
+                   time = timeToIso("0"+timeState[timeindex.value].hour.toString()+":"+"0"+timeState[timeindex.value].minute.toString())
+                }
+                else time = timeToIso(timeState[timeindex.value].hour.toString()+":"+"0"+timeState[timeindex.value].minute.toString())
+            }
+
+            else {
+                if (timeState[timeindex.value].hour<10){
+                    time = timeToIso("0"+timeState[timeindex.value].hour.toString()+":"+timeState[timeindex.value].minute.toString())
+                }
+                else time = timeToIso(timeState[timeindex.value].hour.toString()+":"+timeState[timeindex.value].minute.toString())
+            }
+            Log.i("time post", time)
+                                itinerary[timeindex.value].time = time
+            post.value = post.value.copy(itinerary = itinerary)
+        }, state = timeState[timeindex.value] ) {
+            showTimeDialog.value = false
+        }
+    }else{
+        showTimeDialog.value = false
     }
 
         LazyColumn(
@@ -192,6 +245,42 @@ fun AddPostScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
+                    text = stringResource(R.string.categories),
+                    fontWeight = FontWeight.Normal,
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .padding(horizontal = 10.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Row (
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 10.dp),
+                    horizontalArrangement = Arrangement.Center
+                ){
+                    DropDown(
+                        options = categoryOptions ,
+                        onValueChange = {
+                            var content = ""
+
+                            content = when (it) {
+                                categoryOptions[0] -> "Montañas"
+                                categoryOptions[1] -> "Playas"
+                                categoryOptions[2] -> "Pueblos"
+                                categoryOptions[3] -> "Rutas"
+                                categoryOptions[4] -> "Otros"
+
+                                else -> it
+                            }
+                            post.value = post.value.copy(category = content)
+
+                        },
+                        initialValue = categoryOptions[0]
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
                     text = stringResource(R.string.meeting_place),
                     fontWeight = FontWeight.Normal,
                     modifier = Modifier
@@ -217,7 +306,8 @@ fun AddPostScreen(
                 items(count.value){ index->
                 OutlinedTextField(
                     modifier = Modifier
-                        .height(100.dp),
+                        .height(100.dp)
+                        .fillMaxWidth(0.8f),
                     value = post.value.includes[index],
                     onValueChange = {
                         val newList = post.value.includes.toMutableList().apply {
@@ -246,7 +336,8 @@ fun AddPostScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     modifier = Modifier
-                        .height(200.dp),
+                        .height(200.dp)
+                        .fillMaxWidth(0.8f),
                     value = post.value.description,
                     onValueChange = {post.value = post.value.copy(description = it)},
                     placeholder = { Text(stringResource(id = R.string.description_placeholder)) },
@@ -277,18 +368,12 @@ fun AddPostScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                     ){
-
-                        OutlinedTextField(
-                            modifier = Modifier
-                                .fillMaxWidth(0.25f),
-                            value = post.value.itinerary[index].time,
-                            onValueChange = {
-                                val newList = post.value.itinerary.toMutableList().apply {
-                                    this[index] = this[index].copy(time = it)
-                                }
-                                post.value = post.value.copy(itinerary = newList)},
-                            placeholder = { Text(stringResource(id = R.string.includes_placeholder)) },
-                        )
+                        TextButton(onClick = {
+                            timeindex.value = index
+                            showTimeDialog.value = true
+                        }) {
+                            Text(text = isoDateFormat(post.value.itinerary[index].time))
+                        }
                         OutlinedTextField(
                             modifier = Modifier
                                 .fillMaxWidth(1f),
@@ -299,7 +384,7 @@ fun AddPostScreen(
                                 }
                                 post.value = post.value.copy(itinerary = newList)
                                             },
-                            placeholder = { Text(stringResource(id = R.string.includes_placeholder)) },
+                            placeholder = { Text("") },
                         )
 
                     }
@@ -307,7 +392,8 @@ fun AddPostScreen(
                 }
                 item {
                     Button(onClick = {
-                        post.value.itinerary.add(Itinerary("", ""))
+                        post.value.itinerary.add(Itinerary("00:00", ""))
+                        timeState.add(TimePickerState(0,0,true))
                         itiCount.value +=1}) {
                         Icon(imageVector = Icons.Default.Add, contentDescription = null)
                     }
@@ -366,11 +452,28 @@ fun AddPostScreen(
                 ) {
                     Button(
                         onClick = {
-                            mainViewModel.addPost(
-                                context,
-                                post.value.copy(itinerary = post.value.itinerary.map { it-> Itinerary(
-                                timeToIso(it.time), it.event) }.toMutableList()),
-                                selectedImage.value)
+                            val times = timeState.map {
+                                if (it.minute<10){
+                                    if (it.hour<10){
+                                        timeToIso("0"+it.hour.toString()+":"+"0"+it.minute.toString())
+                                    }
+                                    else timeToIso(it.hour.toString()+":"+"0"+it.minute.toString())
+                                }
+
+                                else {
+                                    if (it.hour<10){
+                                        timeToIso("0"+it.hour.toString()+":"+it.minute.toString())
+                                    }
+                                    else timeToIso(it.hour.toString()+":"+it.minute.toString())
+                                }
+                            }
+
+                            Log.i("MainViewModel", times.toString())
+//                            mainViewModel.addPost(
+//                                context,
+//                                post.value.copy(itinerary = post.value.itinerary.map { it-> Itinerary(
+//                                timeToIso(it.time), it.event) }.toMutableList()),
+//                                selectedImage.value)
                         },
                         modifier = Modifier
                             .fillMaxWidth(0.5f)
@@ -411,4 +514,35 @@ fun timeToIso (time: String): String{
 
     // Format the LocalDateTime to the desired format
     return dateTime.format(formatter)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TimeDialog(onConfirm: ()->Unit, state: TimePickerState, onDismissRequest: ()->Unit){
+    Dialog(onDismissRequest = {  }) {
+            Card(modifier = Modifier.size(250.dp, 200.dp),) {
+                Column (
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
+                TimeInput(
+                    modifier = Modifier
+                        .padding(10.dp),
+
+                    state = state)
+                Row (){
+                    TextButton(onClick = { onDismissRequest() }) {
+                        Text(text = "Cancelar")
+                    }
+                    TextButton(onClick = {
+                        onConfirm()
+                        onDismissRequest()}) {
+                        Text(text = "Confirmar")
+                    }
+                }
+                }
+
+        }
+
+    }
 }

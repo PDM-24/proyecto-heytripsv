@@ -1,6 +1,7 @@
 package com.coderunners.heytripsv.ui.screen
 
 import android.net.Uri
+
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -125,7 +126,6 @@ fun RegisterAgency(
 
         }
     ) { innerPadding ->
-
         Column(
             modifier = Modifier
                 .padding(innerPadding)
