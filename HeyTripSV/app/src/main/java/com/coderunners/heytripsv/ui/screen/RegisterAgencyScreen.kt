@@ -2,9 +2,12 @@ package com.coderunners.heytripsv.ui.screen
 
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -13,13 +16,16 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -33,33 +39,71 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.core.text.isDigitsOnly
 import androidx.navigation.NavController
 import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.R
+import com.coderunners.heytripsv.data.remote.api.AgencyApi
 import com.coderunners.heytripsv.model.AgencyDataModel
 import com.coderunners.heytripsv.ui.components.PhotoSelectorView
 import com.coderunners.heytripsv.ui.theme.MainGreen
 import com.coderunners.heytripsv.ui.theme.NavGray
 import com.coderunners.heytripsv.ui.theme.TextGray
+import com.coderunners.heytripsv.utils.UiState
 
 @Composable
 fun RegisterAgency(
-    navController: NavController
-){
+    navController: NavController, mainViewModel: MainViewModel){
 
-    var name = remember { mutableStateOf("") }
-    var email = remember { mutableStateOf("") }
-    var dui = remember { mutableStateOf("") }
-    var description = remember { mutableStateOf("") }
-    var contactnumber = remember { mutableStateOf("") }
-    var instagram = remember { mutableStateOf("") }
-    var facebook = remember { mutableStateOf("") }
+    val context = LocalContext.current
     val selectedImage= remember { mutableStateOf<Uri?>(null) }
+
+    val addScreenState = mainViewModel.uiState.collectAsState()
+    val agency = remember { mutableStateOf(AgencyApi()) }
+    val numberValue = remember { mutableStateOf(agency.value.number.toString()) }
+
+        when(addScreenState.value){
+        is UiState.Error -> {
+            val message = (addScreenState.value as UiState.Error).msg
+            Toast.makeText(LocalContext.current, message, Toast.LENGTH_SHORT).show()
+            mainViewModel.setStateToReady()
+        }
+        UiState.Loading -> {
+            Dialog(
+                onDismissRequest = { },
+                DialogProperties(
+                    dismissOnBackPress = false,
+                    dismissOnClickOutside = false
+                )
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .background(Color.Transparent)
+                ){
+                    CircularProgressIndicator()
+                }
+            }
+        }
+        UiState.Ready -> {}
+        is UiState.Success -> {
+            val message = (addScreenState.value as UiState.Success).msg
+            Toast.makeText(LocalContext.current, message, Toast.LENGTH_SHORT).show()
+            mainViewModel.setStateToReady()
+
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -89,9 +133,9 @@ fun RegisterAgency(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(75.dp))
+            Spacer(modifier = Modifier.height(25.dp))
             Text(
-                text = stringResource(R.string.edit_agency),
+                text = "Register Agency",
                 color = TextGray,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
@@ -108,8 +152,8 @@ fun RegisterAgency(
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
-                value = name.value,
-                onValueChange = { name.value = it },
+                value = agency.value.name,
+                onValueChange = { agency.value = agency.value.copy(name = it) },
                 placeholder = { Text("") },
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -123,8 +167,8 @@ fun RegisterAgency(
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
-                value = email.value,
-                onValueChange = { email.value = it },
+                value = agency.value.email,
+                onValueChange = { agency.value = agency.value.copy(email = it)  },
                 placeholder = { Text("") },
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -138,23 +182,23 @@ fun RegisterAgency(
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
-                value = dui.value,
-                onValueChange = { dui.value = it },
+                value = agency.value.dui,
+                onValueChange = { agency.value = agency.value.copy(dui = it)  },
                 placeholder = { Text("") },
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(R.string.description),
                 color = TextGray,
-                fontWeight = FontWeight.Normal,
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
-                    .padding(horizontal = 10.dp)
+                    .padding(horizontal = 10.dp),
+                fontWeight = FontWeight.Normal
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
-                value = description.value,
-                onValueChange = { description.value = it },
+                value = agency.value.description,
+                onValueChange = { agency.value = agency.value.copy(description = it)  },
                 placeholder = { Text("") },
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -168,8 +212,31 @@ fun RegisterAgency(
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
-                value = contactnumber.value,
-                onValueChange = { contactnumber.value = it },
+                value = numberValue.value.takeIf { it.isNotBlank() } ?: "",
+                onValueChange = {
+                    if (it.isEmpty() || it.isDigitsOnly()) {
+                        numberValue.value = it
+                    }
+                },
+                placeholder = { Text("") },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done
+                ),
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(R.string.password),
+                color = TextGray,
+                fontWeight = FontWeight.Normal,
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .padding(horizontal = 10.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                value = agency.value.password,
+                onValueChange = { agency.value = agency.value.copy(password = it)  },
                 placeholder = { Text("") },
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -183,8 +250,8 @@ fun RegisterAgency(
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
-                value = instagram.value,
-                onValueChange = { instagram.value = it },
+                value = agency.value.instagram,
+                onValueChange = { agency.value = agency.value.copy(instagram = it) },
                 placeholder = { Text("") },
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -198,8 +265,8 @@ fun RegisterAgency(
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
-                value = facebook.value,
-                onValueChange = { facebook.value = it },
+                value = agency.value.facebook,
+                onValueChange = { agency.value = agency.value.copy(facebook = it) },
                 placeholder = { Text("") },
             )
             Spacer(modifier = Modifier.height(10.dp))
@@ -212,7 +279,9 @@ fun RegisterAgency(
                     .padding(horizontal = 10.dp)
             )
             Spacer(modifier = Modifier.height(8.dp))
-            PhotoSelectorView(selectImage = { selectedImage.value = it })
+            PhotoSelectorView(selectImage = {
+                agency.value = agency.value.copy(image = it)
+                Log.i("Selected image", selectedImage.value.toString())})
             Spacer(modifier = Modifier.height(15.dp))
             Column(
                 modifier = Modifier
@@ -222,7 +291,12 @@ fun RegisterAgency(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Button(
-                    onClick = {},
+                    onClick = {
+                              mainViewModel.registerAgency(
+                                  context,
+                                  agency.value.copy(number = numberValue.value.toInt())
+                              )
+                    },
                     modifier = Modifier
                         .fillMaxWidth(0.5f)
                         .padding(horizontal = 16.dp),
