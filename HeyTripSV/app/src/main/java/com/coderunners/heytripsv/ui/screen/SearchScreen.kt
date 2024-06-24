@@ -1,6 +1,8 @@
 package com.coderunners.heytripsv.ui.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -57,25 +60,34 @@ import com.coderunners.heytripsv.ui.theme.MainGreen
 import com.coderunners.heytripsv.ui.theme.TextGray
 import com.coderunners.heytripsv.ui.theme.White
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import com.coderunners.heytripsv.model.PostDataModel
 import com.coderunners.heytripsv.ui.navigation.BottomNavigationBar
 import com.coderunners.heytripsv.ui.navigation.navBarItemList
+import com.coderunners.heytripsv.utils.UiState
 
 
 @Composable
-fun SliderAdvancedExample() {
-    var sliderPosition by remember { mutableStateOf(0f) }
+fun SliderAdvancedExample(onChangeSlider: (Float) -> Unit) {
+    var sliderPosition by remember { mutableStateOf(100f) }
     Column {
         Slider(
             value = sliderPosition,
-            onValueChange = { sliderPosition = it },
+            onValueChange = { sliderPosition = it
+                onChangeSlider(it)
+                            },
             colors = SliderDefaults.colors(
                 thumbColor = MaterialTheme.colorScheme.secondary,
                 activeTrackColor = MaterialTheme.colorScheme.secondary,
                 inactiveTrackColor = MaterialTheme.colorScheme.secondaryContainer,
             ),
             steps = 3,
-            valueRange = 0f..50f
+            valueRange = 0f..100f
         )
         Text(text = sliderPosition.toString())
     }
@@ -84,13 +96,48 @@ fun SliderAdvancedExample() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(currentRoute: String?,mainViewModel: MainViewModel, navController: NavController){
+    val postViewState = mainViewModel.uiState.collectAsState()
+
+    when(postViewState.value){
+        is UiState.Error -> {
+
+            val message = (postViewState.value as UiState.Error).msg
+            Toast.makeText(LocalContext.current, message, Toast.LENGTH_SHORT).show()
+            mainViewModel.setStateToReady()
+        }
+        UiState.Loading -> {
+            Dialog(
+                onDismissRequest = { },
+                DialogProperties(
+                    dismissOnBackPress = false,
+                    dismissOnClickOutside = false
+                )
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .background(Color.Transparent)
+                ){
+                    CircularProgressIndicator()
+                }
+            }
+        }
+        UiState.Ready -> {}
+        is UiState.Success -> {
+            mainViewModel.setStateToReady()
+        }
+    }
+
     val search = remember { mutableStateOf("") }
     var expanded by remember {
         mutableStateOf(false)
     }
     val filtros = arrayOf(stringResource(id = R.string.closest), stringResource(id = R.string.recent))
     var selectedText by remember { mutableStateOf(filtros[0]) }
-    val savedList = mainViewModel.savedPostList.collectAsState()
+    val upcomingPosts = mainViewModel.upcomingPosts.collectAsState()
+    val recentPosts = mainViewModel.recentPosts.collectAsState()
+    val searchPosts = remember { mutableStateOf(upcomingPosts.value)}
     val navItems = navBarItemList(mainViewModel)
     Scaffold(
         bottomBar = {
@@ -131,7 +178,16 @@ fun SearchScreen(currentRoute: String?,mainViewModel: MainViewModel, navControll
             ) {
                 OutlinedTextField(
                     value = search.value,
-                    onValueChange = { search.value = it },
+                    onValueChange = {
+                        newText ->
+                        search.value = newText
+                        searchPosts.value = searchPosts.value.filter { post->
+                            post.title.uppercase().trim() == newText.uppercase().trim() ||
+                                    post.agency.uppercase().trim() == newText.uppercase().trim()
+                                    || post.category.uppercase().trim() == newText.uppercase().trim()
+                                    || post.description.uppercase().trim() == newText.uppercase().trim()
+                        }.toMutableList()
+                                    },
                     placeholder = { Text("Search...") },
                     leadingIcon = {
                         Icon(
@@ -170,6 +226,11 @@ fun SearchScreen(currentRoute: String?,mainViewModel: MainViewModel, navControll
                             DropdownMenuItem(
                                 text = { Text(text = item) },
                                 onClick = {
+                                    if (selectedText== filtros[0]){
+                                        searchPosts.value = upcomingPosts.value
+                                    }else if(selectedText == filtros[1]){
+                                        searchPosts.value = recentPosts.value
+                                    }
                                     selectedText = item
                                     expanded = false
                                 }
@@ -187,10 +248,14 @@ fun SearchScreen(currentRoute: String?,mainViewModel: MainViewModel, navControll
                         .padding(10.dp)
                 )
 
-                SliderAdvancedExample()
+                SliderAdvancedExample(){
+                    searchPosts.value = upcomingPosts.value.filter { post->
+                        post.price <= it.toDouble()
+                    }.toMutableList()
+                }
             }
             LazyColumn(modifier = Modifier.padding(10.dp, 10.dp, 10.dp, 20.dp)) {
-                items(savedList.value) {
+                items(searchPosts.value) {
                     PostCardHorizontal(
                         post = it,
                         onClick = {
