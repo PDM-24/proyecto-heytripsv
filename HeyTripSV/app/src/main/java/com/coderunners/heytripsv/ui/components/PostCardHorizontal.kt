@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -22,6 +23,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Button
@@ -29,6 +32,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -70,7 +74,7 @@ import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalStdlibApi::class)
 @Composable
-fun PostCardHorizontal(post: PostDataModel, onClick: () -> Unit, save: Boolean = false, edit: Boolean = false, mainViewModel: MainViewModel){
+fun PostCardHorizontal(post: PostDataModel, onClick: () -> Unit, save: Boolean = false, onDelete: () -> Unit ={}, onEdit: () -> Unit = {}, edit: Boolean = false, mainViewModel: MainViewModel){
     val notifications = mainViewModel.notifications.collectAsState()
     val notificationId = post.id.subSequence(0, 3).toString().hexToInt()
     val desc = stringResource(id = R.string.close_tour)
@@ -259,16 +263,60 @@ fun PostCardHorizontal(post: PostDataModel, onClick: () -> Unit, save: Boolean =
                     })
                 }
             } else {
-                Column(
-                    modifier = Modifier.padding(0.dp, 5.dp, 5.dp, 0.dp)
-                ) {
-                    Box(modifier = Modifier.fillMaxWidth()){
-                        Column {
-                            Text(text = post.title, color = TextGray, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp), fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                            Text(text = (post.date + " - $" + "%.2f".format(post.price)), modifier = Modifier.padding(10.dp, 0.dp), fontSize = 12.sp, color = NavGray)
+                if (edit){
+                    Column(
+                        modifier = Modifier
+                            .padding(0.dp, 5.dp, 5.dp, 0.dp)
+                            .fillMaxSize(),
+                        verticalArrangement = Arrangement.SpaceBetween
+                    ) {
+                                Row {
+                                    Column(
+                                    ) {
+                                        Text(text = post.title, color = TextGray, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp), fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                        Text(text = (post.date + " - $" + "%.2f".format(post.price)), modifier = Modifier.padding(10.dp, 0.dp), fontSize = 12.sp, color = NavGray)
+                                    }
+                                }
+                                Row(
+                                    modifier= Modifier
+                                        .fillMaxWidth()
+                                        .padding(10.dp)
+                                ) {
+                                    IconButton(
+                                        onClick = { mainViewModel.deleteAgencyPost(post.id)},
+                                        modifier = Modifier
+                                            .size(30.dp, 30.dp)
+                                            .background(Color(0xFFCC0000), RoundedCornerShape(4.dp))
+                                            .aspectRatio(1f)
+                                    ) {
+                                        Icon(Icons.Filled.Delete, contentDescription = "Delete", tint = Color.White)
+                                    }
+                                    Spacer(modifier = Modifier.padding(5.dp))
+                                    IconButton(
+                                        onClick = { onEdit() },
+                                        modifier = Modifier
+                                            .size(30.dp, 30.dp)
+                                            .background(Color(0xFF1287E0), RoundedCornerShape(4.dp))
+                                            .aspectRatio(1f),
+                                    ) {
+                                        Icon(Icons.Filled.Create, contentDescription = "Edit", tint = Color.White)
+                                    }
+
+                            }
+                    }
+                }else{
+                    Column(
+                        modifier = Modifier.padding(0.dp, 5.dp, 5.dp, 0.dp)
+                    ) {
+                        Box(modifier = Modifier.fillMaxWidth()){
+                            Column {
+                                Text(text = post.title, color = TextGray, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp), fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                Text(text = (post.date + " - $" + "%.2f".format(post.price)), modifier = Modifier.padding(10.dp, 0.dp), fontSize = 12.sp, color = NavGray)
+                            }
                         }
                     }
                 }
+
             }
 
         }

@@ -16,6 +16,7 @@ import com.coderunners.heytripsv.data.remote.model.ReportedAgency
 import com.coderunners.heytripsv.data.remote.model.SendCodeBody
 import com.coderunners.heytripsv.data.remote.model.editOwnBody
 import com.coderunners.heytripsv.data.remote.model.savedPosts
+import com.coderunners.heytripsv.ui.navigation.ScreenRoute
 import com.coderunners.heytripsv.utils.Constants
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -160,4 +161,30 @@ interface ApiService {
         @Header("Authorization") authHeader: String,
         @Body editOwn : editOwnBody
     ): Own
+
+    @Headers(value = ["Content-Type: application/json"])
+    @GET(value = Constants.API_PATH + Constants.GET_INFO_AGENCY)
+    suspend fun getAgencyInfo(@Header("Authorization") authHeader: String): AgencyResponse
+
+    @Multipart
+    @POST(value= Constants.API_PATH + Constants.POST_EDIT_AGENCY)
+    suspend fun EditAgency(
+        @Header("Authorization") authHeader: String,
+        @Part("name") name: RequestBody,
+        @Part("email") email: RequestBody,
+        @Part("dui") dui: RequestBody,
+        @Part("description") description: RequestBody,
+        @Part("number") number: RequestBody,
+        @Part("instagram") instagram: RequestBody?,
+        @Part("facebook") facebook: RequestBody?,
+        @Part("password")  password: RequestBody?,
+        @Part image: MultipartBody.Part?
+    ): APIResponseSuccesful
+    @Headers(value = ["Content-Type: application/json"])
+    @DELETE(value = Constants.API_PATH + Constants.DELETE_POST_AGENCY+"{id}")
+    suspend fun deletePostAgency(
+        @Header("Authorization") authHeader: String,
+        @Path("id") postId: String
+    ): PostListResponse
+
 }
