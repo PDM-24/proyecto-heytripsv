@@ -56,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.navigation.NavController
 import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.R
 import com.coderunners.heytripsv.model.Itinerary
@@ -93,29 +94,28 @@ private fun isoDateFormat(dateToFormat: String): String{
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun AddPostScreen(
+fun EditPostScreen(
     mainViewModel: MainViewModel,
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
+    navController: NavController
     ) {
 
+    val postEdit = mainViewModel.postEdit.collectAsState()
     val timeindex = remember{ mutableStateOf(-1)}
-    val timeState = remember {mutableStateListOf<TimePickerState>(TimePickerState(0,0,true))}
+    val timeState = remember {mutableStateListOf<TimePickerState>()}
+    timeState.apply { addAll(List(postEdit.value.itinerary.size, {TimePickerState(0,0,true)})) }
     val categoryOptions = listOf(stringResource(R.string.mountains), stringResource(R.string.beaches), stringResource(R.string.towns), stringResource(R.string.routes), stringResource(R.string.report_other))
     val context = LocalContext.current
     val selectedImage= remember { mutableStateOf<Uri?>(null) }
-    val count = remember { mutableStateOf(1) }
+    val count = remember { mutableStateOf(postEdit.value.includes.size) }
     val showTimeDialog = remember { mutableStateOf(false)}
-    val itiCount = remember { mutableStateOf(1) }
+    val itiCount = remember { mutableStateOf(postEdit.value.itinerary.size) }
     val selectedDate = remember { mutableStateOf(LocalDate.now())}
-    val priceText = remember { mutableStateOf("") }
-    val post = remember { mutableStateOf(PostDataModel(
-        position = Position(13.699217, -89.1921333),
-        itinerary = mutableListOf(Itinerary("00:00", "")),
-        includes = mutableListOf(""))) }
+    val priceText = remember { mutableStateOf(postEdit.value.price.toString()) }
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(post.value.position.lat, post.value.position.long), 10f)
+        position = CameraPosition.fromLatLngZoom(LatLng(postEdit.value.position.lat, postEdit.value.position.long), 10f)
     }
-    val marcador = remember { mutableStateOf(MarkerState(LatLng(post.value.position.lat, post.value.position.long)))}
+    val marcador = remember { mutableStateOf(MarkerState(LatLng(postEdit.value.position.lat, postEdit.value.position.long)))}
     val columnScrollingEnabled = remember { mutableStateOf(true) }
 
     LaunchedEffect(cameraPositionState.isMoving) {
@@ -159,7 +159,7 @@ fun AddPostScreen(
 
     if(showTimeDialog.value){
         TimeDialog(onConfirm = {
-                               var itinerary = post.value.itinerary
+                               var itinerary = postEdit.value.itinerary
                 var time = ""
             if (timeState[timeindex.value].minute<10){
                 if (timeState[timeindex.value].hour<10){
@@ -175,8 +175,8 @@ fun AddPostScreen(
                 else time = timeToIso(timeState[timeindex.value].hour.toString()+":"+timeState[timeindex.value].minute.toString())
             }
             Log.i("time post", time)
-                                itinerary[timeindex.value].time = time
-            post.value = post.value.copy(itinerary = itinerary)
+                                itinerary[timeindex.value].time = mainViewModel.isoDateFormat(time, true)
+            mainViewModel.savedPostEdit(postEdit.value.copy(itinerary = itinerary))
         }, state = timeState[timeindex.value] ) {
             showTimeDialog.value = false
         }
@@ -210,8 +210,8 @@ fun AddPostScreen(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
-                    value = post.value.title,
-                    onValueChange = {post.value = post.value.copy(title = it)},
+                    value = postEdit.value.title,
+                    onValueChange = {mainViewModel.savedPostEdit(postEdit.value.copy(title = it))},
                     placeholder = { Text("") },
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -227,7 +227,7 @@ fun AddPostScreen(
                 CustomDatePicker(value = selectedDate.value ) {
                     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
                     selectedDate.value = it
-                    post.value = post.value.copy(date = selectedDate.value.format(formatter))
+                    mainViewModel.savedPostEdit(postEdit.value.copy(date = selectedDate.value.format(formatter)))
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
@@ -273,7 +273,7 @@ fun AddPostScreen(
 
                                 else -> it
                             }
-                            post.value = post.value.copy(category = content)
+                            mainViewModel.savedPostEdit(postEdit.value.copy(category = content))
 
                         },
                         initialValue = categoryOptions[0]
@@ -290,8 +290,8 @@ fun AddPostScreen(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
-                    value = post.value.meeting,
-                    onValueChange = {post.value = post.value.copy(meeting = it)},
+                    value = postEdit.value.meeting,
+                    onValueChange = {mainViewModel.savedPostEdit(postEdit.value.copy(meeting = it))},
                     placeholder = { Text("") },
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -309,18 +309,18 @@ fun AddPostScreen(
                     modifier = Modifier
                         .height(100.dp)
                         .fillMaxWidth(0.8f),
-                    value = post.value.includes[index],
+                    value = postEdit.value.includes[index],
                     onValueChange = {
-                        val newList = post.value.includes.toMutableList().apply {
+                        val newList = postEdit.value.includes.toMutableList().apply {
                             this[index] = it
                         }
-                        post.value = post.value.copy(includes = newList)},
+                        mainViewModel.savedPostEdit(postEdit.value.copy(includes = newList))},
                     placeholder = { Text(stringResource(id = R.string.includes_placeholder)) },
                 )
                 }
                 item {
                     Button(onClick = {
-                        post.value.includes.add("")
+                        mainViewModel.addIncludesPostEdit()
                         count.value =count.value+1}) {
                         Icon(imageVector = Icons.Default.Add, contentDescription = null)
                     }
@@ -339,8 +339,8 @@ fun AddPostScreen(
                     modifier = Modifier
                         .height(200.dp)
                         .fillMaxWidth(0.8f),
-                    value = post.value.description,
-                    onValueChange = {post.value = post.value.copy(description = it)},
+                    value = postEdit.value.description,
+                    onValueChange = {mainViewModel.savedPostEdit(postEdit.value.copy(description = it) )},
                     placeholder = { Text(stringResource(id = R.string.description_placeholder)) },
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -373,17 +373,17 @@ fun AddPostScreen(
                             timeindex.value = index
                             showTimeDialog.value = true
                         }) {
-                            Text(text = isoDateFormat(post.value.itinerary[index].time))
+                            Text(text = isoDateFormat(postEdit.value.itinerary[index].time))
                         }
                         OutlinedTextField(
                             modifier = Modifier
                                 .fillMaxWidth(1f),
-                            value = post.value.itinerary[index].event,
+                            value = postEdit.value.itinerary[index].event,
                             onValueChange = {
-                                val newList = post.value.itinerary.toMutableList().apply {
+                                val newList = postEdit.value.itinerary.toMutableList().apply {
                                     this[index] = this[index].copy(event = it)
                                 }
-                                post.value = post.value.copy(itinerary = newList)
+                                mainViewModel.savedPostEdit(postEdit.value.copy(itinerary = newList))
                                             },
                             placeholder = { Text("") },
                         )
@@ -393,7 +393,7 @@ fun AddPostScreen(
                 }
                 item {
                     Button(onClick = {
-                        post.value.itinerary.add(Itinerary("00:00", ""))
+                        mainViewModel.addItineraryPostEdit()
                         timeState.add(TimePickerState(0,0,true))
                         itiCount.value +=1}) {
                         Icon(imageVector = Icons.Default.Add, contentDescription = null)
@@ -429,17 +429,17 @@ fun AddPostScreen(
                                     }),
                             onMapClick = {
                                     ubicacion ->
-                                post.value = post.value.copy(
+                                mainViewModel.savedPostEdit(postEdit.value.copy(
                                     position = Position(ubicacion.latitude, ubicacion.longitude),
                                     price = priceText.value.toDouble()
-                                )
+                                ))
                                 marcador.value = MarkerState(LatLng(ubicacion.latitude, ubicacion.longitude))
                             },
                             cameraPositionState = cameraPositionState
                         ) {
                             Marker(
                                 state = marcador.value,
-                                title = post.value.title
+                                title = postEdit.value.title
                             )
                         }
                     }
@@ -508,7 +508,7 @@ private fun timeToIso (time: String): String{
     }
 
     // Parse the time string to LocalTime
-    val hour = LocalTime.parse(time, DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH))
+    val hour = LocalTime.parse(time, DateTimeFormatter.ofPattern("HH:mm"))
 
     // Combine today's date and parsed time to LocalDateTime
     val dateTime = LocalDateTime.of(today, hour)

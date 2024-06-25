@@ -41,6 +41,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Locale
+
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //ESTADO DE APP (LOADING)
@@ -60,6 +62,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //FLOWS
     private val _notifications = MutableStateFlow(mutableListOf<Int>())
     val notifications = _notifications.asStateFlow()
+
+    private val _postEdit = MutableStateFlow(PostDataModel())
+    val postEdit = _postEdit.asStateFlow()
 
     private val _selectedPost = MutableStateFlow(PostDataModel())
     val selectedPost = _selectedPost.asStateFlow()
@@ -118,18 +123,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _ownUser= MutableStateFlow(Own())
     val ownUser = _ownUser.asStateFlow()
 
-    //Función para parsear el formato que devuelve la API a dd/MM/yyyy o HH:mm
+    //Función para parsear el formato que devuelve la API a dd/MM/yyyy o hh:mm a
     fun isoDateFormat(dateToFormat: String, time: Boolean = false): String{
 
         try {
             val dateStr = dateToFormat.removeSuffix("Z")
             val dateTime = LocalDateTime.parse(dateStr)
 
-            val formatter = DateTimeFormatter.ofPattern(if (!time) "dd/MM/yyyy" else "hh:mm a")
+            val formatter = DateTimeFormatter.ofPattern(if (!time) "dd/MM/yyyy" else "hh:mm a", Locale.ENGLISH)
             return dateTime.format(formatter)
         } catch (e: Exception) {
             Log.i("MainViewModel", e.toString())
-            return if (time) "HH-mm a" else "dd/MM/yyyy"
+            return if (time) "HH-mm" else "dd/MM/yyyy"
         }
     }
 
@@ -821,9 +826,133 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun getAgencyInfo(
+    ){
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                datastore.getToken().collect { token ->
+                    _uiState.value = UiState.Loading
+                    val authHeader = "Bearer $token"
+                    val response = api.getAgencyInfo(authHeader)
+                    _selectedAgency.value = AgencyDataModel(
+                        id = response.agency.id,
+                        name = response.agency.name,
+                        desc = response.agency.description,
+                        email = response.agency.email,
+                        dui = response.agency.dui,
+                        image = response.agency.image,
+                        number = response.agency.number,
+                        instagram = response.agency.instagram,
+                        facebook = response.agency.facebook,
+                        postList =  response.posts.map { post ->
+                            PostDataModel(
+                                id = post.id,
+                                title = post.title,
+                                image = post.image,
+                                date = isoDateFormat(post.date),
+                                price = post.price,
+                                agencyId = post.agency.id,
+                                agency = post.agency.name,
+                                phone = post.agency.number,
+                                description = post.description,
+                                meeting = post.meeting,
+                                itinerary = post.itinerary.map { it ->
+                                    Itinerary(
+                                        it.time,
+                                        it.event
+                                    )
+                                }
+                                    .toMutableList(),
+                                includes = post.includes,
+                                category = post.category,
+                                position = Position(post.lat, post.long))
+                        }.toMutableList()
+                    )
+                    _uiState.value = UiState.Success("Info retrieved correctly")
+                }
+            } catch (e: Exception) {
+                Log.i("ViewModel", e.toString())
+                _uiState.value = UiState.Error("Error patching reported agency")
+            }
+        }
+    }
 
+    fun setSelectedAgency(agency: AgencyDataModel){
+        _selectedAgency.value=agency
+    }
 
+    fun savedPostEdit (post: PostDataModel){
+        _postEdit.value = post
+    }
 
+    fun addIncludesPostEdit (){
+        _postEdit.value.includes.add("")
+    }
+
+    fun addItineraryPostEdit (){
+        _postEdit.value.itinerary.add(Itinerary("00:00", ""))
+    }
+
+    fun editOwnAgency(
+        context : Context,
+        agency : AgencyApi
+    ){
+        Log.i("ViewModel", agency.toString())
+        Log.i("ViewModel", agency.image.toString())
+
+        val thisimage = agency.image?.let {
+            createFilePart(
+                "image",
+                it,
+                contentResolver = context.contentResolver
+            )
+        }
+        Log.d("ViewModel", thisimage.toString())
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try{
+                datastore.getToken().collect { token ->
+                    _uiState.value = UiState.Loading
+                    val authHeader = "Bearer $token"
+                    Log.i("ViewModel", "Starting registration")
+
+                    val response = api.EditAgency(
+                        authHeader = authHeader,
+                        name = createPartFromString(agency.name),
+                        description = createPartFromString(agency.description),
+                        dui = createPartFromString(agency.dui),
+                        email = createPartFromString(agency.email),
+                        facebook = createPartFromString(agency.facebook),
+                        instagram = createPartFromString(agency.instagram),
+                        number = createPartFromString(agency.number),
+                        image = thisimage,
+                        password = createPartFromString("123")
+                    )
+                    Log.d("ViewModel", response.toString())
+                    _uiState.value = UiState.Success(response.result)
+                }
+            }catch(e : Exception){
+                Log.i("ViewModel", e.toString())
+                _uiState.value = UiState.Error("Error registering agency")
+            }
+        }
+    }
+
+    fun deleteAgencyPost(postId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                datastore.getToken().collect { token ->
+                    _uiState.value = UiState.Loading
+                    val authHeader = "Bearer $token"
+                    api.deletePostAgency(authHeader, postId)
+                    _uiState.value = UiState.Success("Post deleted successfully")
+                }
+            } catch (e: Exception) {
+                Log.i("ViewModel", e.toString())
+                _uiState.value = UiState.Error("Error deleting the post")
+            }
+        }
+    }
 
 
 
