@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -35,11 +36,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -80,6 +84,7 @@ fun PostCardHorizontal(post: PostDataModel, onClick: () -> Unit, save: Boolean =
     val desc = stringResource(id = R.string.close_tour)
     val notification = notifications.value.contains(notificationId)
     val context = LocalContext.current
+    var showDeleteDialog by remember { mutableStateOf(false) }
     Log.i("MainViewModel notifications", notifications.toString() + "  " + notificationId.toString() + post.id.subSequence(0, 3))
     val notificationEnabled = remember {
         mutableStateOf(notification)
@@ -90,13 +95,13 @@ fun PostCardHorizontal(post: PostDataModel, onClick: () -> Unit, save: Boolean =
     }
 
     val radioOptions = listOf(
-        stringResource(R.string.one_day_before), stringResource(R.string.two_day_before), stringResource(
-            R.string.three_day_before)
+        stringResource(R.string.one_day_before),
+        stringResource(R.string.two_day_before),
+        stringResource(R.string.three_day_before)
     )
     val selectedOption = remember {
         mutableStateOf(radioOptions[0])
     }
-
     when(dialogNotificationOpen.value){
         true -> {
             Dialog(onDismissRequest = { dialogNotificationOpen.value = false}) {
@@ -219,6 +224,26 @@ fun PostCardHorizontal(post: PostDataModel, onClick: () -> Unit, save: Boolean =
         false -> dialogNotificationOpen.value = false
     }
 
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Confirmar eliminación") },
+            text = { Text("¿Estás seguro de que quieres eliminar este post?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    onDelete(post.id)
+                    showDeleteDialog = false
+                }) {
+                    Text("Sí")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("No")
+                }
+            }
+        )
+    }
     Card(
         modifier = Modifier
             .clickable { onClick() }
@@ -232,10 +257,14 @@ fun PostCardHorizontal(post: PostDataModel, onClick: () -> Unit, save: Boolean =
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            AsyncImage(model = post.image, contentDescription = post.title, modifier = Modifier
-                .aspectRatio(1f)
-                .clip(RoundedCornerShape(12.dp)),
-                contentScale = ContentScale.Crop)
+            AsyncImage(
+                model = post.image,
+                contentDescription = post.title,
+                modifier = Modifier
+                    .aspectRatio(1f)
+                    .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Crop
+            )
             if (save){
                 Column(
                     modifier = Modifier
@@ -246,13 +275,28 @@ fun PostCardHorizontal(post: PostDataModel, onClick: () -> Unit, save: Boolean =
                 ) {
                     Box(modifier = Modifier.fillMaxWidth()){
                         Column {
-                            Text(text = post.title, color = TextGray, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp), fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                            Text(text = (post.date + " - $" + "%.2f".format(post.price)), modifier = Modifier.padding(10.dp, 0.dp), fontSize = 12.sp, color = NavGray)
+                            Text(
+                                text = post.title,
+                                color = TextGray,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(10.dp),
+                                fontSize = 15.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                text = (post.date + " - $" + "%.2f".format(post.price)),
+                                modifier = Modifier.padding(10.dp, 0.dp),
+                                fontSize = 12.sp,
+                                color = NavGray
+                            )
                         }
                     }
-                    Icon(tint = Color.Black,
-                        imageVector = if (notificationEnabled.value) Icons.Default.Notifications else Icons.Outlined.Notifications, contentDescription = "Notification", modifier = Modifier.clickable {
-
+                    Icon(
+                        tint = Color.Black,
+                        imageVector = if (notificationEnabled.value) Icons.Default.Notifications else Icons.Outlined.Notifications,
+                        contentDescription = "Notification",
+                        modifier = Modifier.clickable {
                             if (notificationEnabled.value){
                                 dialogNotificationOpen.value = false
                                 notificationEnabled.value = false
@@ -260,7 +304,8 @@ fun PostCardHorizontal(post: PostDataModel, onClick: () -> Unit, save: Boolean =
                                 notificationManager.cancel(notificationId)
                                 mainViewModel.removeNotif(notificationId.toString())
                             } else dialogNotificationOpen.value = true
-                    })
+                        }
+                    )
                 }
             } else {
                 if (edit){
@@ -313,13 +358,12 @@ fun PostCardHorizontal(post: PostDataModel, onClick: () -> Unit, save: Boolean =
                                 Text(text = post.title, color = TextGray, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp), fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 Text(text = (post.date + " - $" + "%.2f".format(post.price)), modifier = Modifier.padding(10.dp, 0.dp), fontSize = 12.sp, color = NavGray)
                             }
+
                         }
                     }
                 }
 
             }
-
         }
-
     }
 }
