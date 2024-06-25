@@ -19,6 +19,7 @@ import com.coderunners.heytripsv.ui.screen.CategoryScreen
 import com.coderunners.heytripsv.ui.screen.EditAgencyScreen
 import com.coderunners.heytripsv.ui.screen.ChangePass
 import com.coderunners.heytripsv.ui.screen.ConfirmCode
+import com.coderunners.heytripsv.ui.screen.EditPostScreen
 import com.coderunners.heytripsv.ui.screen.ForgotPassword
 import com.coderunners.heytripsv.ui.screen.MainScreen
 import com.coderunners.heytripsv.ui.screen.PostViewScreen
@@ -91,13 +92,8 @@ fun NavBarGraph(
             RegisterAgency(navController = navController, mainViewModel)
         }
 
-        /*TODO: Estas pantallas ya no usan el navbar de la vista pública
-        *  Crear nueva lista para los navbaritem de la lista de admin
-        *  Y agencia no usa navbar (Quitar los innerpadding como parámetros
-        *   e implementar el topAppBar para regresar, un ejemplo está en la pantalla de Login)
-        * */
         composable(ScreenRoute.EditAgency.route){
-            EditAgencyScreen(mainViewModel = mainViewModel, innerPadding = innerPadding)
+            EditAgencyScreen(mainViewModel = mainViewModel, innerPadding = innerPadding, navController = navController)
         }
         composable(ScreenRoute.userProfile.route){
             UserProfile(innerPadding = innerPadding, navController = navController, mainViewModel)
@@ -107,6 +103,9 @@ fun NavBarGraph(
         }
         composable(ScreenRoute.ReportedPost.route){
             ReportedScreen(navController = navController, mainViewModel = mainViewModel,currentRoute = currentRoute)
+        }
+        composable(ScreenRoute.EditPost.route){
+            EditPostScreen(mainViewModel = mainViewModel, innerPadding = innerPadding, navController = navController)
         }
     }
 }

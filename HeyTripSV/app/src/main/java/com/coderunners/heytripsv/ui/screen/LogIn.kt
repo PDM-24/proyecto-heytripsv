@@ -113,8 +113,8 @@ fun LogIn( navController: NavController, mainViewModel: MainViewModel) {
             mainViewModel.setStateToReady()
 
             if (userRole.value == "agency"){
-                //TODO: PANTALLA INICIAL AGENCY
-                navController.navigate(ScreenRoute.addPost.route)
+                mainViewModel.getAgencyInfo()
+                navController.navigate(ScreenRoute.Agency.route)
             }else if(userRole.value == "admin"){
                 navController.navigate(ScreenRoute.Home.route)
             } else {

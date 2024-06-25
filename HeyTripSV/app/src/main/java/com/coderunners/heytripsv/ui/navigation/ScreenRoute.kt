@@ -25,4 +25,6 @@ sealed class ScreenRoute (var route: String) {
     object RegisterAgency : ScreenRoute("registerAgency")
     object ReportedPost : ScreenRoute("ReportedPost")
 
+    object EditPost : ScreenRoute("EditPost")
+
 }

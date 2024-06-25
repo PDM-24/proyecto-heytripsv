@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -31,22 +32,28 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.R
+import com.coderunners.heytripsv.data.remote.api.AgencyApi
 import com.coderunners.heytripsv.ui.components.PhotoSelectorView
 import com.coderunners.heytripsv.ui.navigation.ScreenRoute
 import com.coderunners.heytripsv.ui.theme.AddGreen
 import com.coderunners.heytripsv.ui.theme.MainGreen
 import com.coderunners.heytripsv.ui.theme.TextGray
+import com.coderunners.heytripsv.utils.createFilePart
 
 @Composable
 fun EditAgencyScreen(
     mainViewModel: MainViewModel,
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
+    navController: NavController
 ) {
 
+    val context = LocalContext.current
     val selectedImage= remember { mutableStateOf<Uri?>(null) }
-    val agency = mainViewModel.ownAgency.collectAsState()
+    val agency = mainViewModel.selectedAgency.collectAsState()
+    val numberValue = remember { mutableStateOf(agency.value.number.toString()) }
 
     Column(
         modifier = Modifier
@@ -75,7 +82,7 @@ fun EditAgencyScreen(
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = agency.value.name,
-            onValueChange = {mainViewModel.setOwnAgency(agency.value.copy(name = it))},
+            onValueChange = {mainViewModel.setSelectedAgency(agency.value.copy(name = it))},
             placeholder = { Text("") },
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -90,7 +97,7 @@ fun EditAgencyScreen(
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = agency.value.email,
-            onValueChange = {mainViewModel.setOwnAgency(agency.value.copy(email = it))},
+            onValueChange = {mainViewModel.setSelectedAgency(agency.value.copy(email = it))},
             placeholder = { Text("") },
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -105,7 +112,7 @@ fun EditAgencyScreen(
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = agency.value.dui,
-            onValueChange = {mainViewModel.setOwnAgency(agency.value.copy(dui = it))},
+            onValueChange = {mainViewModel.setSelectedAgency(agency.value.copy(dui = it))},
             placeholder = { Text("") },
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -119,8 +126,10 @@ fun EditAgencyScreen(
         )
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth(0.8f),
             value = agency.value.desc,
-            onValueChange = {mainViewModel.setOwnAgency(agency.value.copy(desc = it))},
+            onValueChange = {mainViewModel.setSelectedAgency(agency.value.copy(desc = it))},
             placeholder = { Text("") },
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -135,7 +144,7 @@ fun EditAgencyScreen(
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = agency.value.number,
-            onValueChange = {mainViewModel.setOwnAgency(agency.value.copy(number = it))},
+            onValueChange = {mainViewModel.setSelectedAgency(agency.value.copy(number = it))},
             placeholder = { Text("") },
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -150,7 +159,7 @@ fun EditAgencyScreen(
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = agency.value.instagram,
-            onValueChange = {mainViewModel.setOwnAgency(agency.value.copy(instagram = it))},
+            onValueChange = {mainViewModel.setSelectedAgency(agency.value.copy(instagram = it))},
             placeholder = { Text("") },
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -165,7 +174,7 @@ fun EditAgencyScreen(
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = agency.value.instagram,
-            onValueChange = {mainViewModel.setOwnAgency(agency.value.copy(facebook = it))},
+            onValueChange = {mainViewModel.setSelectedAgency(agency.value.copy(facebook = it))},
             placeholder = { Text("") },
         )
         Spacer(modifier = Modifier.height(10.dp))
@@ -188,7 +197,22 @@ fun EditAgencyScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Button(
-                onClick = {},
+                onClick = {
+                          mainViewModel.editOwnAgency(
+                              context ,
+                              AgencyApi(
+                                  name = agency.value.name,
+                                  email = agency.value.email,
+                                  dui = agency.value.dui,
+                                  description = agency.value.desc,
+                                  number=numberValue.value,
+                                  instagram = agency.value.instagram,
+                                  facebook = agency.value.facebook,
+                                  image = selectedImage.value
+                              )
+                          )
+                    navController.navigate(ScreenRoute.Agency.route)
+                },
                 modifier = Modifier
                     .fillMaxWidth(0.5f)
                     .padding(horizontal = 16.dp),
