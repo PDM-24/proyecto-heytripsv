@@ -9,13 +9,14 @@ const controller = {}
 controller.findUpcoming = async (req, res, next) => {
     try {
         const { pagination, limit, offset } = req.query;
-        const posts = await Post.find({ date: { $gt: Date.now() } }, undefined, {
+        const _date = new Date()
+        const posts = await Post.find({ date: { $gt: _date }}, undefined, {
             sort: [{ date: 1 }],
             limit: pagination ? limit : undefined,
             skip: pagination ? offset : undefined
         }).populate("agency", "name number");
 
-        return res.status(200).json({ posts, count: pagination ? await Post.countDocuments({ date: { $gt: Date.now() } }) : undefined });
+        return res.status(200).json({ posts, count: pagination ? await Post.countDocuments({ date: { $gt: _date } }) : undefined });
 
     } catch (error) {
         next(error)
@@ -26,15 +27,15 @@ controller.findRecent = async (req, res, next) => {
     try {
           
         const { pagination, limit, offset } = req.query;
-        const date = new Date();
-        const posts = await Post.find({ date: { $gt: new Date() } }, undefined, {
+        const _date = new Date()
+        const posts = await Post.find({ date: { $gt: _date } }, undefined, {
             sort: [{ createdAt: -1 }],
             limit: pagination ? limit : undefined,
             skip: pagination ? offset : undefined
         }).populate("agency", "name number");
 
         console.log(posts);
-        return res.status(200).json({ posts, count: pagination ? await Post.countDocuments({ date: { $gt: Date.now() } }) : undefined });
+        return res.status(200).json({ posts, count: pagination ? await Post.countDocuments({ date: { $gt: _date } }) : undefined });
 
     } catch (error) {
         next(error)
