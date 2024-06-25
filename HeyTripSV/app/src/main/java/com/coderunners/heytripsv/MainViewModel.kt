@@ -168,6 +168,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 getRecentList()
                 _uiState.value = UiState.Success("Posts retrieved correctly")
             } catch (e: Exception) {
+                Log.i("ViewModel", e.toString())
                 _uiState.value = UiState.Error("Error retrieving posts")
             }
         }
@@ -178,8 +179,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return withContext(Dispatchers.IO) {
             var apiPostList = PostListResponse()
             try {
-                _uiState.value = UiState.Loading
+                //_uiState.value = UiState.Loading
                 apiPostList = api.getUpcoming()
+                Log.i("postlist recent api", apiPostList.posts.toString())
                 _upcomingPosts.value = mutableListOf<PostDataModel>()
                 for (post in apiPostList.posts) {
                     _upcomingPosts.value.add(
@@ -213,7 +215,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 Log.i("MainViewModel", "Posts retrieved correctly")
 
             } catch (e: Exception) {
-                Log.i("MainViewModel", e.toString())
+                Log.i("MainViewModel get upcoming", e.toString())
                 _uiState.value = UiState.Error("There was an error connecting to the database")
             }
         }
@@ -226,6 +228,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 //_uiState.value = UiState.Loading
                 apiPostList = api.getRecent()
+                Log.i("postlist recent api", apiPostList.posts.toString())
                 _recentPosts.value = mutableListOf<PostDataModel>()
                 for (post in apiPostList.posts) {
                     _recentPosts.value.add(
@@ -259,7 +262,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 Log.i("MainViewModel", "Posts retrieved correctly")
 
             } catch (e: Exception) {
-                Log.i("MainViewModel", e.toString())
+                Log.i("MainViewModel get recent", e.toString())
                 _uiState.value = UiState.Error("There was an error connecting to the database")
             }
         }

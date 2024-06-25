@@ -1,5 +1,6 @@
 package com.coderunners.heytripsv.ui.screen
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -94,6 +95,9 @@ fun MainScreen(
 
     LaunchedEffect(Unit) {
         mainViewModel.getHomePostList()
+        Log.i("postlist upcoming", upcomingList.value.toString())
+        Log.i("postlist recent", recentList.value.toString())
+
     }
 
     Scaffold(
