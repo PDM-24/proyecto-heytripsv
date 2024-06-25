@@ -86,10 +86,10 @@ fun SliderAdvancedExample(onChangeSlider: (Float) -> Unit) {
                 activeTrackColor = MaterialTheme.colorScheme.secondary,
                 inactiveTrackColor = MaterialTheme.colorScheme.secondaryContainer,
             ),
-            steps = 3,
+            steps = 99,
             valueRange = 0f..100f
         )
-        Text(text = sliderPosition.toString())
+        Text(text = String.format("%.0f", sliderPosition.toDouble()))
     }
 }
 

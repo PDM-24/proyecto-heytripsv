@@ -1,4 +1,5 @@
 const Mongoose = require("mongoose")
+const Post = require('./Post.model')
 const crypto = require("crypto");
 const Schema = Mongoose.Schema;
 
@@ -117,5 +118,9 @@ agencySchema
     .set(function(code = crypto.randomBytes(16).toString()){
         this.hashedCode = this.encryptPassword(code);
     });
+
+agencySchema.pre('delete', (next)=> {
+
+})
 
 module.exports = Mongoose.model("Agency", agencySchema)
