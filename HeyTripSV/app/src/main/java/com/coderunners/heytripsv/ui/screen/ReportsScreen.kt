@@ -114,7 +114,9 @@ fun ReportedScreen(
                                     )
                                     ReportedPost(
                                         item = reportedItem,
-                                        onDelete = { mainViewModel.patchReportedPost(apiModel.id ?: "") }
+                                        onDelete = { mainViewModel.patchReportedPost(apiModel.id ?: "") },
+                                        navController = navController,
+                                        mainViewModel = mainViewModel
                                     )
                                 }
                             }
@@ -136,7 +138,9 @@ fun ReportedScreen(
                                     )
                                     ReportedAgency(
                                         account = agency,
-                                        onDelete = { mainViewModel.patchReportedAgency(reportedAgency.id ?: "") }
+                                        onDelete = { mainViewModel.patchReportedAgency(reportedAgency.id ?: "") },
+                                        navController = navController,
+                                        mainViewModel = mainViewModel
                                     )
                                 }
                             }
@@ -172,7 +176,9 @@ fun ToggleButton(
 @Composable
 fun ReportedPost(
     item: ReportedPost,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    navController: NavController,
+    mainViewModel: MainViewModel
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
@@ -180,6 +186,10 @@ fun ReportedPost(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
+            .clickable {
+                mainViewModel.selectedPost
+                navController.navigate("PostViewScreen")
+            }
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -255,7 +265,9 @@ fun ReportedPost(
 @Composable
 fun ReportedAgency(
     account: ReportedAgencyData,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    mainViewModel: MainViewModel,
+    navController: NavController
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
@@ -263,6 +275,11 @@ fun ReportedAgency(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
+            .clickable{
+                mainViewModel.selectedAgency
+                navController.navigate("agency")
+            }
+
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
