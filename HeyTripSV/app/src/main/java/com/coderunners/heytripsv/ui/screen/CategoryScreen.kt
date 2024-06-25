@@ -44,9 +44,11 @@ fun CategoryScreen(
 ) {
     val selectedCategory = mainViewModel.selectedCategory.collectAsState()
     val categoryList = mainViewModel.categoryList.collectAsState()
+    val userRole = mainViewModel.userRole.collectAsState()
     var expanded by remember {
         mutableStateOf(false)
     }
+    var localCategoryList by remember { mutableStateOf(categoryList.value) }
 
     val navItems = navBarItemList(mainViewModel)
     var filtros = arrayOf(stringResource(id = R.string.closest), stringResource(id = R.string.recent))
@@ -125,13 +127,21 @@ fun CategoryScreen(
                     }
                 }
             }
-            items(categoryList.value) {
-                PostCardHorizontal(post = it, onClick = {
-                    mainViewModel.saveSelectedPost(it)
-                    onClick()
-                }, mainViewModel = mainViewModel)
+            items(localCategoryList) { post ->
+                PostCardHorizontal(
+                    post = post,
+                    onClick = {
+                        mainViewModel.saveSelectedPost(post)
+                        onClick()
+                    },
+                    mainViewModel = mainViewModel,
+                    isAdmin = userRole.value == "admin",
+                    onDelete = { postId ->
+                        mainViewModel.deletePost(postId)
+                        localCategoryList = localCategoryList.filter { it.id != postId }.toMutableList()
+                    }
+                )
             }
-
         }
     }
 }
