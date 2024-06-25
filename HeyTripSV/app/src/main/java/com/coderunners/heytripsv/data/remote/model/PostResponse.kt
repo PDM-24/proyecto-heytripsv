@@ -35,6 +35,8 @@ data class PostApi(
     val image: String = "",
     @SerializedName(value = "itinerary")
     val itinerary: MutableList<ItineraryApi> = mutableListOf(),
+    @SerializedName(value = "reports")
+    val reports: MutableList<ReportsApi> = mutableListOf(),
     @SerializedName(value = "agency")
     val agency: AgencyPostApi = AgencyPostApi()
 
@@ -54,6 +56,15 @@ data class AgencyPostApi(
     val name: String = "",
     @SerializedName(value = "number")
     val number: String = "",
+)
+
+data class ReportsApi(
+    @SerializedName(value = "_id")
+    val id: String = "",
+    @SerializedName(value = "user")
+    val user: String = "",
+    @SerializedName(value = "content")
+    val content: String = "",
 )
 
 data class savedPosts(

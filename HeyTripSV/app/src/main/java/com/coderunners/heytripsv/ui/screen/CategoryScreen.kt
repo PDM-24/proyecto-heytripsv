@@ -22,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -76,71 +77,104 @@ fun CategoryScreen(
                 .padding(innerPadding)
                 .fillMaxWidth()
         ) {
-            item {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = selectedCategory.value,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp),
-                        textAlign = TextAlign.Center,
-                        fontSize = 20.sp
-                    )
-                    Row(modifier = Modifier.padding(10.dp, 10.dp, 10.dp, 20.dp)) {
+            if (categoryList.value.size == 0){
+                item {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.Center
+                    ) {
                         Text(
-                            text = stringResource(id = R.string.sort_by) + ":",
+                            text = selectedCategory.value,
                             modifier = Modifier
-                                .wrapContentHeight()
-                                .padding(10.dp)
+                                .fillMaxWidth()
+                                .padding(20.dp),
+                            textAlign = TextAlign.Center,
+                            fontSize = 20.sp
                         )
-                        ExposedDropdownMenuBox(
-                            expanded = expanded,
-                            onExpandedChange = {
-                                expanded = !expanded
-                            }
-                        ) {
-                            TextField(
-                                value = selectedText,
-                                onValueChange = {},
-                                readOnly = true,
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                                modifier = Modifier.menuAnchor()
+                    }
+                }
+                item {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ){
+                        Text(
+                            text = stringResource(id = R.string.no_posts),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(15.dp),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }else{
+                item {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = selectedCategory.value,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(20.dp),
+                            textAlign = TextAlign.Center,
+                            fontSize = 20.sp
+                        )
+                        Row(modifier = Modifier.padding(10.dp, 10.dp, 10.dp, 20.dp)) {
+                            Text(
+                                text = stringResource(id = R.string.sort_by) + ":",
+                                modifier = Modifier
+                                    .wrapContentHeight()
+                                    .padding(10.dp)
                             )
-                            ExposedDropdownMenu(
+                            ExposedDropdownMenuBox(
                                 expanded = expanded,
-                                onDismissRequest = { expanded = false }
+                                onExpandedChange = {
+                                    expanded = !expanded
+                                }
                             ) {
-                                filtros.forEach { item ->
-                                    DropdownMenuItem(
-                                        text = { Text(text = item) },
-                                        onClick = {
-                                            selectedText = item
-                                            expanded = false
-                                        }
-                                    )
+                                TextField(
+                                    value = selectedText,
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                                    modifier = Modifier.menuAnchor()
+                                )
+                                ExposedDropdownMenu(
+                                    expanded = expanded,
+                                    onDismissRequest = { expanded = false }
+                                ) {
+                                    filtros.forEach { item ->
+                                        DropdownMenuItem(
+                                            text = { Text(text = item) },
+                                            onClick = {
+                                                selectedText = item
+                                                expanded = false
+                                            }
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-            items(localCategoryList) { post ->
-                PostCardHorizontal(
-                    post = post,
-                    onClick = {
-                        mainViewModel.saveSelectedPost(post)
-                        onClick()
-                    },
-                    mainViewModel = mainViewModel,
-                    isAdmin = userRole.value == "admin",
-                    onDelete = { postId ->
-                        mainViewModel.deletePost(postId)
-                        localCategoryList = localCategoryList.filter { it.id != postId }.toMutableList()
-                    }
-                )
+                items(localCategoryList) { post ->
+                    PostCardHorizontal(
+                        post = post,
+                        onClick = {
+                            mainViewModel.saveSelectedPost(post)
+                            onClick()
+                        },
+                        mainViewModel = mainViewModel,
+                        isAdmin = userRole.value == "admin",
+                        onDelete = { postId ->
+                            mainViewModel.deletePost(postId)
+                            localCategoryList = localCategoryList.filter { it.id != postId }.toMutableList()
+                        }
+                    )
+                }
             }
         }
     }

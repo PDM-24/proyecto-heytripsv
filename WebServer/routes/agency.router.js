@@ -13,6 +13,8 @@ router.get('/reported/', authentication, authorization, runValidation, agencyCon
 router.patch("/report/:id", authentication, validateId, reportValidator, runValidation, agencyController.reportAgency);
 //Eliminar reporte
 router.patch("/undo-report/:id", authentication, validateId, runValidation, agencyController.undoReport);
+//Eliminar reporte
+router.delete("/:id", authentication, validateId, runValidation, agencyController.deleteAgency);
 
 //Editar perfil
 router.post("/edit-profile/", authentication, checkRepeatedEmail, runValidation, agencyController.editOwn);

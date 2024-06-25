@@ -3,6 +3,22 @@ const User = require('../models/User.model')
 
 const controller = {}
 
+//Delete agency
+controller.deleteAgency = async(req, res, next) => {
+    try {
+        const {id} = req.params
+        const response = await Agency.deleteOne({_id: id})
+        if(response.deletedCount != 1){
+            return res.status(500).json({error: "There was an error deleting the post"})
+        }
+        const agencies = await Agency.find({ reports: { $exists: true, $not: { $size: 0 } } }, '_id email name dui description image instagram facebook reports').sort({ createdAt: -1 }).populate("reports.user", "name");
+        res.status(200).json(agencies)
+    } catch (error) {
+        console.log(error);
+        next(error)
+    }
+}
+
 //Obtener las agencias reportadas
 controller.findReported = async (req, res, next) => {
     try {

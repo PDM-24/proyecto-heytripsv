@@ -119,8 +119,13 @@ agencySchema
         this.hashedCode = this.encryptPassword(code);
     });
 
-agencySchema.pre('delete', (next)=> {
-
+agencySchema.pre('deleteOne', async (next) => {
+    try {
+        await Post.deleteMany({agency: this._id});
+        next();
+    } catch (error) {
+        next(error);
+    }
 })
 
 module.exports = Mongoose.model("Agency", agencySchema)
