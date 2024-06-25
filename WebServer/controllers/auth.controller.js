@@ -28,7 +28,7 @@ controller.registerUser = async (req, res, next) => {
 
         return res.status(200).json({ message: "User registered" })
     } catch (error) {
-        next(error)
+        next(error.message)
     }
 }
 
@@ -151,7 +151,7 @@ controller.login = async (req, res, next) => {
         //Verificar la contrasenia
         //Si no coincide, 401
         if (!user.comparePassword(password)) {
-            return res.status(401).json({ error: "Contraseña incorrecta" });
+            return res.status(401).json({ error: "Invalid Password" });
         }
 
         //Si coindice, logear

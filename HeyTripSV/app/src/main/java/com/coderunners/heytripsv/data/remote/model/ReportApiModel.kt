@@ -8,6 +8,11 @@ data class ApiReportResponse(
     val data: List<ReportApiModel> = listOf()
 )
 
+data class SendReportModel(
+    @SerializedName(value = "content")
+    val content: String = ""
+)
+
 data class ReportApiModel(
     @SerializedName(value = "_id")
     val id: String = "",

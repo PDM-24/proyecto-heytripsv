@@ -8,6 +8,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.coderunners.heytripsv.data.remote.api.AgencyApi
 import com.coderunners.heytripsv.data.remote.api.ApiClient
+import com.coderunners.heytripsv.data.remote.model.Agency
+import com.coderunners.heytripsv.data.remote.model.ApiError
 import com.coderunners.heytripsv.data.remote.model.ApiReportResponse
 import com.coderunners.heytripsv.data.remote.model.ChangePassBody
 import com.coderunners.heytripsv.data.remote.model.CompareCodeBody
@@ -18,7 +20,9 @@ import com.coderunners.heytripsv.data.remote.model.PostListResponse
 import com.coderunners.heytripsv.data.remote.model.Report
 import com.coderunners.heytripsv.data.remote.model.ReportApiModel
 import com.coderunners.heytripsv.data.remote.model.ReportedAgency
+import com.coderunners.heytripsv.data.remote.model.ReportsApi
 import com.coderunners.heytripsv.data.remote.model.SendCodeBody
+import com.coderunners.heytripsv.data.remote.model.SendReportModel
 import com.coderunners.heytripsv.data.remote.model.editOwnBody
 import com.coderunners.heytripsv.model.AgencyDataModel
 import com.coderunners.heytripsv.model.EmailAccount
@@ -33,12 +37,14 @@ import com.coderunners.heytripsv.utils.createFilePart
 import com.coderunners.heytripsv.utils.createItineraryParts
 import com.coderunners.heytripsv.utils.createPartFromList
 import com.coderunners.heytripsv.utils.createPartFromString
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.HttpException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -148,7 +154,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun saveSelectedCategory(category: String) {
         _selectedCategory.value = category
-        _categoryList.value = PostList.filter {
+        _categoryList.value = _upcomingPosts.value.filter {
             when (category) {
                 "Montañas", "Mountains" -> it.category == "Montañas"
                 "Beaches", "Playas" -> it.category == "Playas"
@@ -158,6 +164,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 else -> false
             }
         }.toMutableList()
+        Log.i("Category", _categoryList.value.toString())
     }
 
     fun setOwnAgency(agency: AgencyDataModel) {
@@ -440,8 +447,27 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
                 _uiState.value = UiState.Success("Logged in correctly")
             } catch (e: Exception) {
-                Log.i("ViewModel", e.toString())
-                _uiState.value = UiState.Error("Error Logging in")
+                when (e) {
+                    is HttpException -> {
+                        val errorBody = e.response()?.errorBody()?.string()
+                        errorBody?.let {
+                            try {
+                                val apiError = Gson().fromJson(it, ApiError::class.java)
+                                Log.i("login", apiError.error)
+                                _uiState.value = UiState.Error(apiError.error)
+                            } catch (jsonException: Exception) {
+                                _uiState.value = UiState.Error("Unknown error")
+                            }
+                        } ?: run {
+                            _uiState.value = UiState.Error("Unknown error")
+                        }
+                    }
+                    else -> {
+                        Log.i("MainViewModel", e.toString())
+                        _uiState.value = UiState.Error( "Error. Contacte con el servicio de soporte")
+
+                    }
+                }
             }
         }
     }
@@ -513,9 +539,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     _uiState.value = UiState.Loading
                     val authHeader = "Bearer $token"
                     val response = if (post){
-                        api.reportPost(authHeader, id, ReportApiModel(content))
+                        api.reportPost(authHeader, id, SendReportModel(content))
                     }else{
-                        api.reportAgency(authHeader, id, ReportApiModel(content))
+                        api.reportAgency(authHeader, id, SendReportModel(content))
                     }
                     _uiState.value = UiState.Success(response.result)
                 }
@@ -671,6 +697,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
                     }
                     _stateSaved.value = UiState.Success("Reported Posts retrieved correctly")
+                    Log.i("MainViewModel", _reportedPosts.value.toString())
                 }
             } catch (e: Exception) {
                 Log.i("MainViewModel", e.toString())
@@ -687,7 +714,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     _uiState.value = UiState.Loading
                     val authHeader = "Bearer $token"
                     val response = api.patchReportedPost(authHeader, id)
-                    _uiState.value = UiState.Success(response.result)
+                    _reportedPosts.value = response.toMutableList()
+                    _uiState.value = UiState.Success("Post patched")
                 }
             } catch (e: Exception) {
                 Log.i("ViewModel", e.toString())
@@ -784,7 +812,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     }
 
-
+    fun deleteAgency(id: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            try{
+                datastore.getToken().collect() {token ->
+                    val authHeader = "Bearer $token"
+                    val response = api.deleteAgency(authHeader, id)
+                    _reportedAgencies.value = response.toMutableList()
+                    Log.d("MainViewModel", "response")
+                }
+            }catch (e : Exception){
+                Log.e("MainViewModel", "Error identificando usuario: ${e.message}")
+            }
+        }
+    }
     fun registerAgency(
         context : Context,
         agency : AgencyApi

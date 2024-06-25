@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 object Constants {
     //api service
-    const val BASE_URL = "http://192.168.0.21:3000"
+    const val BASE_URL = "https://heytripsvapi.vercel.app/"
     const val API_PATH ="/api"
 
     //Obtener post Home
@@ -13,6 +13,7 @@ object Constants {
 
     //Obtener post por agencia
     const val  GET_AGENCY = "/post/agency/"
+    const val DELETE_AGENCY = "/agency/"
 
     //Obtener post reportados
     const val   GET_REPORTED_POST= "/post/reported/"

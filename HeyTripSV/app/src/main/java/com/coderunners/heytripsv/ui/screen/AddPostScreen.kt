@@ -469,12 +469,11 @@ fun AddPostScreen(
                                 }
                             }
 
-                            Log.i("MainViewModel", times.toString())
-//                            mainViewModel.addPost(
-//                                context,
-//                                post.value.copy(itinerary = post.value.itinerary.map { it-> Itinerary(
-//                                timeToIso(it.time), it.event) }.toMutableList()),
-//                                selectedImage.value)
+                            mainViewModel.addPost(
+                                context,
+                                post.value.copy(itinerary = post.value.itinerary.map { it-> Itinerary(
+                                it.time, it.event) }.toMutableList()),
+                                selectedImage.value)
                         },
                         modifier = Modifier
                             .fillMaxWidth(0.5f)

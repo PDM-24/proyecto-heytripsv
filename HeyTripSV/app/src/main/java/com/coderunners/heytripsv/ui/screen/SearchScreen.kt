@@ -181,13 +181,30 @@ fun SearchScreen(currentRoute: String?,mainViewModel: MainViewModel, navControll
                     onValueChange = {
                         newText ->
                         search.value = newText
-                        searchPosts.value = searchPosts.value.filter { post->
-                            post.title.uppercase().trim() == newText.uppercase().trim() ||
-                                    post.agency.uppercase().trim() == newText.uppercase().trim()
-                                    || post.category.uppercase().trim() == newText.uppercase().trim()
-                                    || post.description.uppercase().trim() == newText.uppercase().trim()
-                        }.toMutableList()
-                                    },
+                        if (selectedText== filtros[0]){
+                            searchPosts.value = upcomingPosts.value.filter { post ->
+                                post.title.uppercase().trim()
+                                    .contains(newText.uppercase().trim()) ||
+                                        post.agency.uppercase().trim()
+                                            .contains(newText.uppercase().trim())
+                                        || post.category.uppercase().trim()
+                                    .contains(newText.uppercase().trim())
+                                        || post.description.uppercase().trim()
+                                    .contains(newText.uppercase().trim())
+                            }.toMutableList()
+                        }else if(selectedText == filtros[1]){
+                            searchPosts.value = recentPosts.value.filter { post ->
+                                post.title.uppercase().trim()
+                                    .contains(newText.uppercase().trim()) ||
+                                        post.agency.uppercase().trim()
+                                            .contains(newText.uppercase().trim())
+                                        || post.category.uppercase().trim()
+                                    .contains(newText.uppercase().trim())
+                                        || post.description.uppercase().trim()
+                                    .contains(newText.uppercase().trim())
+                            }.toMutableList()
+                        }
+                    },
                     placeholder = { Text("Search...") },
                     leadingIcon = {
                         Icon(

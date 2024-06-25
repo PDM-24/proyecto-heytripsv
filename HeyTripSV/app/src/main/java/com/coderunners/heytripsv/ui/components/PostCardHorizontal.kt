@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Notifications
@@ -68,6 +69,7 @@ import com.coderunners.heytripsv.MainViewModel
 import com.coderunners.heytripsv.R
 import com.coderunners.heytripsv.model.PostDataModel
 import com.coderunners.heytripsv.ui.navigation.ScreenRoute
+import com.coderunners.heytripsv.ui.theme.AddGreen
 import com.coderunners.heytripsv.ui.theme.MainGreen
 import com.coderunners.heytripsv.ui.theme.NavGray
 import com.coderunners.heytripsv.ui.theme.TextGray
@@ -357,6 +359,29 @@ fun PostCardHorizontal(post: PostDataModel, onClick: () -> Unit, save: Boolean =
                             Column {
                                 Text(text = post.title, color = TextGray, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp), fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 Text(text = (post.date + " - $" + "%.2f".format(post.price)), modifier = Modifier.padding(10.dp, 0.dp), fontSize = 12.sp, color = NavGray)
+                            }
+
+                    if (isAdmin) {
+                        Box(modifier = Modifier.padding(10.dp)){
+                            Row {
+                                IconButton(
+                                    onClick = { onDelete(post.id) },
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .background(AddGreen, RoundedCornerShape(4.dp))
+                                        .aspectRatio(1f),
+                                ) {
+                                    Icon(Icons.Filled.Check, contentDescription = "Aprove", tint = Color.White)
+                                }
+                                IconButton(
+                                    onClick = { showDeleteDialog = true },
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .background(AddGreen, RoundedCornerShape(4.dp))
+                                        .aspectRatio(1f),
+                                ) {
+                                    Icon(Icons.Filled.Delete, contentDescription = "Delete", tint = Color.White)
+                                }
                             }
 
                         }

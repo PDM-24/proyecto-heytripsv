@@ -67,7 +67,6 @@ fun AboutUsScreen(currentRoute:String?, navController: NavController, mainViewMo
             Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = stringResource(R.string.about_us),
-                color = TextGray,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
                 fontWeight = FontWeight.Bold
@@ -77,7 +76,6 @@ fun AboutUsScreen(currentRoute:String?, navController: NavController, mainViewMo
             Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = stringResource(R.string.text_about),
-                color = TextGray,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -88,7 +86,6 @@ fun AboutUsScreen(currentRoute:String?, navController: NavController, mainViewMo
             Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = stringResource(R.string.support_us),
-                color = TextGray,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
                 fontWeight = FontWeight.Bold
@@ -96,7 +93,6 @@ fun AboutUsScreen(currentRoute:String?, navController: NavController, mainViewMo
             Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = stringResource(R.string.text_support),
-                color = TextGray,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()

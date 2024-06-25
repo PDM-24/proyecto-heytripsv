@@ -14,6 +14,7 @@ import com.coderunners.heytripsv.data.remote.model.PostListResponse
 import com.coderunners.heytripsv.data.remote.model.ReportApiModel
 import com.coderunners.heytripsv.data.remote.model.ReportedAgency
 import com.coderunners.heytripsv.data.remote.model.SendCodeBody
+import com.coderunners.heytripsv.data.remote.model.SendReportModel
 import com.coderunners.heytripsv.data.remote.model.editOwnBody
 import com.coderunners.heytripsv.data.remote.model.savedPosts
 import com.coderunners.heytripsv.ui.navigation.ScreenRoute
@@ -99,7 +100,7 @@ interface ApiService {
     suspend fun reportPost(
         @Header("Authorization") authHeader: String,
         @Path("postId") postId: String,
-        @Body reportApiModel: ReportApiModel
+        @Body reportApiModel: SendReportModel
     ):APIResponseSuccesful
 
     @Headers(value = ["Content-Type: application/json"])
@@ -114,7 +115,7 @@ interface ApiService {
     suspend fun patchReportedPost(
         @Header("Authorization") authHeader: String,
         @Path("id") postId: String
-    ): APIResponseSuccesful
+    ): List<ReportApiModel>
 
     @Headers(value = ["Content-Type: application/json"])
     @GET(Constants.API_PATH + Constants.GET_REPORTED_AGENCY)
@@ -133,7 +134,7 @@ interface ApiService {
     suspend fun reportAgency(
         @Header("Authorization") authHeader: String,
         @Path("agencyId") agencyId: String,
-        @Body reportApiModel: ReportApiModel
+        @Body reportApiModel: SendReportModel
     ):APIResponseSuccesful
 
     @Headers(value = ["Content-Type: application/json"])
@@ -163,6 +164,11 @@ interface ApiService {
     ): Own
 
     @Headers(value = ["Content-Type: application/json"])
+    @DELETE(value = Constants.API_PATH + Constants.DELETE_AGENCY + "{id}")
+    suspend fun deleteAgency(
+        @Header("Authorization") authHeader: String,
+        @Path("id") postId: String
+    ): List<ReportedAgency>
     @GET(value = Constants.API_PATH + Constants.GET_INFO_AGENCY)
     suspend fun getAgencyInfo(@Header("Authorization") authHeader: String): AgencyResponse
 

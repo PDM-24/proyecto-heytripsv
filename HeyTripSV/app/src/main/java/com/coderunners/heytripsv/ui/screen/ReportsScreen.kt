@@ -1,5 +1,6 @@
 package com.coderunners.heytripsv.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -48,12 +50,9 @@ fun ReportedScreen(
     val reportedPostsState by mainViewModel.stateSaved.collectAsState()
     val reportedAgenciesState by mainViewModel.stateSaved.collectAsState()
 
-    LaunchedEffect(isPublicationsSelected) {
-        if (isPublicationsSelected) {
+    LaunchedEffect(Unit) {
             mainViewModel.getReportedPosts()
-        } else {
             mainViewModel.getReportedAgency()
-        }
     }
 
     Scaffold(
@@ -85,7 +84,6 @@ fun ReportedScreen(
                 modifier = Modifier
                     .padding(innerPadding)
                     .fillMaxSize()
-                    .background(Color.White)
             ) {
                 Row(
                     modifier = Modifier
@@ -106,18 +104,25 @@ fun ReportedScreen(
                             is UiState.Success -> LazyColumn(
                                 modifier = Modifier.padding(16.dp)
                             ) {
-                                items(reportedPosts) { apiModel ->
-                                    val reportedItem = ReportedPost(
-                                        title = apiModel.title,
-                                        content = apiModel.reports,
-                                        imageRes = apiModel.image
-                                    )
-                                    ReportedPost(
-                                        item = reportedItem,
-                                        onDelete = { mainViewModel.patchReportedPost(apiModel.id ?: "") },
-                                        navController = navController,
-                                        mainViewModel = mainViewModel
-                                    )
+                                if (reportedPosts.isEmpty()){
+                                    item{
+                                        Text(text = stringResource(id = R.string.no_posts))
+                                    }
+                                }else{
+                                    items(reportedPosts) { apiModel ->
+                                        val reportedItem = ReportedPost(
+                                            title = apiModel.title,
+                                            content = apiModel.reports,
+                                            imageRes = apiModel.image
+                                        )
+                                        ReportedPost(
+                                            item = reportedItem,
+                                            onDelete = { mainViewModel.patchReportedPost(apiModel.id ?: "") },
+                                            onDeletePost = {mainViewModel.deletePost(apiModel.id ?: "")},
+                                            navController = navController,
+                                            mainViewModel = mainViewModel
+                                        )
+                                    }
                                 }
                             }
                             else -> Unit
@@ -130,18 +135,25 @@ fun ReportedScreen(
                             is UiState.Success -> LazyColumn(
                                 modifier = Modifier.padding(16.dp)
                             ) {
-                                items(reportedAgencies) { reportedAgency ->
-                                    val agency = ReportedAgencyData(
-                                        username = reportedAgency.name,
-                                        report = reportedAgency.reports,
-                                        imageRes = reportedAgency.image
-                                    )
-                                    ReportedAgency(
-                                        account = agency,
-                                        onDelete = { mainViewModel.patchReportedAgency(reportedAgency.id ?: "") },
-                                        navController = navController,
-                                        mainViewModel = mainViewModel
-                                    )
+                                if (reportedAgencies.isEmpty()){
+                                    item{
+                                        Text(text = stringResource(id = R.string.no_posts))
+                                    }
+                                }else{
+                                    items(reportedAgencies) { reportedAgency ->
+                                        val agency = ReportedAgencyData(
+                                            username = reportedAgency.name,
+                                            report = reportedAgency.reports,
+                                            imageRes = reportedAgency.image
+                                        )
+                                        ReportedAgency(
+                                            account = agency,
+                                            onDelete = { mainViewModel.patchReportedAgency(reportedAgency.id ?: "") },
+                                            onDeleteAgency = {mainViewModel.deleteAgency(reportedAgency.id ?: "")},
+                                            navController = navController,
+                                            mainViewModel = mainViewModel
+                                        )
+                                    }
                                 }
                             }
                             else -> Unit
@@ -177,10 +189,12 @@ fun ToggleButton(
 fun ReportedPost(
     item: ReportedPost,
     onDelete: () -> Unit,
+    onDeletePost: () -> Unit,
     navController: NavController,
     mainViewModel: MainViewModel
 ) {
     var showDialog by remember { mutableStateOf(false) }
+    var showDialogDelete by remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier
@@ -223,7 +237,7 @@ fun ReportedPost(
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                         IconButton(
-                            onClick = { showDialog = true },
+                            onClick = { showDialogDelete = true },
                             modifier = Modifier
                                 .background(Color(0xFFCC0000), shape = RoundedCornerShape(4.dp))
                                 .size(32.dp)
@@ -234,6 +248,31 @@ fun ReportedPost(
                 }
             }
         }
+    }
+
+    if (showDialogDelete) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Eliminar publicación") },
+            text = { Text("¿Estás seguro de que deseas eliminar esta publicación?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onDeletePost()
+                        showDialog = false
+                    }
+                ) {
+                    Text("Sí")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { showDialog = false }
+                ) {
+                    Text("No")
+                }
+            }
+        )
     }
 
     if (showDialog) {
@@ -266,16 +305,18 @@ fun ReportedPost(
 fun ReportedAgency(
     account: ReportedAgencyData,
     onDelete: () -> Unit,
+    onDeleteAgency: () -> Unit,
     mainViewModel: MainViewModel,
     navController: NavController
 ) {
     var showDialog by remember { mutableStateOf(false) }
+    var showDialogDelete by remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .clickable{
+            .clickable {
                 mainViewModel.selectedAgency
                 navController.navigate("agency")
             }
@@ -303,7 +344,7 @@ fun ReportedAgency(
                     horizontalArrangement = Arrangement.End
                 ) {
                     IconButton(
-                        onClick = { showDialog = true },
+                        onClick = { showDialogDelete = true },
                         modifier = Modifier
                             .background(MainGreen, shape = RoundedCornerShape(4.dp))
                             .size(32.dp)
@@ -312,7 +353,7 @@ fun ReportedAgency(
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     IconButton(
-                        onClick = { showDialog = true },
+                        onClick = { showDialogDelete = true},
                         modifier = Modifier
                             .background(Color(0xFFCC0000), shape = RoundedCornerShape(4.dp))
                             .size(32.dp)
@@ -342,6 +383,30 @@ fun ReportedAgency(
             dismissButton = {
                 Button(
                     onClick = { showDialog = false }
+                ) {
+                    Text("No")
+                }
+            }
+        )
+    }
+    if (showDialogDelete) {
+        AlertDialog(
+            onDismissRequest = { showDialogDelete = false },
+            title = { Text("Eliminar agencia") },
+            text = { Text("¿Estás seguro de que deseas eliminar esta agencia?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onDeleteAgency()
+                        showDialogDelete = false
+                    }
+                ) {
+                    Text("Sí")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { showDialogDelete = false }
                 ) {
                     Text("No")
                 }
