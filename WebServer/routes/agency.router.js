@@ -1,5 +1,8 @@
-    const express = require('express');
+const express = require('express');
+const multer = require('multer'); 
 const router = express.Router();
+const storage = multer.memoryStorage(); // Store the file in memory
+const upload = multer({ storage: storage});
 const agencyController = require('../controllers/agency.controller')
 const { authentication, authorization, checkRepeatedEmail } = require("../middlewares/auth.middlewares");
 const { validateId, reportValidator } = require("../validators/post.validators")
@@ -17,6 +20,6 @@ router.patch("/undo-report/:id", authentication, validateId, runValidation, agen
 router.delete("/:id", authentication, validateId, runValidation, agencyController.deleteAgency);
 
 //Editar perfil
-router.post("/edit-profile/", authentication, checkRepeatedEmail, runValidation, agencyController.editOwn);
+router.post("/edit-profile/",upload.single("image"), authentication, checkRepeatedEmail, runValidation, agencyController.editOwn);
 
 module.exports = router;

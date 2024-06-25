@@ -43,6 +43,8 @@ object Constants {
     const val POST_FACEBOOK ="facebook"
     const val POST_IMAGE= "image"
     const val POST_PASSWORD ="password"
+    const val POST_EDIT_AGENCY = "/agency/edit-profile/"
+
 
     //Registrar usuario
     const val POST_REGISTER_USER = "/auth/register/user/"
